@@ -1,0 +1,37 @@
+# Local data and experiment state
+data/*
+!data/README.md
+!data/manifest.csv
+.runs/
+artifacts/
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Notebooks and editors
+.ipynb_checkpoints/
+.vscode/
+.idea/
+
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+
+# Platform files
+.DS_Store
+Thumbs.db
+desktop.ini

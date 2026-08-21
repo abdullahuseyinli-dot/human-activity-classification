@@ -1,0 +1,87 @@
+{
+  "runtime": {
+    "runner": "recover_experiment.py",
+    "runner_sha256": "4a314e4a6d45495add6bb842f63e8d576fb98159916d56829a9ed8ff455fb4d8",
+    "source_notebook": "pipeline_source.ipynb",
+    "source_notebook_sha256": "824b876417ef4a8ac4557ab9d3281826c4cb48b4aee32696c86996a19a235a83",
+    "manifest_sha256": "9014ba11dacb54a7f3df4211f66622b379a0ebe80d89377bf711dc6d42f64825",
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "torch": "2.11.0+cu126",
+    "torchvision": "0.26.0+cu126",
+    "device": "cuda"
+  },
+  "data_protocol": {
+    "protocol": "course_fixed_test_plus_internal_stratified_cv",
+    "selection_partition": "original train + validation",
+    "selection_rows": 242,
+    "final_test_partition": "original test",
+    "final_test_rows": 43,
+    "test_used_during_candidate_selection": false,
+    "test_image_ids_sha256": "30a3cd0c4ff957fa4d6b11fad92affad6f0cdfb8782130d4230621429e3381a4"
+  },
+  "final_execution": {
+    "status": "PREDECLARED_BEFORE_FINAL_TEST",
+    "seeds": [
+      42,
+      52,
+      62
+    ],
+    "cv_n_splits": 5,
+    "cv_split_seed": 42,
+    "cv_epochs": 24,
+    "cv_patience": 5,
+    "final_epoch_rule": "median_best_epoch",
+    "final_lr_schedule": "median_cv_fold_replay",
+    "selection_lock_sha256": "8e62414af4fc85e6d95a19dcf4391947e8cc48d163203511cc20cc516d3a7efc",
+    "final_runner": "finalize_experiment.py",
+    "final_runner_sha256": "1ee37ccb0601451fff6dc7c667bcf813e2eb04f0b88be6ba5dbd33e1ed2a0bdc",
+    "test_role": "opened only after every predeclared CV and full-pool run completes"
+  },
+  "selection_protocol_sha256": "075ca8fb0dcd63061b592fb8923cc0a9bb79f72e1ce6ba5eb9eef8ddb3767d2c",
+  "downstream_lock": {
+    "status": "LOCKED_FROM_OOF_BEFORE_DOWNSTREAM_TEST_EVALUATION",
+    "analysis_runner": "analyze_final.py",
+    "analysis_runner_sha256": "d51842dcb9e9eab9649c695ffb10b35aca092224aeaf0e405cadc1e54da4f3b1",
+    "test_used_for_selection": false,
+    "seed_ensemble": {
+      "convnext_small": [
+        42,
+        52,
+        62
+      ],
+      "dinov2_small": [
+        42,
+        52,
+        62
+      ]
+    },
+    "evaluation_policy": {
+      "convnext_small": "center_plus_horizontal_flip",
+      "dinov2_small": "center_crop"
+    },
+    "svm_selection": {
+      "convnext_small": {
+        "kernel": "rbf",
+        "C": 1.0,
+        "gamma": "scale"
+      },
+      "dinov2_small": {
+        "kernel": "rbf",
+        "C": 1.0,
+        "gamma": "scale"
+      }
+    },
+    "probability_blend": {
+      "convnext_weight": 0.1,
+      "dinov2_weight": 0.9,
+      "grid_step": 0.025
+    },
+    "champion_method": "probability_blend",
+    "selection_metric": "pooled_oof_macro_f1",
+    "tie_breakers": [
+      "lower_oof_log_loss",
+      "method_name"
+    ]
+  },
+  "portable_dataset_content_sha256": "05bc2f3636daa07f92d4aa866bd30af790cbbdb214e1453ec989c4eb2f2b5bf0"
+}

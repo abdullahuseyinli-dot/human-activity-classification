@@ -1,0 +1,45 @@
+{
+  "status": "LOCKED_FROM_OOF_BEFORE_DOWNSTREAM_TEST_EVALUATION",
+  "analysis_runner": "analyze_final.py",
+  "analysis_runner_sha256": "d51842dcb9e9eab9649c695ffb10b35aca092224aeaf0e405cadc1e54da4f3b1",
+  "test_used_for_selection": false,
+  "seed_ensemble": {
+    "convnext_small": [
+      42,
+      52,
+      62
+    ],
+    "dinov2_small": [
+      42,
+      52,
+      62
+    ]
+  },
+  "evaluation_policy": {
+    "convnext_small": "center_plus_horizontal_flip",
+    "dinov2_small": "center_crop"
+  },
+  "svm_selection": {
+    "convnext_small": {
+      "kernel": "rbf",
+      "C": 1.0,
+      "gamma": "scale"
+    },
+    "dinov2_small": {
+      "kernel": "rbf",
+      "C": 1.0,
+      "gamma": "scale"
+    }
+  },
+  "probability_blend": {
+    "convnext_weight": 0.1,
+    "dinov2_weight": 0.9,
+    "grid_step": 0.025
+  },
+  "champion_method": "probability_blend",
+  "selection_metric": "pooled_oof_macro_f1",
+  "tie_breakers": [
+    "lower_oof_log_loss",
+    "method_name"
+  ]
+}

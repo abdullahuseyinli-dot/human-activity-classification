@@ -1,0 +1,7 @@
+image_id,y_true,y_pred,confidence,label,image_url,true_class,predicted_class
+222118,1,0,0.9317779966743356,standing,http://images.cocodataset.org/val2017/000000222118.jpg,standing,sitting
+394199,0,1,0.7177594143996356,sitting,http://images.cocodataset.org/val2017/000000394199.jpg,sitting,standing
+232563,2,1,0.5020416586198777,walking_running,http://images.cocodataset.org/val2017/000000232563.jpg,walking/running,standing
+333745,2,1,0.4866738832582646,walking_running,http://images.cocodataset.org/val2017/000000333745.jpg,walking/running,standing
+210388,2,0,0.4563854229802267,walking_running,http://images.cocodataset.org/val2017/000000210388.jpg,walking/running,sitting
+213547,0,1,0.4025803506867318,sitting,http://images.cocodataset.org/val2017/000000213547.jpg,sitting,standing

@@ -1,0 +1,3 @@
+model_kind,candidate_id,total_params,trainable_params,trainable_percent
+convnext_small,conv_randaugment_d0,49456995,49456995,100.0
+dinov2_small,dino_full_d10,22057731,22057731,100.0

@@ -1,0 +1,5 @@
+family,policy,macro_f1,log_loss,prefer_simpler,selected
+convnext_small,center_plus_horizontal_flip,0.7426248202687292,0.658346775621503,1,True
+convnext_small,center_crop,0.7348243024632678,0.6634423519463111,0,False
+dinov2_small,center_crop,0.7807699637888317,0.5478777615910855,0,True
+dinov2_small,center_plus_horizontal_flip,0.7777777777777777,0.54778357483732,1,False

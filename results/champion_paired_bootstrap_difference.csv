@@ -1,0 +1,3 @@
+champion,reference,metric,mean_difference,ci_2_5,ci_97_5,probability_difference_gt_zero,resamples
+probability_blend,dinov2_small,accuracy,-0.00036046511627906946,-0.06976744186046513,0.06976744186046513,0.352,2000
+probability_blend,dinov2_small,macro_f1,-0.0006741281092220076,-0.07346905625838697,0.06999249918007823,0.431,2000
