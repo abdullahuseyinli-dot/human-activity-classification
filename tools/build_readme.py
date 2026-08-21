@@ -247,6 +247,12 @@ and cross-boundary perceptual near-duplicates.
 - [MixUp](https://arxiv.org/abs/1710.09412)
 - [RandAugment](https://arxiv.org/abs/1909.13719)
 - [When Does Label Smoothing Help?](https://arxiv.org/abs/1906.02629)
+
+## License
+
+Original source code and documentation are licensed under the [MIT License](LICENSE).
+COCO source images and pretrained model components retain their upstream terms;
+see [the third-party notices](THIRD_PARTY_NOTICES.md).
 """
 
     (repository / "README.md").write_text(readme, encoding="utf-8", newline="\n")

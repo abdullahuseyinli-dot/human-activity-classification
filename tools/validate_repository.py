@@ -13,7 +13,9 @@ EXCLUDED_PARTS = {".git", ".runs", "__pycache__", ".pytest_cache", ".ruff_cache"
 REQUIRED = {
     ".github/workflows/ci.yml",
     ".gitignore",
+    "LICENSE",
     "README.md",
+    "THIRD_PARTY_NOTICES.md",
     "data/manifest.csv",
     "docs/EXPERIMENT_PROTOCOL.md",
     "human_activity_classification.ipynb",
@@ -60,6 +62,25 @@ def main() -> None:
     missing = sorted(name for name in REQUIRED if not (repository / name).is_file())
     if missing:
         raise RuntimeError(f"Missing release files: {missing}")
+
+    license_text = (repository / "LICENSE").read_text(encoding="utf-8")
+    for marker in (
+        "MIT License",
+        "Copyright (c) 2026 Abdulla Huseyinli",
+        "Permission is hereby granted, free of charge",
+        'THE SOFTWARE IS PROVIDED "AS IS"',
+    ):
+        if marker not in license_text:
+            raise RuntimeError(f"LICENSE is missing: {marker}")
+
+    notices = (repository / "THIRD_PARTY_NOTICES.md").read_text(encoding="utf-8")
+    for marker in (
+        "cocodataset.org/#termsofuse",
+        "facebookresearch/dinov2",
+        "pytorch/vision",
+    ):
+        if marker not in notices:
+            raise RuntimeError(f"Third-party notice is missing: {marker}")
 
     windows_user_path = re.compile(
         r"[A-Za-z]:\\" + "Users" + r"\\", flags=re.IGNORECASE
