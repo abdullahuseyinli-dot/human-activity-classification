@@ -1,7 +1,7 @@
 # Result lineage
 
-This repository records a reproducible experiment lineage with fingerprinted source inputs.
-Source inputs are preserved through the fingerprints below.
+This repository records a reproducible experiment lineage from a fingerprinted source
+pipeline. The source fingerprint below anchors the retained evidence.
 
 ## Source fingerprints
 
@@ -31,8 +31,8 @@ Source inputs are preserved through the fingerprints below.
   adapter now provides the same `(logits, pooled_features)` contract without
   changing ConvNeXt logits.
 - Local absolute paths, kernel metadata, embedded multi-megabyte training logs,
-  non-release labels, and stale narrative cells are excluded from the portfolio
-  notebook.
+  project-specific presentation labels, and stale narrative cells are excluded
+  from the published notebook.
 
 ## Evidence handling
 

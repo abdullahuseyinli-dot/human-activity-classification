@@ -14,7 +14,7 @@ on the fixed 43-image test split. Its stratified-bootstrap macro-F1 interval is
 interval matters: this is a carefully controlled small benchmark, not a claim of
 deployment-level certainty.
 
-## Reproducibility improvements
+## Engineering corrections
 
 The evidence pipeline resolves a mismatch between selected freeze depth and the
 later DINOv2 training branch, removes stale result narratives, applies configured
