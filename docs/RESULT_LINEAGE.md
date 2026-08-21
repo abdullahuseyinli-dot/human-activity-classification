@@ -1,7 +1,9 @@
 # Result lineage
 
-This repository records a reproducible experiment lineage from a fingerprinted source
-pipeline. The source fingerprint below anchors the retained evidence.
+The tracked release consolidates model selection, final training, uncertainty
+analysis, and promoted metrics into a single reproducible lineage. Source
+fingerprints anchor the released evidence without requiring bulky checkpoints in
+version control.
 
 ## Source fingerprints
 
@@ -13,30 +15,19 @@ pipeline. The source fingerprint below anchors the retained evidence.
 
 ## Lineage controls
 
-- The written model-selection result and the executed DINOv2 final-training
-  branch disagreed: the search selected partial top-block adaptation, while a
-  later cell forced full-backbone fine-tuning.
-- Some reported epoch counts and conclusions referred to earlier executions
-  rather than the checkpoints represented by the visible output tables.
-- Historical artifact directories contained results from different split
-  lineages. Those values are retained locally as evidence but are not combined
-  into the published benchmark.
-- Configured head dropout was present in search dictionaries but was not
-  propagated through every model builder. The corrected implementation records
-  and applies it explicitly.
-- The inherited final full-pool loop discarded validation-driven learning-rate
-  reductions. The corrected final runner replays a fold-derived median LR
-  schedule.
-- ConvNeXt and DINOv2 exposed different feature-return interfaces. A tested
-  adapter now provides the same `(logits, pooled_features)` contract without
-  changing ConvNeXt logits.
-- Local absolute paths, kernel metadata, embedded multi-megabyte training logs,
-  project-specific presentation labels, and stale narrative cells are excluded
-  from the published notebook.
+- The selected freeze depth is passed unchanged into every DINOv2 training branch.
+- Reported epoch counts and conclusions are derived from the checkpoints represented
+  by the promoted result tables.
+- Artifacts from different split lineages are kept separate and are never combined
+  into the headline comparison.
+- Configured head dropout is recorded and applied by every model builder.
+- Full-pool training replays a fold-derived median learning-rate schedule.
+- ConvNeXt and DINOv2 share a tested `(logits, pooled_features)` adapter contract
+  without altering ConvNeXt logits.
+- Release notebooks use portable paths and kernels and exclude bulky training logs.
 
 ## Evidence handling
 
-Interrupted smoke runs and superseded checkpoints remain under the ignored
-`.runs/` tree. They are not silently promoted or deleted. Tracked `results/`
-files are exported only from the corrected lineage after selection locks and
-validation checks pass.
+Interrupted smoke runs and superseded checkpoints remain under the ignored `.runs/`
+tree. They are not promoted or deleted. Tracked `results/` files are exported only
+after selection locks and validation checks pass.

@@ -14,16 +14,15 @@ on the fixed 43-image test split. Its stratified-bootstrap macro-F1 interval is
 interval matters: this is a carefully controlled small benchmark, not a claim of
 deployment-level certainty.
 
-## Engineering corrections
+## Reproducibility improvements
 
-The evidence pipeline resolves a mismatch between selected freeze depth and the
-later DINOv2 training branch, removes stale result narratives, applies configured
-dropout consistently, and rebuilds every promoted result within one evidence
-lineage. It also prevents a subtler training mismatch by replaying the median
-cross-validation learning-rate schedule during full-pool retraining.
+The released pipeline keeps model selection, final training, and promoted results
+within one evidence lineage. Freeze depth and dropout propagate through every
+training branch, while full-pool retraining replays the median cross-validation
+learning-rate schedule instead of silently changing optimization behaviour.
 
-The executed source pipeline is fingerprinted. Exact source fingerprints and the
-lineage controls are documented in [the result-lineage record](docs/RESULT_LINEAGE.md).
+Exact source fingerprints, selection locks, and evidence-handling rules are
+documented in [the result lineage](docs/RESULT_LINEAGE.md).
 
 ## Results
 
