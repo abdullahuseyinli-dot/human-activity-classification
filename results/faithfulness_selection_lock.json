@@ -1,0 +1,60 @@
+{
+  "status": "LOCKED_FROM_OOF_BEFORE_FAITHFULNESS_TEST_EVALUATION",
+  "test_used_for_selection": false,
+  "selection_partition": "deterministic class-balanced OOF audit cohort",
+  "selection_rows": 36,
+  "selection_rows_per_class": 12,
+  "selection_image_ids_sha256": "f7b957262e382b85f998e3bc692db3adcab3c98bfed0144a16d6f6601ae45b66",
+  "primary_metric": "mean ROADCombined across 10%-90% removed patches",
+  "tie_breakers": [
+    "higher random-vs-MoRF selectivity gap",
+    "higher insertion AUC",
+    "method name"
+  ],
+  "ineligible_diagnostic_methods": {
+    "dinov2_small": {
+      "attention_rollout": "class-agnostic diagnostic baseline"
+    }
+  },
+  "selected": {
+    "convnext_small": {
+      "method": "hirescam",
+      "oof_road_combined": 0.18478661336947555,
+      "oof_selectivity_gap": 0.1501984041598108,
+      "oof_insertion_auc": 0.6736137167964544
+    },
+    "dinov2_small": {
+      "method": "gradient_attention_rollout",
+      "oof_road_combined": 0.15593434372387918,
+      "oof_selectivity_gap": 0.1297197964559827,
+      "oof_insertion_auc": 0.7041541838294102
+    }
+  },
+  "perturbation_unit": "16x16 grid of 14x14 image patches",
+  "road_fractions": [
+    0.1,
+    0.2,
+    0.30000000000000004,
+    0.4,
+    0.5,
+    0.6,
+    0.7000000000000001,
+    0.8,
+    0.9
+  ],
+  "curve_fractions": [
+    0.0,
+    0.1,
+    0.2,
+    0.30000000000000004,
+    0.4,
+    0.5,
+    0.6000000000000001,
+    0.7000000000000001,
+    0.8,
+    0.9,
+    1.0
+  ],
+  "integrated_gradient_steps": 16,
+  "faithfulness_random_subsets": 16
+}

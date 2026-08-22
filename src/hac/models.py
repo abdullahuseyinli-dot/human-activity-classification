@@ -36,12 +36,19 @@ class DinoV2Classifier(nn.Module):
         backbone_name: str = "facebook/dinov2-small",
         num_classes: int = 3,
         dropout: float = 0.0,
+        pretrained: bool = True,
     ) -> None:
         super().__init__()
-        from transformers import AutoModel
+        from transformers import AutoConfig, AutoModel
 
         self.backbone_name = backbone_name
-        self.backbone = AutoModel.from_pretrained(backbone_name)
+        if pretrained:
+            self.backbone = AutoModel.from_pretrained(backbone_name)
+        else:
+            configuration = AutoConfig.from_pretrained(
+                backbone_name, local_files_only=True
+            )
+            self.backbone = AutoModel.from_config(configuration)
         hidden_size = int(self.backbone.config.hidden_size)
         self.dropout = nn.Dropout(float(dropout))
         self.classifier = nn.Linear(hidden_size, int(num_classes))
@@ -147,9 +154,15 @@ def configure_dinov2(
     raise ValueError(f"Unsupported DINOv2 strategy: {strategy}")
 
 
-def build_model(config: ModelConfig, num_classes: int = 3) -> nn.Module:
+def build_model(
+    config: ModelConfig,
+    num_classes: int = 3,
+    *,
+    pretrained: bool = True,
+) -> nn.Module:
     if config.model_kind == "convnext_small":
-        model = models.convnext_small(weights=ConvNeXt_Small_Weights.IMAGENET1K_V1)
+        weights = ConvNeXt_Small_Weights.IMAGENET1K_V1 if pretrained else None
+        model = models.convnext_small(weights=weights)
         in_features = int(model.classifier[2].in_features)
         model.classifier[2] = DropoutLinear(
             in_features,
@@ -158,7 +171,11 @@ def build_model(config: ModelConfig, num_classes: int = 3) -> nn.Module:
         )
         model = configure_convnext(model, config.unfreeze_strategy)
         return ConvNeXtFeatureAdapter(model)
-    model = DinoV2Classifier(num_classes=num_classes, dropout=config.dropout)
+    model = DinoV2Classifier(
+        num_classes=num_classes,
+        dropout=config.dropout,
+        pretrained=pretrained,
+    )
     return configure_dinov2(model, config.unfreeze_strategy, config.top_n_blocks)
 
 

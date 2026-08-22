@@ -1,0 +1,6 @@
+family,method,check,spearman_mean,spearman_std,spearman_count,probability_change_mean,probability_change_std,probability_change_count
+convnext_small,hirescam,horizontal_flip_equivariance,1.0,7.850462293418876e-17,9,3.5976493508683825e-05,3.474797612040574e-05,9
+convnext_small,hirescam,target_class_change,-0.4691273355024382,0.20933572605748263,9,,,0
+dinov2_small,attention_rollout,target_class_change_diagnostic,0.9999999999999998,0.0,9,,,0
+dinov2_small,gradient_attention_rollout,horizontal_flip_equivariance,0.9100078520383508,0.053633756430938206,9,0.04820395825386735,0.039709683105692284,9
+dinov2_small,gradient_attention_rollout,target_class_change,0.269663713410137,0.44787796176258465,9,,,0

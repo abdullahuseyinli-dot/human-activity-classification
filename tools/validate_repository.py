@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
+
+import pandas as pd
 
 TEXT_SUFFIXES = {".csv", ".ipynb", ".json", ".md", ".py", ".toml", ".yaml", ".yml"}
 EXCLUDED_PARTS = {".git", ".runs", "__pycache__", ".pytest_cache", ".ruff_cache"}
@@ -18,9 +21,25 @@ REQUIRED = {
     "THIRD_PARTY_NOTICES.md",
     "data/manifest.csv",
     "docs/EXPERIMENT_PROTOCOL.md",
+    "experiments/evaluate_faithfulness.py",
     "human_activity_classification.ipynb",
     "pyproject.toml",
+    "src/hac/explainability.py",
+    "assets/faithfulness_method_selection.png",
+    "assets/faithfulness_perturbation_curves.png",
+    "assets/convnext_small_faithfulness_gallery.jpg",
+    "assets/dinov2_small_faithfulness_gallery.jpg",
     "results/locked_test_metrics.csv",
+    "results/faithfulness_selection_lock.json",
+    "results/faithfulness_test_summary.csv",
+    "results/faithfulness_test_per_image.csv",
+    "results/faithfulness_replay_validation.csv",
+    "results/faithfulness_sanity_summary.csv",
+    "results/faithfulness_stability_summary.csv",
+    "results/faithfulness_checkpoint_manifest.csv",
+    "results/faithfulness_oof_selection_cohort.csv",
+    "results/faithfulness_provenance.json",
+    "results/oof_replay_validation.csv",
     "results/run_provenance.json",
 }
 
@@ -56,6 +75,82 @@ def validate_notebook(path: Path) -> None:
                 raise RuntimeError(f"Notebook contains an error output: {path}")
 
 
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def validate_faithfulness(repository: Path, expected_test_ids: set[str]) -> None:
+    results = repository / "results"
+    with (results / "faithfulness_selection_lock.json").open(encoding="utf-8") as handle:
+        selection = json.load(handle)
+    if selection.get("status") != "LOCKED_FROM_OOF_BEFORE_FAITHFULNESS_TEST_EVALUATION":
+        raise RuntimeError("Invalid attribution-selection lock status")
+    if selection.get("test_used_for_selection") is not False:
+        raise RuntimeError("Attribution selection is not independent of the test split")
+    selected = selection.get("selected", {})
+    if set(selected) != {"convnext_small", "dinov2_small"}:
+        raise RuntimeError("Attribution selection does not cover both model families")
+
+    cohort = pd.read_csv(
+        results / "faithfulness_oof_selection_cohort.csv", dtype={"image_id": str}
+    )
+    if (
+        len(cohort) != 36
+        or cohort["image_id"].duplicated().any()
+        or not cohort.groupby("label").size().eq(12).all()
+    ):
+        raise RuntimeError("Invalid OOF attribution-selection cohort")
+
+    per_image = pd.read_csv(
+        results / "faithfulness_test_per_image.csv", dtype={"image_id": str}
+    )
+    expected_models = {"convnext_small", "dinov2_small", "probability_blend"}
+    if set(per_image["model"]) != expected_models:
+        raise RuntimeError("Unexpected model set in faithfulness test evidence")
+    for model, rows in per_image.groupby("model"):
+        if len(rows) != 43 or rows["image_id"].duplicated().any():
+            raise RuntimeError(f"Invalid faithfulness row count for {model}")
+        if set(rows["image_id"]) != expected_test_ids:
+            raise RuntimeError(f"Faithfulness IDs do not match the test split for {model}")
+
+    summary = pd.read_csv(results / "faithfulness_test_summary.csv")
+    if set(summary["model"]) != expected_models or not summary["test_rows"].eq(43).all():
+        raise RuntimeError("Faithfulness summary does not cover the fixed test split")
+    for name in ("oof_replay_validation.csv", "faithfulness_replay_validation.csv"):
+        replay = pd.read_csv(results / name)
+        if replay.empty or not replay["passed"].astype(str).str.casefold().eq("true").all():
+            raise RuntimeError(f"Probability replay validation failed in {name}")
+
+    checkpoints = pd.read_csv(results / "faithfulness_checkpoint_manifest.csv")
+    if len(checkpoints) != 36:
+        raise RuntimeError("Faithfulness checkpoint manifest must contain 36 checkpoints")
+    for value in checkpoints["artifact_relative_path"].astype(str):
+        relative = PurePosixPath(value)
+        if relative.is_absolute() or ".." in relative.parts:
+            raise RuntimeError(f"Invalid relative checkpoint reference: {value}")
+
+    provenance_path = results / "faithfulness_provenance.json"
+    with provenance_path.open(encoding="utf-8") as handle:
+        provenance = json.load(handle)
+    if provenance.get("status") != "LOCKED_TEST_EVALUATED_AFTER_OOF_ATTRIBUTION_SELECTION":
+        raise RuntimeError("Faithfulness provenance is incomplete")
+    release = provenance.get("release_export", {})
+    if release.get("status") != "VALIDATED_PATH_SANITIZED_EVIDENCE_PROMOTED":
+        raise RuntimeError("Faithfulness release evidence was not validated before export")
+    for relative, expected_hash in release.get("tracked_evidence", {}).items():
+        path = repository / PurePosixPath(relative)
+        if not path.is_file() or sha256_file(path) != expected_hash:
+            raise RuntimeError(f"Faithfulness release fingerprint mismatch: {relative}")
+    for relative, expected_hash in release.get("implementation_fingerprints", {}).items():
+        path = repository / PurePosixPath(relative)
+        if not path.is_file() or sha256_file(path) != expected_hash:
+            raise RuntimeError(f"Faithfulness implementation fingerprint mismatch: {relative}")
+
+
 def main() -> None:
     args = parse_args()
     repository = args.repository.resolve()
@@ -78,6 +173,7 @@ def main() -> None:
         "cocodataset.org/#termsofuse",
         "facebookresearch/dinov2",
         "pytorch/vision",
+        "jacobgil/pytorch-grad-cam",
     ):
         if marker not in notices:
             raise RuntimeError(f"Third-party notice is missing: {marker}")
@@ -113,11 +209,15 @@ def main() -> None:
     sys.path.insert(0, str(repository / "src"))
     from hac.protocol import load_and_validate_manifest
 
-    _, protocol = load_and_validate_manifest(
+    manifest, protocol = load_and_validate_manifest(
         repository / "data" / "manifest.csv", require_images=False
     )
     if protocol.development_rows != 242 or protocol.test_rows != 43:
         raise RuntimeError("Tracked manifest no longer matches the fixed protocol")
+    expected_test_ids = set(
+        manifest.loc[manifest["split"].eq("test"), "image_id"].astype(str)
+    )
+    validate_faithfulness(repository, expected_test_ids)
     print("Repository validation passed")
 
 

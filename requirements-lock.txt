@@ -1,6 +1,7 @@
 # Environment used for the recorded experiment (Python 3.11.9, CUDA 12.6 build).
 # Install the appropriate PyTorch wheels for your CUDA/CPU platform first.
 imagehash==4.3.2
+grad-cam==1.5.5
 matplotlib==3.10.8
 nbclient==0.10.4
 nbformat==5.10.4

@@ -1,0 +1,6 @@
+family,method,condition,mean,std,count
+convnext_small,hirescam,head,0.16325863265677565,0.2659187220633206,9
+convnext_small,hirescam,head_plus_final_stage,0.3453435495922825,0.21495428249333717,9
+dinov2_small,attention_rollout,head_diagnostic,0.9999999999999998,0.0,9
+dinov2_small,gradient_attention_rollout,head,0.616886333002721,0.22111282723852027,9
+dinov2_small,gradient_attention_rollout,head_plus_final_stage,0.2249392818087027,0.2561719825161271,9

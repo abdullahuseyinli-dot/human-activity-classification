@@ -24,6 +24,12 @@ version control.
 - Full-pool training replays a fold-derived median learning-rate schedule.
 - ConvNeXt and DINOv2 share a tested `(logits, pooled_features)` adapter contract
   without altering ConvNeXt logits.
+- Attribution methods are selected from fold-held-out development predictions;
+  the attribution lock is written before the fixed-test explanations are made.
+- Faithfulness replays the exact calibrated inference function and fingerprints
+  every contributing OOF and full-pool checkpoint.
+- Raw DINOv2 attention rollout remains visible as a class-agnostic negative
+  control and is never promoted as a faithful class explanation.
 - Release notebooks use portable paths and kernels and exclude bulky training logs.
 
 ## Evidence handling
@@ -31,3 +37,9 @@ version control.
 Interrupted smoke runs and superseded checkpoints remain under the ignored `.runs/`
 tree. They are not promoted or deleted. Tracked `results/` files are exported only
 after selection locks and validation checks pass.
+
+The local faithfulness run additionally preserves dense perturbation traces and
+attribution arrays. The tracked release contains the OOF selection cohort and
+per-image metrics, the three lock/provenance chains, parameter-randomization and
+stability checks, aggregate curves, and review figures. Local image paths and
+checkpoint payloads are excluded from the export.

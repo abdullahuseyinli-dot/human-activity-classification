@@ -80,6 +80,58 @@ depends on this dataset's out-of-fold evidence, not on a generic recipe.
    OOF predictions; the selected evaluation policy is locked per model family
    before its corresponding test probabilities are read.
 
+## Attribution selection and faithfulness
+
+Explanations follow a third leakage-control gate. A deterministic,
+class-balanced cohort of 36 development images (12 per class) is drawn from the
+existing five-fold assignment. Every explanation is produced by the three
+models that did not train on that image, and the recorded OOF probability is
+replayed within a declared numerical tolerance before the image contributes to
+selection.
+
+ConvNeXt candidates are Grad-CAM, HiResCAM, and integrated gradients. DINOv2
+candidates are class-specific gradient-attention rollout and integrated
+gradients. Raw attention rollout is retained as a deliberately class-agnostic
+diagnostic and cannot win selection. Temperature scaling and the locked
+center/flip inference policy remain inside the differentiated score function;
+seed maps are combined only after each of the three locked models has been
+evaluated.
+
+The selection metric is mean ROADCombined after perturbing 10% through 90% of a
+common 16 by 16 patch grid. Higher random-versus-most-relevant deletion gap and
+higher insertion AUC are deterministic tie-breakers. The selected methods and
+cohort fingerprint are written to `faithfulness_selection_lock.json` before any
+test attribution is generated.
+
+The locked-test audit combines complementary checks:
+
+- ROAD noisy-linear imputation compares most-relevant, least-relevant, and
+  random patch removal.
+- Blur-baseline deletion, insertion, and random-deletion curves cover 0% through
+  100% of patches.
+- Random-subset attribution mass is correlated with the resulting
+  predicted-class probability drop.
+- Seed-to-seed agreement, horizontal-flip equivariance, and target-class
+  sensitivity test attribution stability and specificity.
+- On a deterministic nine-image class-balanced cohort (three per class),
+  classifier-head and final-stage parameter randomization test whether the maps
+  respond to learned parameters. Raw DINOv2 rollout is retained as the expected
+  negative control for classifier-head randomization.
+
+All perturbations target the model's locked predicted-class probability rather
+than the ground-truth label. This avoids turning explanations into an implicit
+error-correction step. Faithfulness metrics describe sensitivity of this model
+under the declared perturbation operators; they are not evidence of human-like
+reasoning or causal understanding. Test-set mean intervals use 2,000
+class-stratified bootstrap resamples; the random-subset correlation uses 16
+deterministic matched subsets per image.
+
+The protocol follows the evaluation principles in
+[ROAD](https://proceedings.mlr.press/v162/rong22a.html),
+[pixel-flipping evaluation](https://arxiv.org/abs/1509.06321),
+[transformer attribution](https://openaccess.thecvf.com/content/CVPR2021/html/Chefer_Transformer_Interpretability_Beyond_Attention_Visualization_CVPR_2021_paper.html),
+and [model-parameter sanity checks](https://papers.neurips.cc/paper_files/paper/2018/hash/294a8ed24b1ad22ec2e7efea049b8737-Abstract.html).
+
 ## Reporting constraints
 
 The 43-image test set is small. Final results therefore include stratified

@@ -45,6 +45,15 @@ def require_files(repository: Path) -> None:
         "assets/dinov2_architecture.png",
         "assets/champion_error_gallery.png",
         "results/champion_error_analysis.csv",
+        "results/faithfulness_method_selection.csv",
+        "results/faithfulness_selection_lock.json",
+        "results/faithfulness_test_summary.csv",
+        "results/faithfulness_sanity_summary.csv",
+        "results/faithfulness_stability_summary.csv",
+        "assets/faithfulness_method_selection.png",
+        "assets/faithfulness_perturbation_curves.png",
+        "assets/convnext_small_faithfulness_gallery.jpg",
+        "assets/dinov2_small_faithfulness_gallery.jpg",
     ]
     missing = [name for name in required if not (repository / name).is_file()]
     if missing:
@@ -322,6 +331,87 @@ This gallery is diagnostic only and is generated after the downstream lock.
 No test image is relabeled, removed, or used to revise the selected method.
 """
         ),
+        markdown("## Attribution faithfulness"),
+        code(
+            """
+faithfulness_selection = pd.read_csv(
+    ROOT / "results" / "faithfulness_method_selection.csv"
+)
+faithfulness_test = pd.read_csv(ROOT / "results" / "faithfulness_test_summary.csv")
+
+display(
+    faithfulness_selection[faithfulness_selection["selected"].astype(bool)][
+        [
+            "family",
+            "method",
+            "road_combined_mean",
+            "selectivity_gap_mean",
+            "insertion_auc_mean",
+            "seed_agreement_mean",
+        ]
+    ].round(4)
+)
+display(
+    faithfulness_test[
+        [
+            "display_name",
+            "method",
+            "road_combined_mean",
+            "road_combined_ci_2_5",
+            "road_combined_ci_97_5",
+            "deletion_auc_mean",
+            "insertion_auc_mean",
+            "selectivity_gap_mean",
+            "faithfulness_spearman_mean",
+        ]
+    ].round(4)
+)
+display(Image(filename=str(ROOT / "assets" / "faithfulness_method_selection.png")))
+display(Image(filename=str(ROOT / "assets" / "faithfulness_perturbation_curves.png")))
+"""
+        ),
+        markdown(
+            """
+The explanation method is itself selected out of fold. ConvNeXt compares
+Grad-CAM, HiResCAM, and integrated gradients; DINOv2 compares class-specific
+gradient-attention rollout and integrated gradients. Raw attention rollout is
+kept as an ineligible class-agnostic negative control. The selected methods are
+locked before any test explanation is produced.
+
+ROAD most/least/random removal, blur deletion and insertion, and matched random
+patch removal quantify whether high-attribution regions actually control the
+locked predicted-class probability. All methods use the same 16 by 16 patch
+grid, so comparisons do not reward a model merely for producing a coarser map.
+"""
+        ),
+        code(
+            """
+display(Image(filename=str(ROOT / "assets" / "convnext_small_faithfulness_gallery.jpg")))
+display(Image(filename=str(ROOT / "assets" / "dinov2_small_faithfulness_gallery.jpg")))
+"""
+        ),
+        markdown("### Sanity, specificity, and stability checks"),
+        code(
+            """
+sanity = pd.read_csv(ROOT / "results" / "faithfulness_sanity_summary.csv")
+stability = pd.read_csv(ROOT / "results" / "faithfulness_stability_summary.csv")
+display(sanity.round(4))
+display(stability.round(4))
+"""
+        ),
+        markdown(
+            """
+Parameter randomization verifies that the promoted maps depend on learned
+weights. Target-class changes test class specificity; horizontal flips test
+equivariance. The class-agnostic DINOv2 control correctly remains unchanged
+when only the classifier head or target class changes, which is why it is not
+presented as a faithful class explanation.
+
+These metrics characterize this model under declared perturbations. They do
+not establish causal or human-like reasoning, and no test explanation is used
+to revise training, calibration, ensembling, or attribution selection.
+"""
+        ),
         markdown("## Uncertainty and paired comparison"),
         code(
             """
@@ -340,7 +430,9 @@ portfolio headline. Its fixed-test result is **{headline_f1:.3f} macro-F1** and
 **{headline_accuracy:.3f} accuracy**. This replaces the notebook's conflicting
 historical outputs with one traceable lineage: a fixed test contract, explicit
 configuration locks, three final seeds, OOF calibration, and paired uncertainty
-reporting.
+reporting. Its explanation layer follows the same discipline through OOF
+method selection, probability replay, perturbation tests, and parameter
+randomization.
 
 The small test set limits precision, and the lack of subject identifiers limits
 the generalization claim. Results should be read as a careful benchmark on this
@@ -358,6 +450,8 @@ manifest, not as a deployment guarantee.
 4. Run the training scripts from the repository root. Bulky checkpoints and
    local experiment artifacts stay under `.runs/` and are intentionally not
    committed.
+5. Run the attribution evaluator only after downstream selection is locked;
+   export its compact evidence with `tools/export_faithfulness_results.py`.
 
 The tracked results are sufficient to rerun this analysis notebook without
 downloading model checkpoints or the source images.

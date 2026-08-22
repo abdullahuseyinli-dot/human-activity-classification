@@ -53,6 +53,29 @@ The experiment compares dropout, MixUp, light RandAugment, random-erasing remova
 label smoothing, weight decay, and multiple freeze depths as controlled OOF
 interventions. A regularizer is retained only when the dataset supports it.
 
+## Attribution faithfulness
+
+![Faithfulness perturbation curves](assets/faithfulness_perturbation_curves.png)
+
+| Locked model | Explanation | ROADCombined ↑ (95% CI) | Deletion AUC ↓ | Insertion AUC ↑ | Random gap ↑ | Subset ρ ↑ |
+| --- | --- | --- | --- | --- | --- | --- |
+| ConvNeXt-Small | HiResCAM | 0.242 [0.220, 0.262] | 0.416 | 0.758 | 0.163 | 0.152 |
+| DINOv2-Small | Gradient-attention rollout | 0.185 [0.165, 0.205] | 0.448 | 0.744 | 0.172 | 0.248 |
+| 0.1 ConvNeXt + 0.9 DINOv2 | 0.1 HiResCAM + 0.9 gradient-attention rollout | 0.190 [0.171, 0.208] | 0.430 | 0.730 | 0.177 | 0.235 |
+
+Attribution methods are selected without reading test explanations. A fixed
+36-image, class-balanced OOF audit selected HiResCAM for ConvNeXt
+(ROADCombined **0.185**) and class-specific gradient-attention
+rollout for DINOv2 (**0.156**). ConvNeXt's Grad-CAM and HiResCAM
+scores were effectively tied; the machine-readable ordering is retained rather
+than presenting the difference as a substantive gain.
+
+The audit perturbs a common 16 by 16 patch grid using ROAD imputation,
+blur-baseline deletion/insertion, and matched random removal. It also checks
+parameter randomization, target-class sensitivity, horizontal-flip
+equivariance, and agreement across the three final seeds. Raw DINOv2 attention
+rollout remains an ineligible class-agnostic negative control.
+
 ## Evaluation design
 
 - **Data:** 285 checksum-verified COCO images; 242 development and 43 fixed test.
@@ -65,6 +88,8 @@ interventions. A regularizer is retained only when the dataset supports it.
 - **Inference:** center crop versus horizontal-flip TTA selected from OOF evidence.
 - **Downstream:** seed averaging, blend weight, and SVM parameters selected OOF-only.
 - **Uncertainty:** 2,000 stratified bootstrap resamples and paired champion deltas.
+- **Explanations:** OOF method selection followed by locked-test perturbation,
+  parameter-randomization, specificity, and stability checks.
 
 The complete contract is in [the experiment protocol](docs/EXPERIMENT_PROTOCOL.md).
 
@@ -135,6 +160,12 @@ python experiments/finalize_experiment.py \
 python experiments/analyze_final.py \
   --artifact-root .runs/final \
   --output-dir .runs/final_analysis
+
+python experiments/evaluate_faithfulness.py \
+  --manifest data/manifest.csv \
+  --final-root .runs/final \
+  --analysis-dir .runs/final_analysis \
+  --output-dir .runs/faithfulness
 ```
 
 Bulky checkpoints, logits, local paths, and interrupted runs remain under
@@ -162,6 +193,10 @@ and cross-boundary perceptual near-duplicates.
   generalization cannot be claimed.
 - Images come from COCO and may reward scene context as well as body pose.
 - The SVM result is a representation probe, not an end-to-end deployment stack.
+- Attribution metrics measure sensitivity under declared patch perturbations;
+  they do not prove causal or human-like reasoning.
+- Parameter-randomization, target-specificity, and flip-stability checks use a
+  deterministic nine-image class-balanced audit cohort.
 
 ## Technical references
 
@@ -171,6 +206,10 @@ and cross-boundary perceptual near-duplicates.
 - [MixUp](https://arxiv.org/abs/1710.09412)
 - [RandAugment](https://arxiv.org/abs/1909.13719)
 - [When Does Label Smoothing Help?](https://arxiv.org/abs/1906.02629)
+- [ROAD: Remove and Debias](https://proceedings.mlr.press/v162/rong22a.html)
+- [Pixel-flipping Evaluation of Neural Explanations](https://arxiv.org/abs/1509.06321)
+- [Transformer Interpretability Beyond Attention Visualization](https://openaccess.thecvf.com/content/CVPR2021/html/Chefer_Transformer_Interpretability_Beyond_Attention_Visualization_CVPR_2021_paper.html)
+- [Sanity Checks for Saliency Maps](https://papers.neurips.cc/paper_files/paper/2018/hash/294a8ed24b1ad22ec2e7efea049b8737-Abstract.html)
 
 ## License
 

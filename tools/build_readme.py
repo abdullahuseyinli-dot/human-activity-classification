@@ -39,6 +39,10 @@ def main() -> None:
         (intervals["method"] == champion["method"]) & (intervals["metric"] == "macro_f1")
     ].iloc[0]
     parameters = pd.read_csv(results / "model_parameter_summary.csv").set_index("model_kind")
+    faithfulness_selection = pd.read_csv(
+        results / "faithfulness_method_selection.csv"
+    )
+    faithfulness_test = pd.read_csv(results / "faithfulness_test_summary.csv")
 
     result_rows = []
     for row in test_metrics.itertuples(index=False):
@@ -81,6 +85,47 @@ def main() -> None:
         ["Family", "Candidate", "Adaptation", "Dropout", "Augmentation", "Trainable"],
         config_rows,
     )
+
+    explanation_names = {
+        "hirescam": "HiResCAM",
+        "gradient_attention_rollout": "Gradient-attention rollout",
+        "weighted_hirescam+gradient_attention_rollout": (
+            "0.1 HiResCAM + 0.9 gradient-attention rollout"
+        ),
+    }
+    faithfulness_rows = []
+    for row in faithfulness_test.itertuples(index=False):
+        faithfulness_rows.append(
+            [
+                str(row.display_name),
+                explanation_names.get(str(row.method), str(row.method)),
+                (
+                    f"{row.road_combined_mean:.3f} "
+                    f"[{row.road_combined_ci_2_5:.3f}, {row.road_combined_ci_97_5:.3f}]"
+                ),
+                f"{row.deletion_auc_mean:.3f}",
+                f"{row.insertion_auc_mean:.3f}",
+                f"{row.selectivity_gap_mean:.3f}",
+                f"{row.faithfulness_spearman_mean:.3f}",
+            ]
+        )
+    faithfulness_table = markdown_table(
+        [
+            "Locked model",
+            "Explanation",
+            "ROADCombined ↑ (95% CI)",
+            "Deletion AUC ↓",
+            "Insertion AUC ↑",
+            "Random gap ↑",
+            "Subset ρ ↑",
+        ],
+        faithfulness_rows,
+    )
+    selected_explanations = faithfulness_selection[
+        faithfulness_selection["selected"].astype(bool)
+    ].set_index("family")
+    conv_oof_road = float(selected_explanations.loc["convnext_small", "road_combined_mean"])
+    dino_oof_road = float(selected_explanations.loc["dinov2_small", "road_combined_mean"])
 
     readme = f"""# Human Activity Classification with ConvNeXt and DINOv2
 
@@ -128,6 +173,25 @@ The experiment compares dropout, MixUp, light RandAugment, random-erasing remova
 label smoothing, weight decay, and multiple freeze depths as controlled OOF
 interventions. A regularizer is retained only when the dataset supports it.
 
+## Attribution faithfulness
+
+![Faithfulness perturbation curves](assets/faithfulness_perturbation_curves.png)
+
+{faithfulness_table}
+
+Attribution methods are selected without reading test explanations. A fixed
+36-image, class-balanced OOF audit selected HiResCAM for ConvNeXt
+(ROADCombined **{conv_oof_road:.3f}**) and class-specific gradient-attention
+rollout for DINOv2 (**{dino_oof_road:.3f}**). ConvNeXt's Grad-CAM and HiResCAM
+scores were effectively tied; the machine-readable ordering is retained rather
+than presenting the difference as a substantive gain.
+
+The audit perturbs a common 16 by 16 patch grid using ROAD imputation,
+blur-baseline deletion/insertion, and matched random removal. It also checks
+parameter randomization, target-class sensitivity, horizontal-flip
+equivariance, and agreement across the three final seeds. Raw DINOv2 attention
+rollout remains an ineligible class-agnostic negative control.
+
 ## Evaluation design
 
 - **Data:** 285 checksum-verified COCO images; 242 development and 43 fixed test.
@@ -140,6 +204,8 @@ interventions. A regularizer is retained only when the dataset supports it.
 - **Inference:** center crop versus horizontal-flip TTA selected from OOF evidence.
 - **Downstream:** seed averaging, blend weight, and SVM parameters selected OOF-only.
 - **Uncertainty:** 2,000 stratified bootstrap resamples and paired champion deltas.
+- **Explanations:** OOF method selection followed by locked-test perturbation,
+  parameter-randomization, specificity, and stability checks.
 
 The complete contract is in [the experiment protocol](docs/EXPERIMENT_PROTOCOL.md).
 
@@ -210,6 +276,12 @@ python experiments/finalize_experiment.py \\
 python experiments/analyze_final.py \\
   --artifact-root .runs/final \\
   --output-dir .runs/final_analysis
+
+python experiments/evaluate_faithfulness.py \\
+  --manifest data/manifest.csv \\
+  --final-root .runs/final \\
+  --analysis-dir .runs/final_analysis \\
+  --output-dir .runs/faithfulness
 ```
 
 Bulky checkpoints, logits, local paths, and interrupted runs remain under
@@ -237,6 +309,10 @@ and cross-boundary perceptual near-duplicates.
   generalization cannot be claimed.
 - Images come from COCO and may reward scene context as well as body pose.
 - The SVM result is a representation probe, not an end-to-end deployment stack.
+- Attribution metrics measure sensitivity under declared patch perturbations;
+  they do not prove causal or human-like reasoning.
+- Parameter-randomization, target-specificity, and flip-stability checks use a
+  deterministic nine-image class-balanced audit cohort.
 
 ## Technical references
 
@@ -246,6 +322,10 @@ and cross-boundary perceptual near-duplicates.
 - [MixUp](https://arxiv.org/abs/1710.09412)
 - [RandAugment](https://arxiv.org/abs/1909.13719)
 - [When Does Label Smoothing Help?](https://arxiv.org/abs/1906.02629)
+- [ROAD: Remove and Debias](https://proceedings.mlr.press/v162/rong22a.html)
+- [Pixel-flipping Evaluation of Neural Explanations](https://arxiv.org/abs/1509.06321)
+- [Transformer Interpretability Beyond Attention Visualization](https://openaccess.thecvf.com/content/CVPR2021/html/Chefer_Transformer_Interpretability_Beyond_Attention_Visualization_CVPR_2021_paper.html)
+- [Sanity Checks for Saliency Maps](https://papers.neurips.cc/paper_files/paper/2018/hash/294a8ed24b1ad22ec2e7efea049b8737-Abstract.html)
 
 ## License
 

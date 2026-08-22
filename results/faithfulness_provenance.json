@@ -1,0 +1,112 @@
+{
+  "status": "LOCKED_TEST_EVALUATED_AFTER_OOF_ATTRIBUTION_SELECTION",
+  "runtime": {
+    "runner": "evaluate_faithfulness.py",
+    "runner_sha256": "b1d31bd91576527d04cfcfebb867c22d2a6c2759affe2d0c14853f787e799211",
+    "python": "3.11.9",
+    "torch": "2.11.0+cu126",
+    "device": "cuda",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU"
+  },
+  "inputs": {
+    "manifest_sha256": "9014ba11dacb54a7f3df4211f66622b379a0ebe80d89377bf711dc6d42f64825",
+    "dataset_manifest_sha256": "9014ba11dacb54a7f3df4211f66622b379a0ebe80d89377bf711dc6d42f64825",
+    "fixed_test_image_ids_sha256": "30a3cd0c4ff957fa4d6b11fad92affad6f0cdfb8782130d4230621429e3381a4",
+    "model_selection_lock_sha256": "8e62414af4fc85e6d95a19dcf4391947e8cc48d163203511cc20cc516d3a7efc",
+    "downstream_selection_lock_sha256": "19ebe9586d1481c9cbb88a7b550765a4c9fc1e0c3ef9a4b903aebf60faa161e2",
+    "faithfulness_selection_lock_sha256": "d0d36f56a9de534358d0d3797e673ab4c6e8adc5f437fce52b7a5ae61a5a8ba4",
+    "checkpoint_manifest_sha256": "e3c5f9f4805d85e6b46882eb1506f0fd084045bb61d0d2fb4a5be456a8d6c7e0",
+    "checkpoint_count": 36
+  },
+  "protocol": {
+    "test_used_for_attribution_selection": false,
+    "test_rows": 43,
+    "test_image_ids_sha256": "30a3cd0c4ff957fa4d6b11fad92affad6f0cdfb8782130d4230621429e3381a4",
+    "target": "locked predicted class probability",
+    "patch_grid": [
+      16,
+      16
+    ],
+    "patch_pixels": [
+      14,
+      14
+    ],
+    "road_imputation": "ROAD noisy linear imputer, deterministic 0.01 noise",
+    "road_fractions": [
+      0.1,
+      0.2,
+      0.30000000000000004,
+      0.4,
+      0.5,
+      0.6,
+      0.7000000000000001,
+      0.8,
+      0.9
+    ],
+    "deletion_insertion_fractions": [
+      0.0,
+      0.1,
+      0.2,
+      0.30000000000000004,
+      0.4,
+      0.5,
+      0.6000000000000001,
+      0.7000000000000001,
+      0.8,
+      0.9,
+      1.0
+    ],
+    "integrated_gradient_steps": 16,
+    "faithfulness_random_subsets": 16,
+    "bootstrap_resamples": 2000,
+    "blend_attribution": "unit-mass component maps combined with the locked 0.1/0.9 probability weights"
+  },
+  "rendering": {
+    "status": "METRICS_UNCHANGED_PRESENTATION_RERENDER",
+    "renderer": "render_faithfulness_figures.py",
+    "renderer_sha256": "0502f75905522179a0a182debb7e03b0cb963ee8ae3fbb4c68f972e10c16fff0",
+    "outputs": [
+      "faithfulness_method_selection.png",
+      "faithfulness_method_selection.svg",
+      "faithfulness_perturbation_curves.png",
+      "faithfulness_perturbation_curves.svg",
+      "convnext_small_faithfulness_gallery.jpg",
+      "dinov2_small_faithfulness_gallery.jpg",
+      "probability_blend_faithfulness_gallery.jpg"
+    ]
+  },
+  "release_export": {
+    "status": "VALIDATED_PATH_SANITIZED_EVIDENCE_PROMOTED",
+    "source_provenance_sha256": "ae079d4d2f28d1d6d2818a8b339f20883ad1530e02605b41356d4794c3705d69",
+    "implementation_fingerprints": {
+      "experiments/evaluate_faithfulness.py": "b1d31bd91576527d04cfcfebb867c22d2a6c2759affe2d0c14853f787e799211",
+      "src/hac/explainability.py": "da51b8b29baf413c66ef5461bd06c89e7351c28c28b1fc202c1e899ed07c8545",
+      "src/hac/models.py": "b7834038ca58c0ddac7d9f997dfd69b2b0b9b1830e5c6f26225fd5387080b436",
+      "tools/export_faithfulness_results.py": "3f455c27cc6454015ce64097727de6f91dabf230c15fd3229f6680384e846032",
+      "tools/render_faithfulness_figures.py": "0502f75905522179a0a182debb7e03b0cb963ee8ae3fbb4c68f972e10c16fff0"
+    },
+    "tracked_evidence": {
+      "assets/convnext_small_faithfulness_gallery.jpg": "35865cc879b212a4f4690467c9100321b3d11ea16794280c31a47462e562ce32",
+      "assets/dinov2_small_faithfulness_gallery.jpg": "ebd41b2e289377ae470dc72fbe0fddc82d72d44109c631b06cdfa66e2ffacc91",
+      "assets/faithfulness_method_selection.png": "625f02903388a91c7bf5fb59303f1ba64629efb1337891cd5a41afd6190c2abf",
+      "assets/faithfulness_method_selection.svg": "5f00b881ec8f46b5d0f795ef231f8ffcb23bde38d47857ab0f0b065ba5a2d548",
+      "assets/faithfulness_perturbation_curves.png": "7dba8ba7a040cb5f4a1e6de1ca473786a71f1f48b4a21590589a3df709964467",
+      "assets/faithfulness_perturbation_curves.svg": "41e18244584d82c5568b7c6929a0e7caaf0e4261b9d871b80d17c682aca62f6f",
+      "assets/probability_blend_faithfulness_gallery.jpg": "cf787683493e90817ec1ac86ff44ec4d752480e0d2f8a03356f0fa9141175849",
+      "results/faithfulness_checkpoint_manifest.csv": "e3c5f9f4805d85e6b46882eb1506f0fd084045bb61d0d2fb4a5be456a8d6c7e0",
+      "results/faithfulness_method_selection.csv": "e1b9fc65823d4ac32b1107b9f94a515c4aa3362054c45b5e5fea9447b856f9a3",
+      "results/faithfulness_oof_selection_cohort.csv": "2aceee47a785d1dfc63c1a3d76740b975ec6ac66793d05d037c7070a14986a79",
+      "results/faithfulness_replay_validation.csv": "ffdb179f3cfb77aba40c312c4214644e38f93d06a0d5f75b4f1d2e74fedb87ca",
+      "results/faithfulness_sanity_checks.csv": "b256e94be7df70d3d6b616c985e38471ac9e7bbec7ee3717e3dfeb8f3c7496cf",
+      "results/faithfulness_sanity_summary.csv": "aa92f5abcb8abb71cdf74c0883c5a192889d9b99dc2de2159c2fa1ff7c5c2887",
+      "results/faithfulness_selection_lock.json": "d0d36f56a9de534358d0d3797e673ab4c6e8adc5f437fce52b7a5ae61a5a8ba4",
+      "results/faithfulness_stability_checks.csv": "826ce9e2b3cd2cd0823410a1b8bea8f89c32883c42b11a7bcaaa8b2a82f36d4f",
+      "results/faithfulness_stability_summary.csv": "aca03cb749c7934824ed7f07436cea6303f6df3a42889d99ec59fb965a192c67",
+      "results/faithfulness_test_curves.csv": "4a4c54f35271ffbd5644e2c879c76715c45ed26dca2fca6f4a67c193b6a2bc13",
+      "results/faithfulness_test_per_image.csv": "4d0cf15f8561c2ee5a3006a52bb899c337d68b0e93ec0f2f9c6dedf3ede9729a",
+      "results/faithfulness_test_summary.csv": "50c07dd77793f7a470dd94378fb18b9f2849c545dc76cc12c51b68ade22d3101",
+      "results/oof_method_selection_per_image.csv": "c605368211f1d0ac5e817e1d33037a405b34b11bd5183b07d6941d354fc79304",
+      "results/oof_replay_validation.csv": "8f65853032d02d07e0a044faad406efc5d2874ed07c50d7be0e63aad4ffbe03f"
+    }
+  }
+}

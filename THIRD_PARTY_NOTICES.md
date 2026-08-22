@@ -34,5 +34,14 @@ The torchvision source is distributed under the
 Torchvision notes that pretrained models can also be subject to terms derived
 from their training data; those upstream rights are not relicensed here.
 
+## PyTorch Grad-CAM
+
+The attribution evaluator uses the ROAD noisy-linear imputer from
+[PyTorch Grad-CAM](https://github.com/jacobgil/pytorch-grad-cam), distributed
+under the [MIT License](https://github.com/jacobgil/pytorch-grad-cam/blob/master/LICENSE).
+The Grad-CAM, HiResCAM, integrated-gradients, and transformer-rollout maps in
+this repository are implemented locally so they can differentiate the exact
+calibrated ensemble score used by the locked experiment.
+
 No third-party framework source or pretrained model checkpoint is committed to
 this repository.

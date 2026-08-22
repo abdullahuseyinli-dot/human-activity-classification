@@ -1,0 +1,4 @@
+model,max_absolute_probability_difference,mean_absolute_probability_difference,acceptance_tolerance,passed
+convnext_small,0.0002415882973680894,3.9369107278604865e-05,0.001,True
+dinov2_small,0.0007454760225866219,0.00014180326842933033,0.001,True
+probability_blend,0.0006786484011715999,0.000127424503963522,0.001,True
