@@ -10,6 +10,8 @@ import math
 import platform
 import subprocess
 import time
+import traceback
+from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
@@ -35,6 +37,8 @@ from hac.polar_training import (
     warmup_cosine_scheduler,
 )
 from hac.training import mixup_batch, seed_everything
+
+FAILURE_DIRECTORY: Path | None = None
 
 
 def parse_args() -> argparse.Namespace:
@@ -243,6 +247,8 @@ def train_epoch(
     optimizer.zero_grad(set_to_none=True)
     losses = []
     samples = 0
+    optimizer_updates = 0
+    skipped_overflow_updates = 0
     started = time.perf_counter()
     for step, batch in enumerate(loader):
         inputs = batch["pixel_values"].to(device, non_blocking=True)
@@ -257,23 +263,39 @@ def train_epoch(
             window_size = min(grad_accum_steps, len(loader) - window_start)
             loss = raw_loss / window_size
         scaler.scale(loss).backward()
+        losses.append(float(raw_loss.detach().item()))
+        samples += len(labels)
         should_step = (step + 1) % grad_accum_steps == 0 or step + 1 == len(loader)
         if should_step:
             scaler.unscale_(optimizer)
-            gradient_norm = nn.utils.clip_grad_norm_(model.parameters(), gradient_clip)
-            if not torch.isfinite(gradient_norm):
-                raise FloatingPointError("Non-finite gradient norm")
+            try:
+                nn.utils.clip_grad_norm_(
+                    model.parameters(),
+                    gradient_clip,
+                    error_if_nonfinite=True,
+                )
+            except RuntimeError as error:
+                if "non-finite" not in str(error).lower() or not scaler.is_enabled():
+                    raise
+                scaler.step(optimizer)
+                scaler.update()
+                optimizer.zero_grad(set_to_none=True)
+                skipped_overflow_updates += 1
+                continue
             scaler.step(optimizer)
             scaler.update()
             optimizer.zero_grad(set_to_none=True)
             scheduler.step()
-        losses.append(float(raw_loss.detach().item()))
-        samples += len(labels)
+            optimizer_updates += 1
     elapsed = time.perf_counter() - started
+    if optimizer_updates == 0:
+        raise FloatingPointError("Epoch completed without a finite optimizer update")
     return {
         "loss": float(np.mean(losses)),
         "seconds": float(elapsed),
         "images_per_second": float(samples / elapsed),
+        "optimizer_updates": int(optimizer_updates),
+        "skipped_overflow_updates": int(skipped_overflow_updates),
     }
 
 
@@ -309,11 +331,13 @@ def save_checkpoint(
 
 
 def main() -> None:
+    global FAILURE_DIRECTORY
     args = parse_args()
     validate_arguments(args)
     torch.set_float32_matmul_precision("high")
     output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
+    FAILURE_DIRECTORY = output_dir
     manifest_path = args.manifest.resolve()
     repository_root = Path(__file__).resolve().parents[1]
 
@@ -402,7 +426,11 @@ def main() -> None:
         weight=class_weights,
         label_smoothing=args.label_smoothing,
     )
-    scaler = torch.amp.GradScaler("cuda", enabled=device.type == "cuda")
+    scaler = torch.amp.GradScaler(
+        "cuda",
+        enabled=device.type == "cuda",
+        init_scale=4096.0,
+    )
     validation_loader = make_loader(
         validation_frame,
         class_to_index,
@@ -489,6 +517,8 @@ def main() -> None:
             "train_loss": train_stats["loss"],
             "train_seconds": train_stats["seconds"],
             "images_per_second": train_stats["images_per_second"],
+            "optimizer_updates": train_stats["optimizer_updates"],
+            "skipped_overflow_updates": train_stats["skipped_overflow_updates"],
             "validation_loss": validation["loss"],
             **{f"validation_{key}": value for key, value in metrics.items()},
             "improved": improved,
@@ -578,4 +608,19 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as error:
+        if FAILURE_DIRECTORY is not None:
+            write_json(
+                FAILURE_DIRECTORY / "failure.json",
+                {
+                    "status": "FAILED",
+                    "timestamp_utc": datetime.now(UTC).isoformat(),
+                    "error_type": type(error).__name__,
+                    "error": str(error),
+                    "traceback": traceback.format_exc(),
+                    "test_rows_read": 0,
+                },
+            )
+        raise
