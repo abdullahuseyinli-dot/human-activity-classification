@@ -143,6 +143,22 @@ def git_revision(root: Path) -> str:
     return result.stdout.strip() if result.returncode == 0 else "unavailable"
 
 
+def implementation_hashes(root: Path) -> dict[str, str]:
+    relative_paths = [
+        "experiments/train_polar_candidate.py",
+        "src/hac/augmentations.py",
+        "src/hac/config.py",
+        "src/hac/data.py",
+        "src/hac/metrics.py",
+        "src/hac/models.py",
+        "src/hac/polar.py",
+        "src/hac/polar_models.py",
+        "src/hac/polar_training.py",
+        "src/hac/training.py",
+    ]
+    return {value: sha256_file(root / value) for value in relative_paths}
+
+
 def checkpoint_evidence(model_kind: str) -> dict:
     if model_kind in DINO_MODEL_SPECS:
         specification = DINO_MODEL_SPECS[model_kind]
@@ -347,6 +363,7 @@ def main() -> None:
         "configuration": config_values,
         "manifest_sha256": sha256_file(manifest_path),
         "runner_sha256": sha256_file(Path(__file__).resolve()),
+        "implementation_sha256": implementation_hashes(repository_root),
         "test_rows_read": 0,
         "test_used_for_selection": False,
     }
