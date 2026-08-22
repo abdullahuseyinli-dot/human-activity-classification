@@ -9,6 +9,7 @@ description = "Leakage-safe transfer-learning benchmarks for image-based human a
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
 dependencies = [
+  "imagehash>=4.3,<5",
   "matplotlib>=3.9,<4",
   "numpy>=2.0,<3",
   "pandas>=2.2,<4",

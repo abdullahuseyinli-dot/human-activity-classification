@@ -19,6 +19,24 @@ Suggested dataset citation:
 > Lin, T.-Y. et al. (2014). Microsoft COCO: Common Objects in Context. ECCV.
 > https://doi.org/10.1007/978-3-319-10602-1_48
 
+## POLAR dataset
+
+The scale study uses POLAR version 1 from Mendeley Data under the licence stated
+on the [dataset record](https://doi.org/10.17632/hvnsh7rwz7.1). The release is
+downloaded and verified locally; no POLAR image is committed or redistributed.
+Although the dataset record is marked CC BY 4.0, its metadata identifies Getty
+source filenames. Getty and other upstream image rights are not relicensed by
+this project. Users must obtain the release from its publisher and assess whether
+their intended use is permitted.
+
+Suggested citations:
+
+> Abdallah, M. et al. (2019). POLAR: A holistic dataset for human activity
+> recognition. Mendeley Data, V1. https://doi.org/10.17632/hvnsh7rwz7.1
+
+> Abdallah, M. et al. (2019). Human activity recognition using recurrent neural
+> networks. ICSAI. https://doi.org/10.1109/ICSAI48974.2019.9010160
+
 ## DINOv2-Small
 
 The DINOv2-Small pretrained model is developed by Meta AI and distributed under

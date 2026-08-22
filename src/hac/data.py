@@ -11,6 +11,8 @@ from PIL import Image
 from sklearn.model_selection import StratifiedKFold
 from torch.utils.data import DataLoader, Dataset
 
+from .polar import image_view
+
 
 class ActivityDataset(Dataset):
     def __init__(
@@ -18,10 +20,12 @@ class ActivityDataset(Dataset):
         frame: pd.DataFrame,
         class_to_index: dict[str, int],
         transform: Callable,
+        view: str = "full_frame",
     ) -> None:
         self.frame = frame.reset_index(drop=True).copy()
         self.class_to_index = dict(class_to_index)
         self.transform = transform
+        self.view = str(view)
 
     def __len__(self) -> int:
         return len(self.frame)
@@ -29,7 +33,8 @@ class ActivityDataset(Dataset):
     def __getitem__(self, index: int) -> dict:
         row = self.frame.iloc[index]
         with Image.open(row["resolved_image_path"]) as image:
-            pixels = self.transform(image.convert("RGB"))
+            source = image.convert("RGB")
+            pixels = self.transform(image_view(source, row, self.view))
         return {
             "pixel_values": pixels,
             "label": int(self.class_to_index[str(row["label"])]),
@@ -47,11 +52,12 @@ def make_loader(
     shuffle: bool,
     seed: int,
     workers: int = 0,
+    view: str = "full_frame",
 ) -> DataLoader:
     generator = torch.Generator()
     generator.manual_seed(int(seed))
     return DataLoader(
-        ActivityDataset(frame, class_to_index, transform),
+        ActivityDataset(frame, class_to_index, transform, view=view),
         batch_size=int(batch_size),
         shuffle=bool(shuffle),
         num_workers=int(workers),
