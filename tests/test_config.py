@@ -43,3 +43,17 @@ def test_valid_dino_config_round_trips_without_null_fields():
     )
     assert config.as_dict()["top_n_blocks"] == 2
     assert config.as_dict(include_model_kind=False)["dropout"] == 0.1
+
+
+def test_dinov2_base_accepts_the_declared_capacity_extension_strategy():
+    config = ModelConfig(
+        model_kind="dinov2_base",
+        augmentation_strength="mild",
+        batch_size=2,
+        head_lr=5e-4,
+        backbone_lr=5e-6,
+        weight_decay=1e-3,
+        unfreeze_strategy="top_blocks",
+        top_n_blocks=4,
+    )
+    assert config.model_kind == "dinov2_base"

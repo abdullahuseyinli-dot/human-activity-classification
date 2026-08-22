@@ -26,20 +26,27 @@ class ActivityDataset(Dataset):
         self.class_to_index = dict(class_to_index)
         self.transform = transform
         self.view = str(view)
+        if "resolved_image_path" in self.frame:
+            self.path_column = "resolved_image_path"
+        elif "image_path" in self.frame:
+            self.path_column = "image_path"
+        else:
+            raise ValueError("Dataset rows require resolved_image_path or image_path")
 
     def __len__(self) -> int:
         return len(self.frame)
 
     def __getitem__(self, index: int) -> dict:
         row = self.frame.iloc[index]
-        with Image.open(row["resolved_image_path"]) as image:
+        image_path = str(row[self.path_column])
+        with Image.open(image_path) as image:
             source = image.convert("RGB")
             pixels = self.transform(image_view(source, row, self.view))
         return {
             "pixel_values": pixels,
             "label": int(self.class_to_index[str(row["label"])]),
             "image_id": str(row["image_id"]),
-            "image_path": str(row["resolved_image_path"]),
+            "image_path": image_path,
         }
 
 

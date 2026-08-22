@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Literal
 
-ModelKind = Literal["convnext_small", "dinov2_small"]
+ModelKind = Literal["convnext_small", "dinov2_small", "dinov2_base"]
 UnfreezeStrategy = Literal["head_only", "last_stage", "probe_only", "top_blocks", "full_backbone"]
 
 
@@ -40,6 +40,7 @@ class ModelConfig:
         allowed = {
             "convnext_small": {"head_only", "last_stage", "full_backbone"},
             "dinov2_small": {"probe_only", "top_blocks", "full_backbone"},
+            "dinov2_base": {"probe_only", "top_blocks", "full_backbone"},
         }
         if self.unfreeze_strategy not in allowed[self.model_kind]:
             raise ValueError(f"{self.unfreeze_strategy!r} is invalid for {self.model_kind}")
