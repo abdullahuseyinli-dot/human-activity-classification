@@ -1,5 +1,5 @@
 {
-  "protocol_version": "1.1.0",
+  "protocol_version": "1.2.0",
   "locked_date": "2026-08-22",
   "status": "PRE_TEST_LOCKED",
   "dataset": {
@@ -53,6 +53,13 @@
   "adaptation": {
     "convnext_small": ["head_only", "last_stage", "full_backbone"],
     "dinov2_small": ["probe_only", "top_4_blocks", "full_backbone"]
+  },
+  "full_adaptation_layer_decay": {
+    "dinov2_small": 0.75,
+    "dinov2_base": 0.75,
+    "convnext_small": 0.7,
+    "locked_before_partial_or_full_adaptation": true,
+    "test_rows_read_at_lock": 0
   },
   "regularization_screen": {
     "dropout": [0.0, 0.1, 0.2],

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import re
 from collections.abc import Iterable
 
 import numpy as np
@@ -167,32 +168,74 @@ def optimizer_parameter_groups(
     head_lr: float,
     backbone_lr: float,
     weight_decay: float,
+    model_kind: str | None = None,
+    layer_decay: float | None = None,
 ) -> list[dict]:
     """Build head/backbone groups while exempting bias and norm vectors from decay."""
 
-    groups: dict[tuple[str, bool], list[nn.Parameter]] = {
-        ("head", True): [],
-        ("head", False): [],
-        ("backbone", True): [],
-        ("backbone", False): [],
-    }
+    if layer_decay is not None and not 0.0 < float(layer_decay) <= 1.0:
+        raise ValueError("layer_decay must be in (0, 1]")
+    if layer_decay is not None and model_kind is None:
+        raise ValueError("model_kind is required with layer_decay")
+
+    trainable_names = [name for name, parameter in model.named_parameters() if parameter.requires_grad]
+    maximum_layer = 0
+    if layer_decay is not None and model_kind in {"dinov2_small", "dinov2_base"}:
+        block_indices = [
+            int(match.group(1))
+            for name in trainable_names
+            if (match := re.search(r"encoder\.layer\.(\d+)", name))
+        ]
+        maximum_layer = max(block_indices, default=-1) + 1
+    elif layer_decay is not None and model_kind == "convnext_small":
+        feature_indices = [
+            int(match.group(1))
+            for name in trainable_names
+            if (match := re.search(r"backbone\.features\.(\d+)", name))
+        ]
+        maximum_layer = max(feature_indices, default=0)
+
+    groups: dict[tuple[str, bool, int], list[nn.Parameter]] = {}
     for name, parameter in model.named_parameters():
         if not parameter.requires_grad:
             continue
         scope = "head" if "classifier" in name or name.startswith("head.") else "backbone"
         use_decay = parameter.ndim > 1 and not name.endswith(".bias")
-        groups[(scope, use_decay)].append(parameter)
+        layer_id = maximum_layer
+        if scope == "backbone" and layer_decay is not None:
+            if model_kind in {"dinov2_small", "dinov2_base"}:
+                match = re.search(r"encoder\.layer\.(\d+)", name)
+                if match:
+                    layer_id = int(match.group(1)) + 1
+                elif "embeddings" in name:
+                    layer_id = 0
+            elif model_kind == "convnext_small":
+                match = re.search(r"backbone\.features\.(\d+)", name)
+                if match:
+                    layer_id = int(match.group(1))
+        groups.setdefault((scope, use_decay, layer_id), []).append(parameter)
 
     output = []
-    for (scope, use_decay), parameters in groups.items():
+    for (scope, use_decay, layer_id), parameters in groups.items():
         if not parameters:
             continue
+        learning_rate = float(head_lr)
+        scale = 1.0
+        if scope == "backbone":
+            scale = (
+                float(layer_decay) ** (maximum_layer - layer_id)
+                if layer_decay is not None
+                else 1.0
+            )
+            learning_rate = float(backbone_lr) * scale
+        layer_name = f"_layer_{layer_id}" if scope == "backbone" and layer_decay else ""
         output.append(
             {
                 "params": parameters,
-                "lr": float(head_lr if scope == "head" else backbone_lr),
+                "lr": learning_rate,
                 "weight_decay": float(weight_decay if use_decay else 0.0),
-                "group_name": f"{scope}_{'decay' if use_decay else 'no_decay'}",
+                "group_name": f"{scope}{layer_name}_{'decay' if use_decay else 'no_decay'}",
+                "lr_scale": scale,
             }
         )
     if not output:

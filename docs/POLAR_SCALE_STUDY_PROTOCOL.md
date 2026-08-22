@@ -1,8 +1,25 @@
 # POLAR scale study protocol
 
-Protocol version: **1.1.0**
+Protocol version: **1.2.0**
 Locked: **2026-08-22, before image download, duplicate inspection, model fitting, or
 access to POLAR test labels by the study runner**
+
+### Amendment 1.2.0: layer-wise decay for full adaptation
+
+Locked on **2026-08-22 after the frozen probe and head-only engineering baseline,
+before partial/full adaptation and without loading any POLAR test row**. Official
+fine-tuning implementations for transformer and ConvNeXt backbones decay learning
+rates toward earlier layers, preserving general low-level features while allowing
+task-specific change near the output. Full-backbone DINOv2 candidates therefore
+use layer decay 0.75, matching the published BEiT-family recipe, and full-backbone
+ConvNeXt candidates use the official ConvNeXt value 0.70. Head and partial-depth
+candidates retain the two-rate policy so adaptation depth remains identifiable.
+
+Primary implementation references:
+
+- [Microsoft UNILM/BEiT fine-tuning](https://github.com/microsoft/unilm/blob/master/dit/classification/README.md)
+- [Meta ConvNeXt fine-tuning](https://github.com/facebookresearch/ConvNeXt/blob/main/TRAINING.md)
+- [DINOv2 paper and official code](https://github.com/facebookresearch/dinov2)
 
 ### Amendment 1.1.0: source-related split contamination
 

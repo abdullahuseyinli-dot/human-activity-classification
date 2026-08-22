@@ -80,6 +80,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--head-lr", type=float, default=5e-4)
     parser.add_argument("--backbone-lr", type=float, default=1e-5)
     parser.add_argument("--weight-decay", type=float, default=1e-2)
+    parser.add_argument("--layer-decay", type=float)
     parser.add_argument("--dropout", type=float, default=0.1)
     parser.add_argument("--mixup-alpha", type=float, default=0.0)
     parser.add_argument("--label-smoothing", type=float, default=0.0)
@@ -211,6 +212,7 @@ def configuration(args: argparse.Namespace) -> dict:
         "head_lr": args.head_lr,
         "backbone_lr": args.backbone_lr,
         "weight_decay": args.weight_decay,
+        "layer_decay": args.layer_decay,
         "dropout": args.dropout,
         "mixup_alpha": args.mixup_alpha,
         "label_smoothing": args.label_smoothing,
@@ -240,6 +242,10 @@ def validate_arguments(args: argparse.Namespace) -> None:
         raise ValueError("min-epochs cannot exceed max-epochs")
     if args.gradient_clip <= 0.0:
         raise ValueError("gradient-clip must be positive")
+    if args.layer_decay is not None and not 0.0 < args.layer_decay <= 1.0:
+        raise ValueError("layer-decay must be in (0, 1]")
+    if args.layer_decay is not None and args.unfreeze_strategy != "full_backbone":
+        raise ValueError("layer-decay is reserved for full-backbone adaptation")
 
 
 def train_epoch(
@@ -427,6 +433,8 @@ def main() -> None:
         head_lr=args.head_lr,
         backbone_lr=args.backbone_lr,
         weight_decay=args.weight_decay,
+        model_kind=args.model_kind,
+        layer_decay=args.layer_decay,
     )
     optimizer = torch.optim.AdamW(groups)
     batches_per_epoch = math.ceil(len(train_frame) / args.batch_size)

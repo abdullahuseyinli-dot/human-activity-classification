@@ -79,3 +79,24 @@ def test_optimizer_groups_keep_head_and_backbone_learning_rates_separate():
     assert by_name["head_decay"]["lr"] == 1e-3
     assert by_name["backbone_decay"]["lr"] == 1e-5
     assert by_name["head_no_decay"]["weight_decay"] == 0.0
+
+
+def test_dino_layer_decay_reduces_learning_rate_toward_embeddings():
+    model = nn.Module()
+    model.backbone = nn.Module()
+    model.backbone.embeddings = nn.Linear(3, 3)
+    model.backbone.encoder = nn.Module()
+    model.backbone.encoder.layer = nn.ModuleList([nn.Linear(3, 3) for _ in range(3)])
+    model.classifier = nn.Linear(3, 2)
+    groups = optimizer_parameter_groups(
+        model,
+        head_lr=1e-3,
+        backbone_lr=1e-4,
+        weight_decay=0.01,
+        model_kind="dinov2_small",
+        layer_decay=0.75,
+    )
+    rates = {group["group_name"]: group["lr"] for group in groups}
+    assert rates["backbone_layer_0_decay"] < rates["backbone_layer_3_decay"]
+    assert rates["backbone_layer_3_decay"] == pytest.approx(1e-4)
+    assert rates["head_decay"] == pytest.approx(1e-3)
