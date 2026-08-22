@@ -1,0 +1,17 @@
+left_image_id,left_split,left_label,right_image_id,right_split,right_label,embedding_cosine,phash_distance,normalized_mae,normalized_correlation,decision
+p1_21647,train,standing,p1_29061,val,standing,0.9996872544288636,4,0.0133635876700282,0.9855167127159832,quarantined_source_related
+p1_06653,test,running,p1_24185,train,running,0.9969582557678224,0,0.0007960898801684,0.9999527977855094,quarantined_source_related
+p1_15259,test,running,p1_23920,train,running,0.995915412902832,10,0.0532379783689975,0.966928705959324,quarantined_source_related
+p1_01038,train,walking,p1_03924,val,walking,0.9954268932342528,2,0.0134765617549419,0.9765289312107662,quarantined_source_related
+p1_03588,train,running,p1_03957,test,running,0.994360625743866,0,0.0133193079382181,0.9932657762877906,quarantined_source_related
+p1_17462,train,running,p1_21704,val,running,0.9937251210212708,0,0.0279859360307455,0.998552387284602,quarantined_source_related
+p1_06059,train,standing,p1_15142,val,standing,0.9929609298706056,4,0.0104482620954513,0.9519420097789024,quarantined_source_related
+p1_12489,test,sitting,p1_18547,train,sitting,0.9917564392089844,4,0.0088141951709985,0.977796414280437,quarantined_source_related
+p1_02676,test,walking,p1_04088,val,walking,0.991713047027588,2,0.019131289795041,0.9843853628090892,quarantined_source_related
+p1_01667,val,standing,p1_06059,train,standing,0.990748405456543,4,0.0101864095777273,0.9518324218286164,quarantined_source_related
+p1_00305,test,walking,p1_13045,train,walking,0.9906617999076844,0,0.0117273665964603,0.9916802037373152,quarantined_source_related
+p1_05881,train,sitting,p1_24983,val,sitting,0.9903398752212524,10,0.0134892482310533,0.959974387320262,quarantined_source_related
+p1_03681,train,walking,p1_04831,val,walking,0.9891849756240844,4,0.0088850427418947,0.9927376386698056,quarantined_source_related
+p1_28380,train,standing,p1_29392,val,standing,0.9886278510093688,2,0.0194888841360807,0.999329662151875,quarantined_source_related
+p1_02891,val,standing,p1_05934,test,standing,0.986193597316742,4,0.0075044520199298,0.9714156797136964,quarantined_source_related
+p1_03491,test,walking,p1_16069,train,walking,0.9855127930641174,2,0.0101177133619785,0.979168351495476,quarantined_source_related

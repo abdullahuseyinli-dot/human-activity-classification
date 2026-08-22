@@ -1,0 +1,32 @@
+{
+  "clean_manifest_sha256": "0c47f3eb52bc40e16303818996bc84914cb1a4ff062315dfbb2b5c3674952e93",
+  "clean_rows": 16614,
+  "clean_target_counts": {
+    "test": {
+      "running": 736,
+      "sitting": 1034,
+      "standing": 921,
+      "walking": 638
+    },
+    "train": {
+      "running": 2223,
+      "sitting": 3021,
+      "standing": 2720,
+      "walking": 1994
+    },
+    "val": {
+      "running": 712,
+      "sitting": 1000,
+      "standing": 967,
+      "walking": 648
+    }
+  },
+  "embedding_audit_candidates_sha256": "0c1087234dced1094288bba025ba1c44407986c819239fcf330222b794a7361e",
+  "full_manifest_sha256": "aa00952556280d0c8f46a892d9a69077c78d9da6ee2c825f269e69d22280c8b8",
+  "protocol_version": "1.1.0",
+  "quarantine_sha256": "5ed193e060dda3aface520bd141b9053ffda91e1fa7cf8055fcff8df42cae06f",
+  "repository_head": "19812797a791b60207c78777ac4700f002efe594",
+  "status": "LOCKED_BEFORE_SUPERVISED_FITTING",
+  "test_model_evaluated": false,
+  "test_used_for_selection": false
+}

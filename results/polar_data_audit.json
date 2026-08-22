@@ -1,0 +1,81 @@
+{
+  "ambiguous_target_annotations": 0,
+  "annotations": 35324,
+  "bbox_area_fraction": {
+    "mean": 0.31193141116598305,
+    "median": 0.29637252379727297,
+    "p05": 0.03391725535926929,
+    "p95": 0.6756249093705344
+  },
+  "clean_manifest": "polar_clean_manifest.csv",
+  "clean_manifest_sha256": "0c47f3eb52bc40e16303818996bc84914cb1a4ff062315dfbb2b5c3674952e93",
+  "clean_rows": 16614,
+  "clean_target_counts": {
+    "test": {
+      "running": 736,
+      "sitting": 1034,
+      "standing": 921,
+      "walking": 638
+    },
+    "train": {
+      "running": 2223,
+      "sitting": 3021,
+      "standing": 2720,
+      "walking": 1994
+    },
+    "val": {
+      "running": 712,
+      "sitting": 1000,
+      "standing": 967,
+      "walking": 648
+    }
+  },
+  "clipped_boxes": 0,
+  "confirmed_source_related_pairs": 64,
+  "dataset_doi": "10.17632/hvnsh7rwz7.1",
+  "decode_failures": 0,
+  "dimension_mismatches": 0,
+  "eligible_rows": 16614,
+  "embedding_confirmed_source_related_pairs": 16,
+  "embedding_minimum_cosine": 0.985,
+  "exact_cross_split_pairs": 0,
+  "exact_duplicate_groups": 0,
+  "invalid_boxes": 0,
+  "legacy_overlap_candidates": 0,
+  "manifest": "polar_target_manifest.csv",
+  "manifest_sha256": "aa00952556280d0c8f46a892d9a69077c78d9da6ee2c825f269e69d22280c8b8",
+  "near_cross_split_candidates": 164,
+  "near_hash_review_threshold": 6,
+  "non_target_annotations": 18585,
+  "phash_confirmed_source_related_pairs": 62,
+  "protocol_version": "1.1.0",
+  "quarantine_applied": true,
+  "quarantine_components": 61,
+  "quarantine_images": 125,
+  "raw_images_redistributed": false,
+  "source_related_minimum_correlation": 0.9,
+  "status": "PRE_SUPERVISED_FIT_DATA_LOCK",
+  "target_counts": {
+    "test": {
+      "running": 739,
+      "sitting": 1043,
+      "standing": 936,
+      "walking": 641
+    },
+    "train": {
+      "running": 2230,
+      "sitting": 3043,
+      "standing": 2740,
+      "walking": 2002
+    },
+    "val": {
+      "running": 716,
+      "sitting": 1015,
+      "standing": 980,
+      "walking": 654
+    }
+  },
+  "target_rows": 16739,
+  "test_model_evaluated": false,
+  "test_used_for_model_selection": false
+}

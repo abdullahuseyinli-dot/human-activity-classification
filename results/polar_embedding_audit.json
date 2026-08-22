@@ -1,0 +1,36 @@
+{
+  "candidate_pairs": 16,
+  "device": "cuda",
+  "embedding_shape": [
+    16739,
+    384
+  ],
+  "manifest": "polar_target_manifest.csv",
+  "manifest_sha256": "aa00952556280d0c8f46a892d9a69077c78d9da6ee2c825f269e69d22280c8b8",
+  "minimum_cosine": 0.985,
+  "model": "facebook/dinov2-small",
+  "model_files": [
+    {
+      "bytes": 547,
+      "path": "config.json",
+      "sha256": "1809f83e3bdb1609a501a610ad4a742f4fd8ae44d72ca4aa0df52d1f2ac8628d"
+    },
+    {
+      "bytes": 88249960,
+      "path": "model.safetensors",
+      "sha256": "ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1"
+    },
+    {
+      "bytes": 436,
+      "path": "preprocessor_config.json",
+      "sha256": "14e780d86fa1861f8751f868d7f45425b5feb55c38ca26f152ca5097ab30f828"
+    }
+  ],
+  "model_revision": "ed25f3a31f01632728cabb09d1542f84ab7b0056",
+  "model_snapshot": "ed25f3a31f01632728cabb09d1542f84ab7b0056",
+  "status": "PRE_SUPERVISED_FIT_AUDIT",
+  "supervised_model_fitted": false,
+  "test_labels_used": false,
+  "top_k": 20,
+  "torch": "2.11.0+cu126"
+}
