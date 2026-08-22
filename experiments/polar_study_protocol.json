@@ -1,0 +1,94 @@
+{
+  "protocol_version": "1.0.0",
+  "locked_date": "2026-08-22",
+  "status": "PRE_TEST_LOCKED",
+  "dataset": {
+    "name": "POLAR",
+    "version": 1,
+    "doi": "10.17632/hvnsh7rwz7.1",
+    "official_splits": ["train", "val", "test"],
+    "primary_labels": ["sitting", "standing", "walking", "running"],
+    "source_to_primary": {
+      "sit": "sitting",
+      "stand": "standing",
+      "walk": "walking",
+      "run": "running"
+    },
+    "secondary_labels": ["sitting", "standing", "walking_running"],
+    "primary_to_secondary": {
+      "sitting": "sitting",
+      "standing": "standing",
+      "walking": "walking_running",
+      "running": "walking_running"
+    },
+    "expected_target_counts": {
+      "train": {"sitting": 3043, "standing": 2740, "walking": 2002, "running": 2230},
+      "val": {"sitting": 1015, "standing": 980, "walking": 654, "running": 716},
+      "test": {"sitting": 1043, "standing": 936, "walking": 641, "running": 739}
+    }
+  },
+  "archive_sha256": {
+    "JPEGImages.z01": "2c70432788d221627ac5a7eeb67a044acf7e39e3f51323cd253e2fa3f946831d",
+    "JPEGImages.z02": "ae23efcbd37dc96b3bc052ff703a51ec594c52a0101e8bdb356c382dd1bc3865",
+    "JPEGImages.z03": "ce622c898f7898e288619632c3e84b490cd40683cb771e0f185fcfb545d68b6a",
+    "JPEGImages.z04": "3e7ef5f09fcf6bb7ef9160b43f4a23ee7036308231eba553e61535b07d4860a0",
+    "JPEGImages.zip": "a911de85a38f5d428408f2f377f839caa568d023f6c4b7c11cae46e2e4de4846"
+  },
+  "deduplication": {
+    "exact": "sha256",
+    "perceptual_hash": "phash64",
+    "review_max_hamming_distance": 6,
+    "cross_boundary_confirmed_duplicate_policy": "exclude_group_from_all_study_splits",
+    "test_examples_may_move_to_training": false
+  },
+  "views": ["full_frame", "person_context_10", "person_context_25", "validation_locked_late_fusion"],
+  "required_model_families": ["convnext_small", "dinov2_small"],
+  "optional_capacity_extension": ["dinov2_base"],
+  "adaptation": {
+    "convnext_small": ["head_only", "last_stage", "full_backbone"],
+    "dinov2_small": ["probe_only", "top_4_blocks", "full_backbone"]
+  },
+  "regularization_screen": {
+    "dropout": [0.0, 0.1, 0.2],
+    "augmentation": ["mild", "moderate"],
+    "mixup_alpha": [0.0, 0.2],
+    "label_smoothing": [0.0, 0.05],
+    "class_balance": ["unweighted", "inverse_frequency"]
+  },
+  "selection": {
+    "screen_seed": 42,
+    "confirmation_seeds": [42, 52, 62],
+    "primary_metric": "macro_f1",
+    "practical_tie_absolute": 0.002,
+    "confirmation_band_absolute": 0.005,
+    "tie_breakers": ["lower_seed_std", "lower_log_loss", "lower_ece_15", "lower_training_cost"],
+    "test_used_for_selection": false
+  },
+  "scale": {
+    "subset_seed": 20260822,
+    "nested_train_sizes": [242, 500, 1000, 3000, "all"],
+    "seeds": [42, 52, 62],
+    "fixed_validation": true
+  },
+  "test_gate": {
+    "required_state": "FINAL_LOCK_WRITTEN_AND_ALL_FINAL_FITS_COMPLETE",
+    "test_open_count": 1,
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 20260822
+  },
+  "metrics": [
+    "macro_f1",
+    "accuracy",
+    "balanced_accuracy",
+    "per_class_precision_recall_f1",
+    "log_loss",
+    "multiclass_brier",
+    "ece_15"
+  ],
+  "external_validation": {
+    "dataset": "V-COCO",
+    "mixed_image_policy": "exclude_from_image_level_evaluation",
+    "legacy_coco_overlap_policy": "exclude",
+    "selection_role": "none"
+  }
+}
