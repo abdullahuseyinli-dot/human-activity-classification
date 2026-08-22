@@ -100,8 +100,14 @@ def main() -> None:
 
     manifest_path = output_dir / "polar_target_manifest.csv"
     clean_manifest_path = output_dir / "polar_clean_manifest.csv"
+    development_manifest_path = output_dir / "polar_development_manifest.csv"
+    test_manifest_path = output_dir / "polar_test_manifest.csv"
     full_frame.to_csv(manifest_path, index=False)
     clean_frame.to_csv(clean_manifest_path, index=False)
+    clean_frame[clean_frame["split"].isin(["train", "val"])].to_csv(
+        development_manifest_path, index=False
+    )
+    clean_frame[clean_frame["split"] == "test"].to_csv(test_manifest_path, index=False)
 
     overlaps = None
     if args.legacy_manifest:
@@ -118,6 +124,10 @@ def main() -> None:
             "manifest_sha256": sha256_file(manifest_path),
             "clean_manifest": clean_manifest_path.name,
             "clean_manifest_sha256": sha256_file(clean_manifest_path),
+            "development_manifest": development_manifest_path.name,
+            "development_manifest_sha256": sha256_file(development_manifest_path),
+            "test_manifest": test_manifest_path.name,
+            "test_manifest_sha256": sha256_file(test_manifest_path),
             "exact_cross_split_pairs": len(exact),
             "near_cross_split_candidates": len(near),
             "confirmed_source_related_pairs": len(confirmed),

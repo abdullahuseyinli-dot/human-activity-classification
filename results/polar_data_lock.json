@@ -21,12 +21,14 @@
       "walking": 648
     }
   },
+  "development_manifest_sha256": "2cc5bf62790f6064acc74f7113c341b5c2cd1124bcbfbc3d1e9eb19618a75b83",
   "embedding_audit_candidates_sha256": "0c1087234dced1094288bba025ba1c44407986c819239fcf330222b794a7361e",
   "full_manifest_sha256": "aa00952556280d0c8f46a892d9a69077c78d9da6ee2c825f269e69d22280c8b8",
   "protocol_version": "1.1.0",
   "quarantine_sha256": "5ed193e060dda3aface520bd141b9053ffda91e1fa7cf8055fcff8df42cae06f",
-  "repository_head": "19812797a791b60207c78777ac4700f002efe594",
+  "repository_head": "65d8c18471ce260c3f2a812d0709436589b65fe0",
   "status": "LOCKED_BEFORE_SUPERVISED_FITTING",
+  "test_manifest_sha256": "a8e01e1037e980edeb1886ef2bbbd22a07c316df044741c08e8e2afa8d32fce5",
   "test_model_evaluated": false,
   "test_used_for_selection": false
 }

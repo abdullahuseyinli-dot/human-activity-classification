@@ -34,6 +34,8 @@
   "confirmed_source_related_pairs": 64,
   "dataset_doi": "10.17632/hvnsh7rwz7.1",
   "decode_failures": 0,
+  "development_manifest": "polar_development_manifest.csv",
+  "development_manifest_sha256": "2cc5bf62790f6064acc74f7113c341b5c2cd1124bcbfbc3d1e9eb19618a75b83",
   "dimension_mismatches": 0,
   "eligible_rows": 16614,
   "embedding_confirmed_source_related_pairs": 16,
@@ -76,6 +78,8 @@
     }
   },
   "target_rows": 16739,
+  "test_manifest": "polar_test_manifest.csv",
+  "test_manifest_sha256": "a8e01e1037e980edeb1886ef2bbbd22a07c316df044741c08e8e2afa8d32fce5",
   "test_model_evaluated": false,
   "test_used_for_model_selection": false
 }

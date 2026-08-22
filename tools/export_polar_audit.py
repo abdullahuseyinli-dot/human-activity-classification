@@ -107,6 +107,8 @@ def main() -> None:
         "protocol_version": "1.1.0",
         "repository_head": git_head(),
         "clean_manifest_sha256": audit["clean_manifest_sha256"],
+        "development_manifest_sha256": audit["development_manifest_sha256"],
+        "test_manifest_sha256": audit["test_manifest_sha256"],
         "full_manifest_sha256": audit["manifest_sha256"],
         "quarantine_sha256": sha256_file(quarantine_path),
         "embedding_audit_candidates_sha256": sha256_file(candidate_path),
