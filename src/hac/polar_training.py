@@ -10,10 +10,67 @@ import pandas as pd
 import torch
 from torch import nn
 
+from .metrics import classification_metrics
+
 TASK_LABELS = {
     "label_4": ("sitting", "standing", "walking", "running"),
     "label_3": ("sitting", "standing", "walking_running"),
 }
+
+
+def stable_probabilities(logits: torch.Tensor) -> torch.Tensor:
+    """Compute probabilities in FP32 even when inference used mixed precision."""
+
+    return torch.softmax(logits.float(), dim=1)
+
+
+@torch.inference_mode()
+def evaluate_classifier(
+    model: nn.Module,
+    loader,
+    criterion: nn.Module,
+    device: torch.device,
+    *,
+    return_features: bool = False,
+) -> dict:
+    model.eval()
+    losses, logits, probabilities, labels, features = [], [], [], [], []
+    image_ids, image_paths = [], []
+    for batch in loader:
+        inputs = batch["pixel_values"].to(device, non_blocking=True)
+        targets = batch["label"].to(device, non_blocking=True)
+        with torch.autocast(device_type=device.type, enabled=device.type == "cuda"):
+            if return_features:
+                batch_logits, batch_features = model(inputs, return_features=True)
+            else:
+                batch_logits = model(inputs)
+                batch_features = None
+            loss = criterion(batch_logits, targets)
+        batch_logits = batch_logits.float()
+        batch_probabilities = stable_probabilities(batch_logits)
+        losses.append(float(loss.item()))
+        logits.append(batch_logits.cpu().numpy())
+        probabilities.append(batch_probabilities.cpu().numpy())
+        labels.append(targets.cpu().numpy())
+        if batch_features is not None:
+            features.append(batch_features.float().cpu().numpy())
+        image_ids.extend(str(value) for value in batch["image_id"])
+        image_paths.extend(str(value) for value in batch["image_path"])
+
+    logits_array = np.concatenate(logits)
+    probabilities_array = np.concatenate(probabilities)
+    labels_array = np.concatenate(labels)
+    return {
+        "loss": float(np.mean(losses)),
+        "labels": labels_array,
+        "logits": logits_array,
+        "probabilities": probabilities_array,
+        "predictions": probabilities_array.argmax(axis=1),
+        "features": np.concatenate(features) if features else None,
+        "image_ids": image_ids,
+        "image_paths": image_paths,
+        "metrics": classification_metrics(labels_array, probabilities_array),
+    }
 
 
 def validate_development_manifest(frame: pd.DataFrame, task: str) -> pd.DataFrame:

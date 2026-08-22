@@ -23,12 +23,12 @@ from torch import nn
 from hac.augmentations import build_eval_transform, build_train_transform
 from hac.config import ModelConfig
 from hac.data import make_loader
-from hac.evaluation import evaluate
 from hac.models import parameter_counts
 from hac.polar import sha256_file
 from hac.polar_models import DINO_MODEL_SPECS, build_polar_model
 from hac.polar_training import (
     TASK_LABELS,
+    evaluate_classifier,
     inverse_frequency_weights,
     is_better_validation,
     nested_stratified_subset,
@@ -493,7 +493,7 @@ def main() -> None:
             gradient_clip=args.gradient_clip,
             frozen_backbone=args.unfreeze_strategy in {"head_only", "probe_only"},
         )
-        validation = evaluate(model, validation_loader, criterion, device)
+        validation = evaluate_classifier(model, validation_loader, criterion, device)
         metrics = validation["metrics"]
         improved = is_better_validation(metrics, best_metrics)
         if improved:
@@ -559,7 +559,13 @@ def main() -> None:
         raise RuntimeError("Training produced no best checkpoint")
     best_payload = torch.load(best_checkpoint, map_location=device, weights_only=False)
     model.load_state_dict(best_payload["model_state_dict"])
-    final_validation = evaluate(model, validation_loader, criterion, device, return_features=True)
+    final_validation = evaluate_classifier(
+        model,
+        validation_loader,
+        criterion,
+        device,
+        return_features=True,
+    )
     np.savez_compressed(
         output_dir / "validation_predictions.npz",
         logits=final_validation["logits"],

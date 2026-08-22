@@ -1,13 +1,22 @@
 import pandas as pd
 import pytest
+import torch
 from torch import nn
 
 from hac.polar_training import (
     inverse_frequency_weights,
     nested_stratified_subset,
     optimizer_parameter_groups,
+    stable_probabilities,
     validate_development_manifest,
 )
+
+
+def test_stable_probabilities_promote_half_precision_logits():
+    logits = torch.tensor([[13.0, 12.0, 11.0, 10.0]], dtype=torch.float16)
+    probabilities = stable_probabilities(logits)
+    assert probabilities.dtype == torch.float32
+    assert float(probabilities.sum()) == pytest.approx(1.0, abs=5e-7)
 
 
 def _manifest() -> pd.DataFrame:
