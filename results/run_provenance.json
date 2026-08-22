@@ -11,7 +11,7 @@
     "device": "cuda"
   },
   "data_protocol": {
-    "protocol": "course_fixed_test_plus_internal_stratified_cv",
+    "protocol": "fixed_test_plus_internal_stratified_cv",
     "selection_partition": "original train + validation",
     "selection_rows": 242,
     "final_test_partition": "original test",

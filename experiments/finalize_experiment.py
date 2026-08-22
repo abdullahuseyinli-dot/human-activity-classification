@@ -1,4 +1,4 @@
-"""Retrain locked configurations and evaluate the untouched course test set.
+"""Retrain locked configurations and evaluate the untouched fixed test set.
 
 Configuration selection is intentionally external to this script. A lock file
 created from five-fold OOF confirmation evidence must exist before any final

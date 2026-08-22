@@ -17,3 +17,19 @@ def test_normalize_image_id_handles_collated_tensor_representation():
 
     assert exporter.normalize_image_id("tensor(308394)") == "308394"
     assert exporter.normalize_image_id("21167") == "21167"
+
+
+def test_release_protocol_uses_portfolio_neutral_terminology():
+    exporter = load_export_module()
+
+    sanitized = exporter.sanitize_data_protocol(
+        {
+            "protocol": "legacy_fixed_test_plus_internal_stratified_cv",
+            "final_test_rows": 43,
+        }
+    )
+
+    assert sanitized == {
+        "protocol": "fixed_test_plus_internal_stratified_cv",
+        "final_test_rows": 43,
+    }

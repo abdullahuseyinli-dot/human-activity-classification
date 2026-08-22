@@ -1,7 +1,7 @@
 """Leakage-safe recovery runner for the human-activity experiment.
 
 This utility reuses the training primitives from the earlier internal-CV
-notebook while enforcing the course-provided test partition. Candidate
+notebook while enforcing the fixed test partition. Candidate
 selection never evaluates the test set.
 """
 
@@ -423,10 +423,10 @@ def patch_cv_cell(source: str) -> str:
     return source
 
 
-def restore_course_split(namespace: dict) -> None:
+def restore_fixed_split(namespace: dict) -> None:
     df = namespace["df"].copy()
     if "original_split" not in df.columns:
-        raise RuntimeError("The manifest does not expose the original course split.")
+        raise RuntimeError("The manifest does not expose the original fixed split.")
 
     original = (
         df["original_split"]
@@ -449,7 +449,7 @@ def restore_course_split(namespace: dict) -> None:
     df["frozen_test_target_count"] = int(df["frozen_test_flag"].sum())
 
     if int(df["frozen_test_flag"].sum()) != 43:
-        raise RuntimeError("Expected the course-provided test split to contain 43 rows.")
+        raise RuntimeError("Expected the fixed test split to contain 43 rows.")
     if int(df["non_test_pool_flag"].sum()) != 242:
         raise RuntimeError("Expected train+validation to form a 242-row development pool.")
 
@@ -458,7 +458,7 @@ def restore_course_split(namespace: dict) -> None:
     df.to_csv(dirs["manifests"] / "standardized_manifest_fixed_test.csv", index=False)
 
     protocol = {
-        "protocol": "course_fixed_test_plus_internal_stratified_cv",
+        "protocol": "fixed_test_plus_internal_stratified_cv",
         "selection_partition": "original train + validation",
         "selection_rows": 242,
         "final_test_partition": "original test",
@@ -679,7 +679,7 @@ def initialise_pipeline(args: argparse.Namespace) -> dict:
             source = patch_cv_cell(source)
         execute_cell(namespace, source, f"{source_notebook.name}:cell-{cell_index}")
         if cell_index == 8:
-            restore_course_split(namespace)
+            restore_fixed_split(namespace)
 
     install_transform_variant(namespace)
     install_regularized_model_builder(namespace)

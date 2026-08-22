@@ -45,6 +45,17 @@ def sanitize_selection_lock(lock: dict) -> dict:
     } | {"selected": selected}
 
 
+def sanitize_data_protocol(protocol: dict) -> dict:
+    """Normalize legacy experiment labels without altering measured fields."""
+
+    sanitized = dict(protocol)
+    if str(sanitized.get("protocol", "")).endswith(
+        "fixed_test_plus_internal_stratified_cv"
+    ):
+        sanitized["protocol"] = "fixed_test_plus_internal_stratified_cv"
+    return sanitized
+
+
 def export_parameter_summary(final_root: Path, results_dir: Path) -> None:
     rows = []
     for family in ("convnext_small", "dinov2_small"):
@@ -167,7 +178,7 @@ def main() -> None:
     execution.pop("selection_lock", None)
     provenance = {
         "runtime": runtime,
-        "data_protocol": protocol,
+        "data_protocol": sanitize_data_protocol(protocol),
         "final_execution": execution,
         "selection_protocol_sha256": selection_lock.get("protocol_sha256"),
         "downstream_lock": downstream_lock,
