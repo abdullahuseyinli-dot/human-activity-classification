@@ -42,6 +42,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument(
+        "--run-role",
+        choices=[
+            "engineering_smoke",
+            "adaptation_screen",
+            "regularization_screen",
+            "confirmation",
+            "scale",
+        ],
+        default="adaptation_screen",
+    )
+    parser.add_argument(
         "--model-kind",
         choices=["convnext_small", "dinov2_small", "dinov2_base"],
         required=True,
@@ -167,6 +178,7 @@ def checkpoint_evidence(model_kind: str) -> dict:
 def configuration(args: argparse.Namespace) -> dict:
     return {
         "model_kind": args.model_kind,
+        "run_role": args.run_role,
         "task": args.task,
         "view": args.view,
         "unfreeze_strategy": args.unfreeze_strategy,
@@ -222,8 +234,12 @@ def train_epoch(
     mixup_alpha: float,
     grad_accum_steps: int,
     gradient_clip: float,
+    frozen_backbone: bool,
 ) -> dict[str, float]:
     model.train()
+    if frozen_backbone:
+        model.backbone.eval()
+        model.classifier.train()
     optimizer.zero_grad(set_to_none=True)
     losses = []
     samples = 0
@@ -302,23 +318,27 @@ def main() -> None:
     repository_root = Path(__file__).resolve().parents[1]
 
     config_values = configuration(args)
-    request = {
+    request_core = {
         "status": "DEVELOPMENT_TRAINING_REQUEST",
         "configuration": config_values,
         "manifest_sha256": sha256_file(manifest_path),
         "runner_sha256": sha256_file(Path(__file__).resolve()),
-        "git_revision_at_start": git_revision(repository_root),
         "test_rows_read": 0,
         "test_used_for_selection": False,
     }
-    request_encoded = json.dumps(request, sort_keys=True).encode("utf-8")
+    request_encoded = json.dumps(request_core, sort_keys=True).encode("utf-8")
     request_hash = hashlib.sha256(request_encoded).hexdigest()
-    request["request_sha256"] = request_hash
+    request = {
+        **request_core,
+        "git_revision_at_start": git_revision(repository_root),
+        "request_sha256": request_hash,
+    }
     request_path = output_dir / "request.json"
     if request_path.is_file():
         previous = json.loads(request_path.read_text(encoding="utf-8"))
-        if previous != request:
+        if previous.get("request_sha256") != request_hash:
             raise RuntimeError(f"Existing run request differs: {request_path}")
+        request = previous
     else:
         write_json(request_path, request)
 
@@ -443,6 +463,7 @@ def main() -> None:
             mixup_alpha=args.mixup_alpha,
             grad_accum_steps=args.grad_accum_steps,
             gradient_clip=args.gradient_clip,
+            frozen_backbone=args.unfreeze_strategy in {"head_only", "probe_only"},
         )
         validation = evaluate(model, validation_loader, criterion, device)
         metrics = validation["metrics"]

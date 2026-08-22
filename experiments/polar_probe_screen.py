@@ -30,6 +30,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--include-fusions", action="store_true")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--task", choices=sorted(LABEL_ORDERS), action="append", dest="tasks")
+    parser.add_argument(
+        "--candidate-contains",
+        action="append",
+        dest="candidate_filters",
+        help="Retain candidates containing at least one supplied substring.",
+    )
     return parser.parse_args()
 
 
@@ -116,6 +123,7 @@ def fit_candidate(
     metrics = classification_metrics(labels[val_mask], probabilities)
     metrics["fit_seconds"] = float(elapsed)
     metrics["iterations"] = int(np.max(pipeline.named_steps["classifier"].n_iter_))
+    metrics["converged"] = metrics["iterations"] < 2000
     return metrics, probabilities
 
 
@@ -130,12 +138,22 @@ def main() -> None:
         raise ValueError("Probe screen requires train and validation only")
     caches = load_caches(args.feature_root.resolve(), manifest_hash)
     candidates = candidate_features(caches, manifest, args.include_fusions)
+    if args.candidate_filters:
+        candidates = {
+            name: features
+            for name, features in candidates.items()
+            if any(value in name for value in args.candidate_filters)
+        }
+    if not candidates:
+        raise ValueError("Candidate filters removed every representation")
     train_mask = manifest["split"].astype(str).eq("train").to_numpy()
     val_mask = manifest["split"].astype(str).eq("val").to_numpy()
 
     rows = []
     best_predictions: dict[str, tuple[tuple, dict]] = {}
-    for task, class_names in LABEL_ORDERS.items():
+    tasks = args.tasks or list(LABEL_ORDERS)
+    for task in tasks:
+        class_names = LABEL_ORDERS[task]
         label_to_index = {label: index for index, label in enumerate(class_names)}
         labels = manifest[task].map(label_to_index).to_numpy(dtype=int)
         for candidate_name, features in candidates.items():
@@ -210,6 +228,8 @@ def main() -> None:
             name: cache["provenance"] for name, cache in sorted(caches.items())
         },
         "tasks": LABEL_ORDERS,
+        "executed_tasks": tasks,
+        "candidate_filters": args.candidate_filters or [],
         "test_rows_read": 0,
         "test_used_for_selection": False,
     }
