@@ -1,8 +1,33 @@
 # POLAR scale study protocol
 
-Protocol version: **1.0.0**  
+Protocol version: **1.1.0**
 Locked: **2026-08-22, before image download, duplicate inspection, model fitting, or
 access to POLAR test labels by the study runner**
+
+### Amendment 1.1.0: source-related split contamination
+
+Locked on **2026-08-22 before any feature extraction or model fitting**. The
+content audit reproduced every declared count and found no byte-identical
+cross-split files. It did, however, reveal colour/monochrome renderings,
+alternate crops, and adjacent frames from the same Getty capture across official
+boundaries. These are materially easier than independent images and can reward
+source or scene memorization.
+
+The primary clean protocol therefore joins candidate pairs when their 64-bit
+pHash distance is at most six and the Pearson correlation of their independently
+resized 128 by 128 grayscale pixels is at least 0.90. Every image in a connected
+cross-split component is quarantined from all primary partitions. The threshold,
+pair table, component membership, and changed class counts are preserved. The
+unfiltered official split may be reported only as a sensitivity baseline labelled
+`OFFICIAL_UNFILTERED_SOURCE_OVERLAP`; it cannot select a model or support the
+primary claim.
+
+As a second audit, frozen upstream DINOv2-Small full-frame embeddings may retrieve
+cross-split neighbours with cosine similarity at least 0.985. Embedding proximity
+alone never removes an image. A retrieved pair is added to quarantine only when
+independent source evidence or normalized-pixel inspection confirms the same
+rendered asset, capture sequence, or scene. That decision and evidence must be
+recorded before supervised fitting.
 
 ## Research question
 
@@ -74,11 +99,12 @@ Before training, the builder must:
 - record, never conceal, corrupt files, missing files, label conflicts, and
   quarantine decisions.
 
-An exact duplicate or a confirmed same-image derivative crossing an official
-boundary is excluded from **all** affected study splits. Perceptual-hash proximity
-alone is not enough: confirmation requires a visual/normalized-pixel check or
-matching source evidence. Exclusions are immutable after fitting begins. No test
-record may be moved into train or validation.
+An exact duplicate, a confirmed same-image derivative, or a source-related pair
+meeting Amendment 1.1.0 across an official boundary is excluded from **all**
+affected study splits. Perceptual-hash proximity alone is not enough: confirmation
+also requires the locked normalized-pixel rule, a visual check, or matching source
+evidence. Exclusions are immutable after fitting begins. No test record may be
+moved into train or validation.
 
 ## Views and localization controls
 
@@ -205,4 +231,3 @@ The final article may claim state of the art only after finding a directly
 comparable published result with the same POLAR release, target subset, splits,
 label space, and metric. Otherwise it reports a reproducible benchmark and
 explicitly labels cross-paper numbers as non-comparable.
-

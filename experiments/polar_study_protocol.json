@@ -1,5 +1,5 @@
 {
-  "protocol_version": "1.0.0",
+  "protocol_version": "1.1.0",
   "locked_date": "2026-08-22",
   "status": "PRE_TEST_LOCKED",
   "dataset": {
@@ -38,7 +38,13 @@
     "exact": "sha256",
     "perceptual_hash": "phash64",
     "review_max_hamming_distance": 6,
-    "cross_boundary_confirmed_duplicate_policy": "exclude_group_from_all_study_splits",
+    "source_related_normalized_grayscale_size": [128, 128],
+    "source_related_minimum_correlation": 0.9,
+    "source_related_pair_policy": "phash_distance_lte_6_and_correlation_gte_0.9",
+    "frozen_dinov2_retrieval_candidate_cosine": 0.985,
+    "embedding_only_can_exclude": false,
+    "cross_boundary_confirmed_duplicate_policy": "exclude_connected_group_from_all_study_splits",
+    "unfiltered_official_role": "sensitivity_only_OFFICIAL_UNFILTERED_SOURCE_OVERLAP",
     "test_examples_may_move_to_training": false
   },
   "views": ["full_frame", "person_context_10", "person_context_25", "validation_locked_late_fusion"],
