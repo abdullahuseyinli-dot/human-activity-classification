@@ -24,6 +24,16 @@ def stable_probabilities(logits: torch.Tensor) -> torch.Tensor:
     return torch.softmax(logits.float(), dim=1)
 
 
+def normalize_probability_rows(probabilities: np.ndarray) -> np.ndarray:
+    values = np.asarray(probabilities, dtype=np.float64)
+    if values.ndim != 2 or not np.isfinite(values).all() or (values < 0.0).any():
+        raise ValueError("Probabilities must be a finite non-negative matrix")
+    row_sums = values.sum(axis=1, keepdims=True)
+    if (row_sums <= 0.0).any():
+        raise ValueError("Probability rows must have positive mass")
+    return values / row_sums
+
+
 @torch.inference_mode()
 def evaluate_classifier(
     model: nn.Module,
@@ -58,7 +68,7 @@ def evaluate_classifier(
         image_paths.extend(str(value) for value in batch["image_path"])
 
     logits_array = np.concatenate(logits)
-    probabilities_array = np.concatenate(probabilities)
+    probabilities_array = normalize_probability_rows(np.concatenate(probabilities))
     labels_array = np.concatenate(labels)
     return {
         "loss": float(np.mean(losses)),

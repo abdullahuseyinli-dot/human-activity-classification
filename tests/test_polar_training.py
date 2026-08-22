@@ -6,6 +6,7 @@ from torch import nn
 from hac.polar_training import (
     inverse_frequency_weights,
     nested_stratified_subset,
+    normalize_probability_rows,
     optimizer_parameter_groups,
     stable_probabilities,
     validate_development_manifest,
@@ -17,6 +18,12 @@ def test_stable_probabilities_promote_half_precision_logits():
     probabilities = stable_probabilities(logits)
     assert probabilities.dtype == torch.float32
     assert float(probabilities.sum()) == pytest.approx(1.0, abs=5e-7)
+
+
+def test_probability_normalization_uses_double_precision_rows():
+    probabilities = normalize_probability_rows([[0.1, 0.2, 0.6999999]])
+    assert probabilities.dtype.name == "float64"
+    assert float(probabilities.sum()) == pytest.approx(1.0, abs=1e-15)
 
 
 def _manifest() -> pd.DataFrame:
