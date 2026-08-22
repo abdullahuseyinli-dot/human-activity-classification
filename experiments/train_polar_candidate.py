@@ -146,6 +146,8 @@ def git_revision(root: Path) -> str:
 
 def implementation_hashes(root: Path) -> dict[str, str]:
     relative_paths = [
+        "docs/POLAR_SCALE_STUDY_PROTOCOL.md",
+        "experiments/polar_study_protocol.json",
         "experiments/train_polar_candidate.py",
         "src/hac/augmentations.py",
         "src/hac/config.py",
@@ -436,6 +438,16 @@ def main() -> None:
         model_kind=args.model_kind,
         layer_decay=args.layer_decay,
     )
+    optimizer_group_spec = [
+        {
+            "group_name": group["group_name"],
+            "initial_lr": float(group["lr"]),
+            "lr_scale": float(group["lr_scale"]),
+            "weight_decay": float(group["weight_decay"]),
+            "parameter_count": int(sum(parameter.numel() for parameter in group["params"])),
+        }
+        for group in groups
+    ]
     optimizer = torch.optim.AdamW(groups)
     batches_per_epoch = math.ceil(len(train_frame) / args.batch_size)
     optimizer_steps_per_epoch = math.ceil(batches_per_epoch / args.grad_accum_steps)
@@ -620,6 +632,7 @@ def main() -> None:
         "best_validation_metrics": final_validation["metrics"],
         "parameter_counts": parameter_counts(model),
         "optimizer_steps_per_epoch": optimizer_steps_per_epoch,
+        "optimizer_parameter_groups": optimizer_group_spec,
         "checkpoint_sha256": checkpoint_hash,
         "pretrained_checkpoint": checkpoint_evidence(args.model_kind),
         "runtime_seconds_this_invocation": time.perf_counter() - run_started,

@@ -1,0 +1,18 @@
+[
+  {
+    "disposition": "preserved; excluded from selection",
+    "error": "Probability rows must sum to one",
+    "error_type": "ValueError",
+    "record_sha256": "6c27db6bc58b8a7539f09066831a60ad943887b63fc612ee59e6128e6321deaf",
+    "run_id": "engineering_smoke/dinov2_small_context25_v2",
+    "test_rows_read": 0
+  },
+  {
+    "disposition": "preserved; excluded from model selection",
+    "error": "Non-finite gradient norm",
+    "error_type": "FloatingPointError",
+    "record_sha256": "642dc16ba5e2c6dc5fa626a5b92bea87a86c95c2b0f75229a2a093dbee647b88",
+    "run_id": "engineering_smoke/dinov2_small_context25",
+    "test_rows_read": 0
+  }
+]
