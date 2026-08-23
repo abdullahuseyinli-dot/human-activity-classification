@@ -12,6 +12,16 @@ def load_export_module():
     return module
 
 
+def load_polar_export_module():
+    repository = Path(__file__).resolve().parents[1]
+    path = repository / "tools" / "export_polar_final_results.py"
+    spec = importlib.util.spec_from_file_location("export_polar_final_results_test", path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
 def test_normalize_image_id_handles_collated_tensor_representation():
     exporter = load_export_module()
 
@@ -33,3 +43,16 @@ def test_release_protocol_uses_portfolio_neutral_terminology():
         "protocol": "fixed_test_plus_internal_stratified_cv",
         "final_test_rows": 43,
     }
+
+
+def test_polar_export_names_remove_repeated_group_prefixes():
+    exporter = load_polar_export_module()
+
+    assert exporter.published_name("test", "test_metrics.csv") == "polar_test_metrics.csv"
+    assert (
+        exporter.published_name("external", "external_person_metrics.csv")
+        == "polar_external_person_metrics.csv"
+    )
+    assert exporter.published_name("faithfulness", "summary.json") == (
+        "polar_faithfulness_summary.json"
+    )
