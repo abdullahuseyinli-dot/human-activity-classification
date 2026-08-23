@@ -1,0 +1,36 @@
+{
+  "excluded_local_artifacts": [
+    "opened test manifest with machine-local image paths",
+    "model checkpoints and fitted classifier binaries",
+    "per-example probability arrays",
+    "full-resolution attribution maps"
+  ],
+  "exported_files": {
+    "polar_external_confusions.json": "7191ed6e163d3677e6266366cea9ba9925a9422a1b901e3b5333c33ad5a298d5",
+    "polar_external_image_metrics.csv": "69574ba0c579023df251233f49c592c2c719a97ae1e5fea90d74776f7fb48b9d",
+    "polar_external_image_uncertainty.json": "bf328bdc29613fd0402f62d89ff7364370369953d3c83c6fd055aaead5179c0a",
+    "polar_external_overlap_audit.json": "668e0951fc2d4128559a140a306e612fb32321e246617ca0923ee380fc1cc7d0",
+    "polar_external_per_class.csv": "471e67606ccd40d94ec0fe9bd9fdc092aed310949280220a02185a133188af8b",
+    "polar_external_person_metrics.csv": "bac6f357a551bf511bb8b5674d033c2f12da8e40833348c9097af3a4e9521933",
+    "polar_external_summary.json": "ab80d205531f182750ceabd57c356eb06a30e2a471b54bd496e9040bb5c685d6",
+    "polar_faithfulness_curves.csv": "08562047b46c79fbba263adc138c53e9dd0fbc053b1be1c9d3c39a22b4051c89",
+    "polar_faithfulness_per_image.csv": "b49303ea1e2b6ac773d0f9d21ecf7a591afeeaef4efa7b8b2f081379e4ca0fca",
+    "polar_faithfulness_randomization.csv": "73eb53c5ae7b8f801b86c7e81d877aa9fba94761c77d9afb239a653337de775e",
+    "polar_faithfulness_strata.csv": "89d3c08cd54d648ebab796d58191b1625d1822db9be2a1a906213b70c8992a72",
+    "polar_faithfulness_summary.json": "6783d7ff0f775c09eb8054e6f1bfc62e960e2e358bda814517316e66abc85001",
+    "polar_fault_robustness_metrics.csv": "6c212cd95e1a206fe511646c85f2b0068e9bc2d5d91f1ea2ea85c26fb9a5dc10",
+    "polar_fault_summary.json": "b3de92cba9a73e2054666512cd03515d4d8b0818a21a24dac69eb240e3064a73",
+    "polar_final_fit_manifest.json": "929c7b26667fdb203170c6c472855be2c4a1587407f5be3b9ff0c4b5c07ec904",
+    "polar_test_access_gate.json": "27a8ae58eaf064f2a3a06dfb8e8cf6f28a4a4e50f03489bff90eea0eb3987dce",
+    "polar_test_confusions.json": "ff71f323e60cea98eb8093bc80d53705fcbb4cf98a952e262256fa746e4bb6aa",
+    "polar_test_metrics.csv": "c42e60fb3ca9238509d8a630f0b5e13346a216540c0af95da07e8520f87e2bef",
+    "polar_test_per_class.csv": "05ebfb663869938d70aebcc747b4c26af7ab51038ef5d047147771505f53c25a",
+    "polar_test_secondary_metrics.csv": "db1a9faa4847cd703a6ebb863312fb650f63011cd9af36a213c565aee4e0c98d",
+    "polar_test_seed_metrics.csv": "2ac27f4cd56cd40df3d026c4f4eb9647c2bd0d375eefccb6bdb7f92a52a33228",
+    "polar_test_summary.json": "324c5d877f059326154bd6032c661bbbfbda8cd99db31a6758650791b5a2b31b",
+    "polar_test_uncertainty.json": "955fcfe540245fd5aa148c0fd09015dff53845d715f175e47ffe034189346499"
+  },
+  "selection_lock_sha256": "fa3fb7c80a073d29048afb8e0b8da1fb17f5ade9721630347c37523714cca187",
+  "status": "LOCKED_POLAR_PORTFOLIO_EVIDENCE",
+  "test_used_for_selection": false
+}

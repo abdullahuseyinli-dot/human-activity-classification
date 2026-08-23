@@ -1,0 +1,25 @@
+{
+  "artifact_sha256": {
+    "confirmed_source_related_pairs.csv": "d2627a027054b55bcf34bcb8163bda665027dd243f08aa99062f22abd1e14cfe",
+    "exact_overlap_pairs.csv": "289c5744eddb7033a2eb0d92b38b279c22a8c8f59ed0329ad5b6c057f319c589",
+    "perceptual_overlap_candidates.csv": "9f4df30ad2a0fb2dd4bc58d599f488aa700645572822834272d0595569724be8"
+  },
+  "confirmed_source_related_pairs": 0,
+  "exact_overlap_pairs": 0,
+  "model_predictions_read": 0,
+  "near_phash_maximum_distance": 6,
+  "perceptual_candidates": 0,
+  "polar_clean_rows": 16614,
+  "polar_test_images_compared": 3329,
+  "polar_test_labels_read": false,
+  "selection_role": "none",
+  "source_related_minimum_correlation": 0.9,
+  "source_sha256": {
+    "polar_clean_manifest": "0c47f3eb52bc40e16303818996bc84914cb1a4ff062315dfbb2b5c3674952e93",
+    "vcoco_image_audit": "4ffb556e2e8620199cb9a80d4fe0523f7b9c70776c5a61c700cb02b1cb2291aa",
+    "vcoco_person_manifest": "0eb0afcc7e832babc495d3d9a74981077968f401097eedc34c6aeb9a0e644cb4"
+  },
+  "status": "POLAR_VCOCO_CROSS_DATASET_OVERLAP_AUDITED",
+  "test_used_for_selection": false,
+  "vcoco_unique_images": 4123
+}

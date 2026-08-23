@@ -1,0 +1,290 @@
+{
+  "aggregate": {
+    "convnext_small_full": {
+      "deletion_auc": {
+        "ci95_high": 0.647246596074406,
+        "ci95_low": 0.5813549561619616,
+        "excluded_rows": 0,
+        "mean": 0.6147022867078884,
+        "rows": 256
+      },
+      "deletion_selectivity_gap": {
+        "ci95_high": 0.18538761187071873,
+        "ci95_low": 0.14111671375809995,
+        "excluded_rows": 0,
+        "mean": 0.16336110847012902,
+        "rows": 256
+      },
+      "full_crop_agreement_rate": {
+        "ci95_high": 0.92578125,
+        "ci95_low": 0.85546875,
+        "excluded_rows": 0,
+        "mean": 0.890625,
+        "rows": 256
+      },
+      "full_crop_js_divergence": {
+        "ci95_high": 0.05542602152015163,
+        "ci95_low": 0.03169730626832689,
+        "excluded_rows": 0,
+        "mean": 0.04310143791925712,
+        "rows": 256
+      },
+      "insertion_auc": {
+        "ci95_high": 0.9114054531451241,
+        "ci95_low": 0.8804367589417353,
+        "excluded_rows": 0,
+        "mean": 0.8963822785105652,
+        "rows": 256
+      },
+      "person_attribution_mass": {
+        "ci95_high": 0.7127193677906178,
+        "ci95_low": 0.6690336684157752,
+        "excluded_rows": 0,
+        "mean": 0.6910117735981023,
+        "rows": 256
+      },
+      "person_attribution_mass_lift": {
+        "ci95_high": 2.555656982123132,
+        "ci95_low": 2.1888244651653457,
+        "excluded_rows": 0,
+        "mean": 2.367899402117048,
+        "rows": 256
+      },
+      "person_minus_context_occlusion_drop": {
+        "ci95_high": 0.2727110165481117,
+        "ci95_low": 0.19322895989919067,
+        "excluded_rows": 2,
+        "mean": 0.23360947076635485,
+        "rows": 254
+      },
+      "pointing_game_rate": {
+        "ci95_high": 0.8984375,
+        "ci95_low": 0.8203125,
+        "excluded_rows": 0,
+        "mean": 0.859375,
+        "rows": 256
+      },
+      "random_deletion_auc": {
+        "ci95_high": 0.8014078715990558,
+        "ci95_low": 0.7543774607735252,
+        "excluded_rows": 0,
+        "mean": 0.7780633951780175,
+        "rows": 256
+      },
+      "randomized_adapted_cascade_spearman": {
+        "ci95_high": 0.2561087066787498,
+        "ci95_low": 0.007078102626813141,
+        "excluded_rows": 0,
+        "mean": 0.13465411419626852,
+        "rows": 16
+      },
+      "randomized_head_spearman": {
+        "ci95_high": 0.3312443040785316,
+        "ci95_low": 0.027497237048760993,
+        "excluded_rows": 0,
+        "mean": 0.18329699352968318,
+        "rows": 16
+      },
+      "target_vs_alternative_attribution_spearman": {
+        "ci95_high": -0.4563449268365115,
+        "ci95_low": -0.5240991678253032,
+        "excluded_rows": 0,
+        "mean": -0.49128830169932075,
+        "rows": 256
+      }
+    },
+    "dinov2_base_top4": {
+      "deletion_auc": {
+        "ci95_high": 0.8961944424707674,
+        "ci95_low": 0.8498695658183495,
+        "excluded_rows": 0,
+        "mean": 0.8735997049287676,
+        "rows": 256
+      },
+      "deletion_selectivity_gap": {
+        "ci95_high": 0.07412756118419221,
+        "ci95_low": 0.04366533702682387,
+        "excluded_rows": 0,
+        "mean": 0.05815353094105925,
+        "rows": 256
+      },
+      "full_crop_agreement_rate": {
+        "ci95_high": 0.98046875,
+        "ci95_low": 0.9375,
+        "excluded_rows": 0,
+        "mean": 0.9609375,
+        "rows": 256
+      },
+      "full_crop_js_divergence": {
+        "ci95_high": 0.03320287161695301,
+        "ci95_low": 0.01463094472388125,
+        "excluded_rows": 0,
+        "mean": 0.023445003738393415,
+        "rows": 256
+      },
+      "insertion_auc": {
+        "ci95_high": 0.9586914483084001,
+        "ci95_low": 0.9331700623848611,
+        "excluded_rows": 0,
+        "mean": 0.9462691349068928,
+        "rows": 256
+      },
+      "person_attribution_mass": {
+        "ci95_high": 0.8573312922682194,
+        "ci95_low": 0.8380125339912614,
+        "excluded_rows": 0,
+        "mean": 0.8478448104821765,
+        "rows": 256
+      },
+      "person_attribution_mass_lift": {
+        "ci95_high": 1.1091437329711904,
+        "ci95_low": 1.0812316278676042,
+        "excluded_rows": 0,
+        "mean": 1.0950470424669891,
+        "rows": 256
+      },
+      "person_minus_context_occlusion_drop": {
+        "ci95_high": 0.02799628732108458,
+        "ci95_low": -0.0021227889850410566,
+        "excluded_rows": 2,
+        "mean": 0.012384274940854645,
+        "rows": 254
+      },
+      "pointing_game_rate": {
+        "ci95_high": 0.87109375,
+        "ci95_low": 0.78125,
+        "excluded_rows": 0,
+        "mean": 0.828125,
+        "rows": 256
+      },
+      "random_deletion_auc": {
+        "ci95_high": 0.9478454472092638,
+        "ci95_low": 0.9144071358072153,
+        "excluded_rows": 0,
+        "mean": 0.9317532358698268,
+        "rows": 256
+      },
+      "randomized_adapted_cascade_spearman": {
+        "ci95_high": 0.7751072430173992,
+        "ci95_low": 0.6345921331272892,
+        "excluded_rows": 0,
+        "mean": 0.7080929487179486,
+        "rows": 16
+      },
+      "randomized_head_spearman": {
+        "ci95_high": 0.9098361664377287,
+        "ci95_low": 0.8264433092948715,
+        "excluded_rows": 0,
+        "mean": 0.8713198260073258,
+        "rows": 16
+      },
+      "target_vs_alternative_attribution_spearman": {
+        "ci95_high": 0.9470820258408428,
+        "ci95_low": 0.9194713761265568,
+        "excluded_rows": 0,
+        "mean": 0.9341211468900846,
+        "rows": 256
+      }
+    }
+  },
+  "artifacts": {
+    "convnext_small_full_attribution_maps.npz": "3dbaae47c05f9fbde6dd84783cbacd002b1f80d3f389519a44d2317bbecdb2cf",
+    "dinov2_base_top4_attribution_maps.npz": "595dbe9bc515387997c6808124fb70b54e8d1cde658c47afac4d710b568ab90c",
+    "faithfulness_cohort.csv": "5c8cf3c854b826561ac608561b5322108a1b857d3b1ac34665da729013f10771",
+    "faithfulness_curves.csv": "08562047b46c79fbba263adc138c53e9dd0fbc053b1be1c9d3c39a22b4051c89",
+    "faithfulness_per_image.csv": "b49303ea1e2b6ac773d0f9d21ecf7a591afeeaef4efa7b8b2f081379e4ca0fca",
+    "faithfulness_randomization.csv": "73eb53c5ae7b8f801b86c7e81d877aa9fba94761c77d9afb239a653337de775e",
+    "faithfulness_strata.csv": "89d3c08cd54d648ebab796d58191b1625d1822db9be2a1a906213b70c8992a72"
+  },
+  "bootstrap": {
+    "per_image_strata": [
+      "true_label",
+      "bbox_area_quartile"
+    ],
+    "randomization_strata": [
+      "true_label"
+    ],
+    "resamples": 10000,
+    "seed_policy": "sha256_stable_metric_specific"
+  },
+  "cohort_rows": 256,
+  "cohort_sha256": "5c8cf3c854b826561ac608561b5322108a1b857d3b1ac34665da729013f10771",
+  "environment": {
+    "device": "cuda",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "python": "3.11.9",
+    "torch": "2.11.0+cu126"
+  },
+  "implementation_sha256": "08b6a1e4ba1dbe209eca05ba1b94ccbf82e3c1f70f2c640791019672b83879e3",
+  "matched_occlusion_unavailable_rows_per_family": {
+    "convnext_small_full": 2,
+    "dinov2_base_top4": 2
+  },
+  "max_probability_parity_absolute_error": 0.001757767706070168,
+  "opened_test_manifest_cache_sha256": "35d2a73b33de866f52d857c266f57d3eee1259113f3da43b07bdd3e8dfa1142e",
+  "parameter_randomization_rows_per_family": 16,
+  "parameter_randomization_scopes": {
+    "convnext_small_full": [
+      "classifier_head",
+      "classifier_head_plus_last_convnext_stage"
+    ],
+    "dinov2_base_top4": [
+      "classifier_head",
+      "classifier_head_plus_top_four_transformer_blocks"
+    ]
+  },
+  "protocol": {
+    "attribution_methods": {
+      "convnext_small_full": "gradcam",
+      "dinov2_base_top4": "integrated_gradients"
+    },
+    "cohort_rows": 256,
+    "cohort_sampling": "deterministic_class_and_bbox_area_stratified",
+    "cohort_seed": 20260822,
+    "deletion_insertion_fractions": [
+      0.0,
+      0.1,
+      0.2,
+      0.4,
+      0.6,
+      0.8,
+      1.0
+    ],
+    "families": [
+      "convnext_small_full",
+      "dinov2_base_top4"
+    ],
+    "integrated_gradient_steps": 16,
+    "metrics": [
+      "deletion_auc",
+      "insertion_auc",
+      "random_deletion_auc",
+      "positive_attribution_mass_in_person_bbox",
+      "pointing_game",
+      "person_vs_matched_context_occlusion",
+      "full_crop_probability_consistency",
+      "target_sensitivity",
+      "parameter_randomization_sanity"
+    ],
+    "perturbation_grid": [
+      8,
+      8
+    ],
+    "selection_role": "none",
+    "strata": [
+      "class",
+      "bbox_area_quartile"
+    ],
+    "target": "locked_predicted_class_probability",
+    "test_used_for_attribution_selection": false
+  },
+  "runtime_seconds": 593.8722818000242,
+  "selection_lock_sha256": "fa3fb7c80a073d29048afb8e0b8da1fb17f5ade9721630347c37523714cca187",
+  "selection_role": "none",
+  "status": "LOCKED_POLAR_FAITHFULNESS_COMPLETE",
+  "test_evaluation_summary_sha256": "324c5d877f059326154bd6032c661bbbfbda8cd99db31a6758650791b5a2b31b",
+  "test_predictions_sha256": "0f96ecb7411abf8b3385004380a5fa001965113f0855015db4337fb76078c5f9",
+  "test_rows_read": 256,
+  "test_used_for_attribution_selection": false,
+  "test_used_for_model_selection": false
+}

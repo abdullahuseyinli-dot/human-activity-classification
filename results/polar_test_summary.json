@@ -1,0 +1,131 @@
+{
+  "all_candidate_metrics": [
+    {
+      "accuracy": 0.9456293181135476,
+      "balanced_accuracy": 0.9395820835319696,
+      "brier_score": 0.0838358013583503,
+      "candidate": "locked_ensemble",
+      "ece": 0.029057159009995545,
+      "log_loss": 0.1563726501599631,
+      "macro_f1": 0.9398833285904803,
+      "weighted_f1": 0.9455986406579802
+    },
+    {
+      "accuracy": 0.9342144788224692,
+      "balanced_accuracy": 0.9276841362624797,
+      "brier_score": 0.1089226977455661,
+      "candidate": "dinov2_base_multilayer_rbf",
+      "ece": 0.026889962351215123,
+      "log_loss": 0.22803681992916508,
+      "macro_f1": 0.9273539195659692,
+      "weighted_f1": 0.934193951703694
+    },
+    {
+      "accuracy": 0.9324121357765095,
+      "balanced_accuracy": 0.9268518943624147,
+      "brier_score": 0.09950865567183535,
+      "candidate": "dinov2_base_multilayer_logistic",
+      "ece": 0.013303223658814325,
+      "log_loss": 0.17635373343682298,
+      "macro_f1": 0.9257534072767701,
+      "weighted_f1": 0.9325590818251327
+    },
+    {
+      "accuracy": 0.9327125262841695,
+      "balanced_accuracy": 0.9235937119658185,
+      "brier_score": 0.1054653917062424,
+      "candidate": "dinov2_base_top4",
+      "ece": 0.04199691960511026,
+      "log_loss": 0.217282290048738,
+      "macro_f1": 0.9251832868613679,
+      "weighted_f1": 0.9323756709552725
+    },
+    {
+      "accuracy": 0.920997296485431,
+      "balanced_accuracy": 0.9120165724814997,
+      "brier_score": 0.1216680402008984,
+      "candidate": "dinov2_small_moderate",
+      "ece": 0.029769103254950302,
+      "log_loss": 0.23893747542636992,
+      "macro_f1": 0.9130823262437728,
+      "weighted_f1": 0.9210972768544944
+    },
+    {
+      "accuracy": 0.8993691799339141,
+      "balanced_accuracy": 0.8913105906832037,
+      "brier_score": 0.15553943388853747,
+      "candidate": "convnext_small_full",
+      "ece": 0.04292293224646321,
+      "log_loss": 0.3080800835887146,
+      "macro_f1": 0.8914495478360013,
+      "weighted_f1": 0.8994531870701962
+    }
+  ],
+  "best_observed_candidate_metrics": {
+    "accuracy": 0.9456293181135476,
+    "balanced_accuracy": 0.9395820835319696,
+    "brier_score": 0.0838358013583503,
+    "candidate": "locked_ensemble",
+    "ece": 0.029057159009995545,
+    "log_loss": 0.1563726501599631,
+    "macro_f1": 0.9398833285904803,
+    "weighted_f1": 0.9455986406579802
+  },
+  "bootstrap_resamples": 10000,
+  "bootstrap_seed": 20260822,
+  "ensemble_weights": {
+    "convnext_small_full": 0.2,
+    "dinov2_base_multilayer_logistic": 0.2,
+    "dinov2_base_multilayer_rbf": 0.2,
+    "dinov2_base_top4": 0.25,
+    "dinov2_small_moderate": 0.15
+  },
+  "environment": {
+    "cuda": "12.6",
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "python": "3.11.9",
+    "torch": "2.11.0+cu126"
+  },
+  "official_test_manifest_open_count": 1,
+  "predictions_sha256": "0f96ecb7411abf8b3385004380a5fa001965113f0855015db4337fb76078c5f9",
+  "primary_candidate": "locked_ensemble",
+  "primary_candidate_locked_pre_test": true,
+  "primary_metrics": {
+    "accuracy": 0.9456293181135476,
+    "balanced_accuracy": 0.9395820835319696,
+    "brier_score": 0.0838358013583503,
+    "candidate": "locked_ensemble",
+    "ece": 0.029057159009995545,
+    "log_loss": 0.1563726501599631,
+    "macro_f1": 0.9398833285904803,
+    "weighted_f1": 0.9455986406579802
+  },
+  "runtime_seconds": 499.24854760000017,
+  "secondary_metrics": [
+    {
+      "accuracy": 0.9621507960348453,
+      "balanced_accuracy": 0.9613148983412835,
+      "brier_score": 0.059013377203138616,
+      "candidate": "collapsed_locked_four_class",
+      "ece": 0.02399023552572784,
+      "log_loss": 0.1082068607302286,
+      "macro_f1": 0.9611453447507476,
+      "weighted_f1": 0.9622189720065267
+    },
+    {
+      "accuracy": 0.9543406428356864,
+      "balanced_accuracy": 0.9521039335615512,
+      "brier_score": 0.06792135573028353,
+      "candidate": "direct_three_class_probe",
+      "ece": 0.01010167666531422,
+      "log_loss": 0.11904852407314719,
+      "macro_f1": 0.9530587835948235,
+      "weighted_f1": 0.9542523592921092
+    }
+  ],
+  "selection_lock_sha256": "fa3fb7c80a073d29048afb8e0b8da1fb17f5ade9721630347c37523714cca187",
+  "status": "LOCKED_FINAL_TEST_COMPLETE",
+  "test_manifest_sha256": "a8e01e1037e980edeb1886ef2bbbd22a07c316df044741c08e8e2afa8d32fce5",
+  "test_rows_read": 3329,
+  "test_used_for_selection": false
+}

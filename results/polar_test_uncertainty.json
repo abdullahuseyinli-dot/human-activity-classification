@@ -1,0 +1,81 @@
+{
+  "convnext_small_full": {
+    "ci_95_high": 0.9020269486152404,
+    "ci_95_low": 0.8803300264102055,
+    "point_estimate": 0.8914495478360013,
+    "resamples": 10000,
+    "seed": 20260822
+  },
+  "dinov2_base_multilayer_logistic": {
+    "ci_95_high": 0.934815769059607,
+    "ci_95_low": 0.9163777910179867,
+    "point_estimate": 0.9257534072767701,
+    "resamples": 10000,
+    "seed": 20260822
+  },
+  "dinov2_base_multilayer_rbf": {
+    "ci_95_high": 0.9361656644871922,
+    "ci_95_low": 0.9179070917205351,
+    "point_estimate": 0.9273539195659692,
+    "resamples": 10000,
+    "seed": 20260822
+  },
+  "dinov2_base_top4": {
+    "ci_95_high": 0.9343015317689943,
+    "ci_95_low": 0.915601097747254,
+    "point_estimate": 0.9251832868613679,
+    "resamples": 10000,
+    "seed": 20260822
+  },
+  "dinov2_small_moderate": {
+    "ci_95_high": 0.9226409287473687,
+    "ci_95_low": 0.9027671648608356,
+    "point_estimate": 0.9130823262437728,
+    "resamples": 10000,
+    "seed": 20260822
+  },
+  "locked_ensemble": {
+    "ci_95_high": 0.9481378677775028,
+    "ci_95_low": 0.9312186075972294,
+    "point_estimate": 0.9398833285904803,
+    "resamples": 10000,
+    "seed": 20260822
+  },
+  "locked_ensemble_paired_deltas": {
+    "convnext_small_full": {
+      "ci_95_high": 0.05885253829018778,
+      "ci_95_low": 0.03840372737488658,
+      "point_estimate": 0.04843378075447902,
+      "resamples": 10000,
+      "seed": 20260822
+    },
+    "dinov2_base_multilayer_logistic": {
+      "ci_95_high": 0.02133321125317948,
+      "ci_95_low": 0.007151550237616658,
+      "point_estimate": 0.014129921313710159,
+      "resamples": 10000,
+      "seed": 20260822
+    },
+    "dinov2_base_multilayer_rbf": {
+      "ci_95_high": 0.01861867401204713,
+      "ci_95_low": 0.006531265702408098,
+      "point_estimate": 0.012529409024511051,
+      "resamples": 10000,
+      "seed": 20260822
+    },
+    "dinov2_base_top4": {
+      "ci_95_high": 0.02209582960870703,
+      "ci_95_low": 0.007401080850934144,
+      "point_estimate": 0.014700041729112434,
+      "resamples": 10000,
+      "seed": 20260822
+    },
+    "dinov2_small_moderate": {
+      "ci_95_high": 0.03509796621423401,
+      "ci_95_low": 0.018679450930777254,
+      "point_estimate": 0.02680100234670746,
+      "resamples": 10000,
+      "seed": 20260822
+    }
+  }
+}

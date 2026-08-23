@@ -66,6 +66,7 @@ def configure_style() -> None:
 
 def save_figure(figure: plt.Figure, output_dir: Path, stem: str) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
+    svg_path = output_dir / f"{stem}.svg"
     figure.savefig(
         output_dir / f"{stem}.png",
         dpi=200,
@@ -73,9 +74,17 @@ def save_figure(figure: plt.Figure, output_dir: Path, stem: str) -> None:
         metadata={"Software": "Matplotlib"},
     )
     figure.savefig(
-        output_dir / f"{stem}.svg",
+        svg_path,
         facecolor="white",
         metadata={"Date": None, "Creator": "Matplotlib"},
+    )
+    # Matplotlib emits trailing spaces in SVG path data. Normalize generated text
+    # so repository whitespace checks stay useful and the artifact is deterministic.
+    svg = svg_path.read_text(encoding="utf-8")
+    svg_path.write_text(
+        "\n".join(line.rstrip() for line in svg.splitlines()) + "\n",
+        encoding="utf-8",
+        newline="\n",
     )
     plt.close(figure)
 
@@ -272,6 +281,50 @@ def render_faithfulness(results: Path, output: Path) -> None:
     save_figure(figure, output, "polar_faithfulness")
 
 
+def render_attribution_sanity(results: Path, output: Path) -> None:
+    summary = read_json(results / "polar_faithfulness_summary.json")
+    families = list(summary["protocol"]["families"])
+    metrics = (
+        ("target_vs_alternative_attribution_spearman", "Alternative target"),
+        ("randomized_head_spearman", "Randomized head"),
+        ("randomized_adapted_cascade_spearman", "Randomized adapted layers"),
+    )
+    positions = np.arange(len(metrics), dtype=float)
+    width = 0.34
+    figure, axis = plt.subplots(figsize=(8.5, 4.8))
+    for family_index, family in enumerate(families):
+        offsets = positions + (family_index - (len(families) - 1) / 2) * width
+        values = [float(summary["aggregate"][family][metric]["mean"]) for metric, _ in metrics]
+        bars = axis.bar(
+            offsets,
+            values,
+            width=width,
+            color=candidate_color(family),
+            label=DISPLAY_NAMES.get(family, family),
+        )
+        for bar, value in zip(bars, values, strict=True):
+            vertical = 0.035 if value >= 0.0 else -0.075
+            axis.text(
+                bar.get_x() + bar.get_width() / 2,
+                value + vertical,
+                f"{value:.2f}",
+                ha="center",
+                va="bottom" if value >= 0.0 else "top",
+                fontsize=8,
+            )
+    axis.axhline(0.0, color="#475569", linewidth=1.0)
+    axis.set_xticks(positions, [label for _, label in metrics])
+    axis.set_ylim(-0.65, 1.02)
+    axis.set_ylabel("Mean attribution Spearman correlation")
+    axis.set_title(
+        "Attribution specificity and parameter-randomization sanity\n"
+        "(lower correlation indicates greater sensitivity)"
+    )
+    axis.legend(fontsize=8, loc="lower right")
+    figure.tight_layout()
+    save_figure(figure, output, "polar_attribution_sanity")
+
+
 def render_fault_robustness(results: Path, output: Path) -> None:
     frame = pd.read_csv(results / "polar_fault_robustness_metrics.csv")
     aggregate = frame[frame["fault_seed"].astype(str).eq("aggregate")].copy()
@@ -340,6 +393,7 @@ def main() -> None:
     render_confusion(results, output)
     render_external(results, output)
     render_faithfulness(results, output)
+    render_attribution_sanity(results, output)
     render_fault_robustness(results, output)
     print(f"Rendered locked POLAR figures in {output}", flush=True)
 

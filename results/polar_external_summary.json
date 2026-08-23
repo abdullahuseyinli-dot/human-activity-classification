@@ -1,0 +1,64 @@
+{
+  "best_observed_image_metrics": {
+    "accuracy": 0.6750864131879819,
+    "balanced_accuracy": 0.7601503963245646,
+    "brier_score": 0.5537191183682608,
+    "candidate": "dinov2_base_top4",
+    "ece": 0.23649750415374232,
+    "log_loss": 1.750871296022627,
+    "macro_f1": 0.6731894794562202,
+    "weighted_f1": 0.6806209711861225
+  },
+  "best_observed_person_metrics": {
+    "accuracy": 0.6768072289156627,
+    "balanced_accuracy": 0.754202778610121,
+    "brier_score": 0.5616973854183063,
+    "candidate": "dinov2_base_top4",
+    "ece": 0.25331278684122954,
+    "log_loss": 1.822315271718345,
+    "macro_f1": 0.6853244990345811,
+    "weighted_f1": 0.6815189609446
+  },
+  "confirmed_cross_dataset_source_related_pairs": 0,
+  "ensemble_weights": {
+    "convnext_small_full": 0.2,
+    "dinov2_base_multilayer_logistic": 0.2,
+    "dinov2_base_multilayer_rbf": 0.2,
+    "dinov2_base_top4": 0.25,
+    "dinov2_small_moderate": 0.15
+  },
+  "image_level_rows": 3761,
+  "manifest_sha256": "0eb0afcc7e832babc495d3d9a74981077968f401097eedc34c6aeb9a0e644cb4",
+  "overlap_audit_sha256": "668e0951fc2d4128559a140a306e612fb32321e246617ca0923ee380fc1cc7d0",
+  "person_rows": 6640,
+  "polar_test_rows_read": 0,
+  "predictions_sha256": "37560bb5410e485cb497f9a07ae4113c89767164cf9ded2e45bf1122fc3c4319",
+  "primary_candidate": "locked_ensemble_collapsed",
+  "primary_candidate_locked_pre_test": true,
+  "primary_image_metrics": {
+    "accuracy": 0.6663121510236639,
+    "balanced_accuracy": 0.7569082810711252,
+    "brier_score": 0.5397953036631573,
+    "candidate": "locked_ensemble_collapsed",
+    "ece": 0.19167657852802208,
+    "log_loss": 1.251168850728911,
+    "macro_f1": 0.6669343425821733,
+    "weighted_f1": 0.6741238158503868
+  },
+  "primary_person_metrics": {
+    "accuracy": 0.6728915662650602,
+    "balanced_accuracy": 0.7555620345909525,
+    "brier_score": 0.5215137195955337,
+    "candidate": "locked_ensemble_collapsed",
+    "ece": 0.18007402277832957,
+    "log_loss": 1.2001382958418734,
+    "macro_f1": 0.6840393638307938,
+    "weighted_f1": 0.6803758586894302
+  },
+  "runtime_seconds": 892.3298038999783,
+  "selection_lock_sha256": "fa3fb7c80a073d29048afb8e0b8da1fb17f5ade9721630347c37523714cca187",
+  "selection_role": "none",
+  "status": "LOCKED_EXTERNAL_EVALUATION_COMPLETE",
+  "test_used_for_selection": false,
+  "unique_images": 4123
+}

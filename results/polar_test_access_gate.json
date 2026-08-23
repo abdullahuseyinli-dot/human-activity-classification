@@ -1,0 +1,8 @@
+{
+  "official_test_manifest_open_count": 1,
+  "opened_manifest_cache_sha256": "35d2a73b33de866f52d857c266f57d3eee1259113f3da43b07bdd3e8dfa1142e",
+  "selection_lock_sha256": "fa3fb7c80a073d29048afb8e0b8da1fb17f5ade9721630347c37523714cca187",
+  "status": "POLAR_TEST_GATE_OPEN",
+  "test_manifest_sha256": "a8e01e1037e980edeb1886ef2bbbd22a07c316df044741c08e8e2afa8d32fce5",
+  "test_rows_read": 3329
+}

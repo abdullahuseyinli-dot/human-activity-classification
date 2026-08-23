@@ -1,0 +1,423 @@
+{
+  "development_rows": 13285,
+  "neural": {
+    "convnext_small_full": {
+      "configuration": {
+        "augmentation": "mild",
+        "backbone_lr": 3e-05,
+        "batch_size": 16,
+        "class_balance": "unweighted",
+        "dropout": 0.1,
+        "effective_batch_size": 64,
+        "fixed_epochs": 12,
+        "grad_accum_steps": 4,
+        "gradient_clip": 1.0,
+        "head_lr": 0.001,
+        "label_smoothing": 0.0,
+        "layer_decay": 0.7,
+        "mixup_alpha": 0.0,
+        "model_kind": "convnext_small",
+        "task": "label_4",
+        "top_n_blocks": null,
+        "unfreeze_strategy": "full_backbone",
+        "view": "full_frame",
+        "warmup_fraction": 0.1,
+        "weight_decay": 0.0001,
+        "workers": 4
+      },
+      "seeds": {
+        "42": {
+          "checkpoint_bytes": 197968221,
+          "checkpoint_sha256": "391298cf54650a72bac29eee548b45aa19b49acd1430a549ffb74408ee4fa029",
+          "epochs_completed": 12,
+          "parameter_counts": {
+            "frozen": 0,
+            "total": 49457764,
+            "trainable": 49457764
+          },
+          "pretrained_checkpoint": {
+            "files": [
+              {
+                "bytes": 201014929,
+                "path": "convnext_small-0c510722.pth",
+                "sha256": "0c510722adfd92966a2bd72b92f785ca05966bbac03cafe2f7a90b1f54bfab9a"
+              }
+            ],
+            "model_id": "torchvision/convnext_small",
+            "revision": "ConvNeXt_Small_Weights.IMAGENET1K_V1"
+          },
+          "request_sha256": "ce0e20ed8c93581fa62b0158c1c43a9683e8656741c1e7b0d7caf37533d0aa58",
+          "runtime_seconds": 1122.1099116000696,
+          "test_rows_read": 0
+        },
+        "52": {
+          "checkpoint_bytes": 197968221,
+          "checkpoint_sha256": "838c05122ac64589de14552525c0756c27d0f9cdde39d8214e8808faf81c449b",
+          "epochs_completed": 12,
+          "parameter_counts": {
+            "frozen": 0,
+            "total": 49457764,
+            "trainable": 49457764
+          },
+          "pretrained_checkpoint": {
+            "files": [
+              {
+                "bytes": 201014929,
+                "path": "convnext_small-0c510722.pth",
+                "sha256": "0c510722adfd92966a2bd72b92f785ca05966bbac03cafe2f7a90b1f54bfab9a"
+              }
+            ],
+            "model_id": "torchvision/convnext_small",
+            "revision": "ConvNeXt_Small_Weights.IMAGENET1K_V1"
+          },
+          "request_sha256": "10b9af085cafc67eb3097911cf5993175adc322348e1f8c5cac95a9714ac5ecf",
+          "runtime_seconds": 1136.0966705000028,
+          "test_rows_read": 0
+        },
+        "62": {
+          "checkpoint_bytes": 197968221,
+          "checkpoint_sha256": "02e055def6f57616b37b0506ed20b60a8db7eb6bd6bb64676332f4868aa89b81",
+          "epochs_completed": 12,
+          "parameter_counts": {
+            "frozen": 0,
+            "total": 49457764,
+            "trainable": 49457764
+          },
+          "pretrained_checkpoint": {
+            "files": [
+              {
+                "bytes": 201014929,
+                "path": "convnext_small-0c510722.pth",
+                "sha256": "0c510722adfd92966a2bd72b92f785ca05966bbac03cafe2f7a90b1f54bfab9a"
+              }
+            ],
+            "model_id": "torchvision/convnext_small",
+            "revision": "ConvNeXt_Small_Weights.IMAGENET1K_V1"
+          },
+          "request_sha256": "1101992d476f211d08c80300f6500ed63f9e05b1e6a7f1d8de25b87e9bbb3aa5",
+          "runtime_seconds": 1139.3771082999883,
+          "test_rows_read": 0
+        }
+      }
+    },
+    "dinov2_base_top4": {
+      "configuration": {
+        "augmentation": "mild",
+        "backbone_lr": 5e-06,
+        "batch_size": 16,
+        "class_balance": "unweighted",
+        "dropout": 0.1,
+        "effective_batch_size": 64,
+        "fixed_epochs": 7,
+        "grad_accum_steps": 4,
+        "gradient_clip": 1.0,
+        "head_lr": 0.001,
+        "label_smoothing": 0.0,
+        "layer_decay": null,
+        "mixup_alpha": 0.0,
+        "model_kind": "dinov2_base",
+        "task": "label_4",
+        "top_n_blocks": 4,
+        "unfreeze_strategy": "top_blocks",
+        "view": "person_context_25",
+        "warmup_fraction": 0.1,
+        "weight_decay": 0.0001,
+        "workers": 4
+      },
+      "seeds": {
+        "42": {
+          "checkpoint_bytes": 346427228,
+          "checkpoint_sha256": "2e22491b4dea493f8dffea7021f3385dcbe5ed026cdb8480c29a2c5732b288c8",
+          "epochs_completed": 7,
+          "parameter_counts": {
+            "frozen": 58196736,
+            "total": 86583556,
+            "trainable": 28386820
+          },
+          "pretrained_checkpoint": {
+            "files": [
+              {
+                "bytes": 346345912,
+                "path": "model.safetensors",
+                "sha256": "d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841"
+              },
+              {
+                "bytes": 548,
+                "path": "config.json",
+                "sha256": "f7ff4cfa73d2f70647dbf6950541ad25d73082d54c2e7e9bded160c7656b2a70"
+              }
+            ],
+            "model_id": "facebook/dinov2-base",
+            "revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415"
+          },
+          "request_sha256": "aa610b2794380958194aae76a7c870210cb6f5c2ba61e8a5998086fe870948c3",
+          "runtime_seconds": 813.4242404000834,
+          "test_rows_read": 0
+        },
+        "52": {
+          "checkpoint_bytes": 346427228,
+          "checkpoint_sha256": "46b3804d56092eb8bbc0e517497bbc8c647ef6ec01d0e2792082f1fb29d1aeb6",
+          "epochs_completed": 7,
+          "parameter_counts": {
+            "frozen": 58196736,
+            "total": 86583556,
+            "trainable": 28386820
+          },
+          "pretrained_checkpoint": {
+            "files": [
+              {
+                "bytes": 346345912,
+                "path": "model.safetensors",
+                "sha256": "d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841"
+              },
+              {
+                "bytes": 548,
+                "path": "config.json",
+                "sha256": "f7ff4cfa73d2f70647dbf6950541ad25d73082d54c2e7e9bded160c7656b2a70"
+              }
+            ],
+            "model_id": "facebook/dinov2-base",
+            "revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415"
+          },
+          "request_sha256": "e5fdf73af8a68d6ea108fe4f03ac57f5869694f64ca2bb60017f472ff8f8f6b8",
+          "runtime_seconds": 806.809548899997,
+          "test_rows_read": 0
+        },
+        "62": {
+          "checkpoint_bytes": 346427228,
+          "checkpoint_sha256": "f6ccdd7b07e1e496814813b704c1e446dea25b256bbcf1a627df73c3a6f143a3",
+          "epochs_completed": 7,
+          "parameter_counts": {
+            "frozen": 58196736,
+            "total": 86583556,
+            "trainable": 28386820
+          },
+          "pretrained_checkpoint": {
+            "files": [
+              {
+                "bytes": 346345912,
+                "path": "model.safetensors",
+                "sha256": "d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841"
+              },
+              {
+                "bytes": 548,
+                "path": "config.json",
+                "sha256": "f7ff4cfa73d2f70647dbf6950541ad25d73082d54c2e7e9bded160c7656b2a70"
+              }
+            ],
+            "model_id": "facebook/dinov2-base",
+            "revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415"
+          },
+          "request_sha256": "da3284720163c51651074922dc4043162aa59a83a967658b04e5cb209dfea6a5",
+          "runtime_seconds": 806.4901782999514,
+          "test_rows_read": 0
+        }
+      }
+    },
+    "dinov2_small_moderate": {
+      "configuration": {
+        "augmentation": "moderate",
+        "backbone_lr": 5e-06,
+        "batch_size": 32,
+        "class_balance": "unweighted",
+        "dropout": 0.1,
+        "effective_batch_size": 64,
+        "fixed_epochs": 12,
+        "grad_accum_steps": 2,
+        "gradient_clip": 1.0,
+        "head_lr": 0.001,
+        "label_smoothing": 0.0,
+        "layer_decay": 0.75,
+        "mixup_alpha": 0.0,
+        "model_kind": "dinov2_small",
+        "task": "label_4",
+        "top_n_blocks": null,
+        "unfreeze_strategy": "full_backbone",
+        "view": "person_context_25",
+        "warmup_fraction": 0.1,
+        "weight_decay": 0.0001,
+        "workers": 4
+      },
+      "seeds": {
+        "42": {
+          "checkpoint_bytes": 88325468,
+          "checkpoint_sha256": "4a39cbe28ae5765da1bbd9235f571153f77b603113af3b738e803b059be74605",
+          "epochs_completed": 12,
+          "parameter_counts": {
+            "frozen": 0,
+            "total": 22058116,
+            "trainable": 22058116
+          },
+          "pretrained_checkpoint": {
+            "files": [
+              {
+                "bytes": 88249960,
+                "path": "model.safetensors",
+                "sha256": "ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1"
+              },
+              {
+                "bytes": 547,
+                "path": "config.json",
+                "sha256": "1809f83e3bdb1609a501a610ad4a742f4fd8ae44d72ca4aa0df52d1f2ac8628d"
+              }
+            ],
+            "model_id": "facebook/dinov2-small",
+            "revision": "ed25f3a31f01632728cabb09d1542f84ab7b0056"
+          },
+          "request_sha256": "13e3074101acf867477e979f33a2648494c2e068623780790a44b37794434633",
+          "runtime_seconds": 695.578833000036,
+          "test_rows_read": 0
+        },
+        "52": {
+          "checkpoint_bytes": 88325468,
+          "checkpoint_sha256": "e4df02ac6a67c6e709365f3a897b2fa490636226e151c3a19b87415b11173ea7",
+          "epochs_completed": 12,
+          "parameter_counts": {
+            "frozen": 0,
+            "total": 22058116,
+            "trainable": 22058116
+          },
+          "pretrained_checkpoint": {
+            "files": [
+              {
+                "bytes": 88249960,
+                "path": "model.safetensors",
+                "sha256": "ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1"
+              },
+              {
+                "bytes": 547,
+                "path": "config.json",
+                "sha256": "1809f83e3bdb1609a501a610ad4a742f4fd8ae44d72ca4aa0df52d1f2ac8628d"
+              }
+            ],
+            "model_id": "facebook/dinov2-small",
+            "revision": "ed25f3a31f01632728cabb09d1542f84ab7b0056"
+          },
+          "request_sha256": "b419cdd00c50336b12399744a5e414bc59baed6bc982c2300a434c4d03703d33",
+          "runtime_seconds": 693.8839659999358,
+          "test_rows_read": 0
+        },
+        "62": {
+          "checkpoint_bytes": 88325468,
+          "checkpoint_sha256": "bca3d54b22e66e29e32ac95a843f8e267eb3d87e23ce2e791c169756a697f3c7",
+          "epochs_completed": 12,
+          "parameter_counts": {
+            "frozen": 0,
+            "total": 22058116,
+            "trainable": 22058116
+          },
+          "pretrained_checkpoint": {
+            "files": [
+              {
+                "bytes": 88249960,
+                "path": "model.safetensors",
+                "sha256": "ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1"
+              },
+              {
+                "bytes": 547,
+                "path": "config.json",
+                "sha256": "1809f83e3bdb1609a501a610ad4a742f4fd8ae44d72ca4aa0df52d1f2ac8628d"
+              }
+            ],
+            "model_id": "facebook/dinov2-small",
+            "revision": "ed25f3a31f01632728cabb09d1542f84ab7b0056"
+          },
+          "request_sha256": "081d96bdbcf31e88203852ec85d955918379ac0fa89b8ded86650712026c602b",
+          "runtime_seconds": 693.2187503000023,
+          "test_rows_read": 0
+        }
+      }
+    }
+  },
+  "probes": {
+    "dinov2_base_multilayer_logistic": {
+      "configuration": {
+        "C": 0.001,
+        "class_weight": "balanced",
+        "classifier": "standardized_multinomial_logistic",
+        "max_iter": 2000,
+        "model_kind": "dinov2_base",
+        "representation": "last4_cls_mean_patch",
+        "seed": 42,
+        "solver": "lbfgs",
+        "task": "label_4",
+        "tol": 1e-05,
+        "views": [
+          "full_frame",
+          "person_context_10"
+        ]
+      },
+      "feature_dimensions": 7680,
+      "fit_seconds": 13.921387500013225,
+      "pipeline_bytes": 413567,
+      "pipeline_sha256": "f905c463d3fd952016aa6931de185d9cf165ea93edb6018dd668681328d9fbb1",
+      "request_sha256": "fe3f4a4abb22ca58bb8d79c3ab2f46d5138b5217571e3686c4d405085ef2b6a3",
+      "test_rows_read": 0
+    },
+    "dinov2_base_multilayer_logistic_3class": {
+      "configuration": {
+        "C": 0.001,
+        "class_weight": "none",
+        "classifier": "standardized_multinomial_logistic",
+        "max_iter": 2000,
+        "model_kind": "dinov2_base",
+        "representation": "last4_cls_mean_patch",
+        "seed": 42,
+        "solver": "lbfgs",
+        "task": "label_3",
+        "tol": 1e-05,
+        "views": [
+          "full_frame",
+          "person_context_10"
+        ]
+      },
+      "feature_dimensions": 7680,
+      "fit_seconds": 11.126939399982803,
+      "pipeline_bytes": 354416,
+      "pipeline_sha256": "02c6eacd0807d8a39c84dfe7937885496502105b2f8345af596b9ec3d92c165b",
+      "request_sha256": "423c0f9adb285d1a94062da977eaaba9c95b9b5d05c546c4fb40a863438e2c58",
+      "test_rows_read": 0
+    },
+    "dinov2_base_multilayer_rbf": {
+      "configuration": {
+        "C": 10.0,
+        "cache_size_mb": 4096,
+        "calibration": "sigmoid",
+        "calibration_ensemble": true,
+        "calibration_folds": 5,
+        "class_weight": "none",
+        "classifier": "calibrated_rbf_svm",
+        "gamma_multiplier": 1.0,
+        "kernel": "rbf",
+        "model_kind": "dinov2_base",
+        "representation": "last4_cls_mean_patch",
+        "seed": 42,
+        "task": "label_4",
+        "views": [
+          "full_frame",
+          "person_context_10"
+        ]
+      },
+      "feature_dimensions": 7680,
+      "fit_seconds": 3625.2293929000152,
+      "mean_support_vectors": 5037.8,
+      "pipeline_bytes": 870856590,
+      "pipeline_sha256": "00805267df45a1dc9c8e52e0300d5914f75cad1213d9a1029567c84069e958f0",
+      "request_sha256": "c91bf446bfaf87e7ca29d1a7fa2ce3d8da8032417b6895a66de3b934f830219c",
+      "resolved_gamma": 0.00013020833333333333,
+      "support_vector_counts_by_calibration_fold": [
+        5062,
+        4988,
+        5058,
+        5029,
+        5052
+      ],
+      "test_rows_read": 0
+    }
+  },
+  "selection_lock_sha256": "fa3fb7c80a073d29048afb8e0b8da1fb17f5ade9721630347c37523714cca187",
+  "status": "LOCKED_POLAR_FINAL_FITS_VERIFIED",
+  "test_rows_read": 0,
+  "test_used_for_selection": false,
+  "total_fit_runtime_seconds": 11557.266927100078
+}
