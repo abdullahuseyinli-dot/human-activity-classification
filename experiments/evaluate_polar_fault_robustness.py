@@ -45,11 +45,13 @@ def json_safe(value):
     if isinstance(value, list | tuple):
         return [json_safe(item) for item in value]
     if isinstance(value, np.ndarray):
-        return value.tolist()
+        return json_safe(value.tolist())
     if isinstance(value, np.integer):
         return int(value)
     if isinstance(value, np.floating):
         return float(value) if np.isfinite(value) else None
+    if isinstance(value, float):
+        return value if np.isfinite(value) else None
     if isinstance(value, np.bool_):
         return bool(value)
     return value
@@ -189,7 +191,17 @@ def main() -> None:
     labels = cohort["label_4"].map(class_to_index).to_numpy(dtype=int)
 
     prediction_artifact = np.load(test_predictions_path, allow_pickle=False)
-    all_ids = [str(value) for value in prediction_artifact["image_ids"]]
+    opened_manifest = evaluation_dir / "opened_test_manifest.csv"
+    gate = json.loads((evaluation_dir / "test_access_gate.json").read_text(encoding="utf-8"))
+    if sha256_file(opened_manifest) != gate["opened_manifest_cache_sha256"]:
+        raise RuntimeError("Opened test-manifest cache hash drift")
+    test_frame = pd.read_csv(opened_manifest, dtype={"image_id": str})
+    all_ids = test_frame["image_id"].astype(str).tolist()
+    expected_labels = test_frame["label_4"].map(class_to_index)
+    if expected_labels.isna().any() or not np.array_equal(
+        prediction_artifact["labels_4"], expected_labels.to_numpy(dtype=int)
+    ):
+        raise RuntimeError("Locked predictions do not align with the opened test manifest")
     index_by_id = {value: index for index, value in enumerate(all_ids)}
     order = np.asarray([index_by_id[value] for value in cohort["image_id"].astype(str)])
     final_root = args.final_root.resolve()
@@ -340,8 +352,8 @@ def main() -> None:
         output_dir / "fault_robustness_predictions.npz",
         **probability_artifacts,
         labels=labels,
-        image_ids=cohort["image_id"].astype(str).to_numpy(),
-        class_names=np.asarray(class_names),
+        image_ids=cohort["image_id"].astype(str).to_numpy(dtype=str),
+        class_names=np.asarray(class_names, dtype=str),
     )
     aggregate_rows = result_frame[
         result_frame["fault_seed"].astype(str).isin({"none", "aggregate"})

@@ -51,6 +51,12 @@ def test_matched_occlusion_subsamples_a_majority_person_region():
     assert fraction == pytest.approx(0.25)
 
 
+def test_matched_occlusion_rejects_a_region_without_context():
+    person = torch.ones((10, 10), dtype=torch.bool)
+    with pytest.raises(ValueError, match="Both person and context regions"):
+        area_matched_occlusion_masks(person, seed=17)
+
+
 def test_localization_reports_mass_and_pointing_game():
     person = box_mask((0, 0, 2, 2), output_size=(4, 4))
     attribution = np.ones((4, 4), dtype=float)
@@ -140,3 +146,24 @@ def test_stratified_bootstrap_preserves_fixed_group_composition():
     assert result["mean"] == pytest.approx(1.0)
     assert result["ci95_low"] == pytest.approx(1.0)
     assert result["ci95_high"] == pytest.approx(1.0)
+
+
+def test_stratified_bootstrap_reports_unavailable_observations():
+    frame = pd.DataFrame(
+        {
+            "label": ["a", "a", "b", "b"],
+            "value": [0.0, np.nan, 2.0, 2.0],
+        }
+    )
+
+    result = stratified_bootstrap_mean(
+        frame,
+        "value",
+        strata=("label",),
+        resamples=100,
+        seed=17,
+    )
+
+    assert result["rows"] == 3
+    assert result["excluded_rows"] == 1
+    assert result["mean"] == pytest.approx(4.0 / 3.0)

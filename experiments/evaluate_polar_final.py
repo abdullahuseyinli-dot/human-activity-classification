@@ -500,9 +500,11 @@ def main() -> None:
         "probabilities_direct_three": direct_three,
         "labels_4": labels,
         "labels_3": secondary_labels,
-        "image_ids": frame["image_id"].to_numpy(),
-        "class_names_4": np.asarray(class_names),
-        "class_names_3": np.asarray(secondary_names),
+        # Store text as native NumPy Unicode arrays. Object arrays require
+        # pickle-backed loading, which is unnecessary for this evidence format.
+        "image_ids": frame["image_id"].astype(str).to_numpy(dtype=str),
+        "class_names_4": np.asarray(class_names, dtype=str),
+        "class_names_3": np.asarray(secondary_names, dtype=str),
     }
     np.savez_compressed(output_dir / "test_predictions.npz", **prediction_payload)
     locked_primary = metric_frame.loc[

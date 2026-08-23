@@ -187,9 +187,13 @@ def stratified_bootstrap_mean(
 ) -> dict:
     if column not in frame or any(name not in frame for name in strata):
         raise ValueError("Bootstrap column or stratum is missing")
+    values = frame[column].to_numpy(dtype=float)
+    finite = np.isfinite(values)
+    excluded_rows = int((~finite).sum())
+    frame = frame.loc[finite]
     array = frame[column].to_numpy(dtype=float)
-    if len(array) < 1 or not np.isfinite(array).all():
-        raise ValueError("Bootstrap values must be non-empty and finite")
+    if len(array) < 1:
+        raise ValueError("Bootstrap values must contain at least one finite observation")
     generator = np.random.default_rng(seed)
     draws = np.zeros(resamples, dtype=float)
     for _, group in frame.groupby(list(strata), sort=True, observed=True):
@@ -203,6 +207,7 @@ def stratified_bootstrap_mean(
         "ci95_low": float(np.quantile(draws, 0.025)),
         "ci95_high": float(np.quantile(draws, 0.975)),
         "rows": len(array),
+        "excluded_rows": excluded_rows,
     }
 
 
@@ -266,7 +271,8 @@ def evaluate_family(
     context_occluded_sum = np.zeros(row_count, dtype=np.float64)
     full_sum = np.zeros((row_count, 4), dtype=np.float64)
     crop_sum = np.zeros((row_count, 4), dtype=np.float64)
-    match_fraction = np.zeros(row_count, dtype=np.float64)
+    match_fraction = np.full(row_count, np.nan, dtype=np.float64)
+    matched_occlusion_available = np.ones(row_count, dtype=bool)
     sanity_indices = np.concatenate(
         [group.index.to_numpy()[:4] for _, group in cohort.groupby("label_4", sort=True)]
     )
@@ -299,11 +305,20 @@ def evaluate_family(
 
             person_box = projected_person_box(row, configuration["view"])
             person_mask = box_mask(person_box)
-            person_match, context_match, fraction = area_matched_occlusion_masks(
-                person_mask,
-                seed=stable_seed("matched-context", family, row["image_id"]),
-            )
-            match_fraction[position] = fraction
+            try:
+                person_match, context_match, fraction = area_matched_occlusion_masks(
+                    person_mask,
+                    seed=stable_seed("matched-context", family, row["image_id"]),
+                )
+                match_fraction[position] = fraction
+            except ValueError as error:
+                if str(error) != "Both person and context regions must contain pixels":
+                    raise
+                # A full-frame projected box has no context comparison. Keep the
+                # sample for every other metric and mark only this contrast absent.
+                matched_occlusion_available[position] = False
+                person_match = torch.zeros_like(person_mask)
+                context_match = torch.zeros_like(person_mask)
             baseline = gaussian_baseline(selected)
             person_occluded = occluded_input(selected, baseline, person_match)
             context_occluded = occluded_input(selected, baseline, context_match)
@@ -410,6 +425,7 @@ def evaluate_family(
         curve_metrics = {
             f"{name}_auc": curve_auc(fractions, values[position]) for name, values in curves.items()
         }
+        matched_available = bool(matched_occlusion_available[position])
         record = {
             "family": family,
             "image_id": str(row["image_id"]),
@@ -428,14 +444,25 @@ def evaluate_family(
             "probability_parity_absolute_error": float(
                 abs(locked_probabilities[position, target] - original[position])
             ),
-            "person_occlusion_drop": float(original[position] - person_occluded[position]),
-            "matched_context_occlusion_drop": float(
-                original[position] - context_occluded[position]
+            "matched_occlusion_available": matched_available,
+            "person_occlusion_drop": (
+                float(original[position] - person_occluded[position])
+                if matched_available
+                else np.nan
             ),
-            "person_minus_context_occlusion_drop": float(
-                context_occluded[position] - person_occluded[position]
+            "matched_context_occlusion_drop": (
+                float(original[position] - context_occluded[position])
+                if matched_available
+                else np.nan
             ),
-            "matched_person_fraction": float(match_fraction[position]),
+            "person_minus_context_occlusion_drop": (
+                float(context_occluded[position] - person_occluded[position])
+                if matched_available
+                else np.nan
+            ),
+            "matched_person_fraction": (
+                float(match_fraction[position]) if matched_available else np.nan
+            ),
             "full_crop_js_divergence": jensen_shannon(full[position], crop[position]),
             "full_crop_prediction_agreement": bool(
                 np.argmax(full[position]) == np.argmax(crop[position])
@@ -479,12 +506,14 @@ def evaluate_family(
 
     np.savez_compressed(
         output_dir / f"{family}_attribution_maps.npz",
-        image_ids=cohort["image_id"].astype(str).to_numpy(),
+        image_ids=cohort["image_id"].astype(str).to_numpy(dtype=str),
         attributions=attribution_maps,
         alternative_target_attributions=alternative_maps,
         randomized_head_attributions=randomized_maps,
         randomized_adapted_cascade_attributions=cascade_randomized_maps,
-        randomized_head_image_ids=cohort.iloc[sanity_indices]["image_id"].astype(str).to_numpy(),
+        randomized_head_image_ids=cohort.iloc[sanity_indices]["image_id"]
+        .astype(str)
+        .to_numpy(dtype=str),
     )
     return pd.DataFrame(per_image), pd.DataFrame(curve_rows), pd.DataFrame(sanity_rows)
 
@@ -549,7 +578,17 @@ def main() -> None:
     final_root = args.final_root.resolve()
     resolved = verify_final_fits(lock, final_root, lock_hash)
     predictions = np.load(prediction_path, allow_pickle=False)
-    prediction_ids = [str(value) for value in predictions["image_ids"]]
+    # The opened manifest is the authoritative row order. Early locked archives
+    # encoded image_ids as an object array, so do not deserialize that field.
+    # Numeric labels provide an independent alignment check before attribution.
+    prediction_ids = frame["image_id"].astype(str).tolist()
+    expected_labels = frame["label_4"].map(
+        {name: index for index, name in enumerate(TASK_LABELS["label_4"])}
+    )
+    if expected_labels.isna().any() or not np.array_equal(
+        predictions["labels_4"], expected_labels.to_numpy(dtype=int)
+    ):
+        raise RuntimeError("Locked predictions do not align with the opened test manifest")
     index_by_id = {image_id: index for index, image_id in enumerate(prediction_ids)}
     order = np.asarray([index_by_id[value] for value in cohort["image_id"].astype(str)])
     device = torch.device(args.device)
@@ -676,6 +715,10 @@ def main() -> None:
         "parameter_randomization_rows_per_family": int(
             sanity.groupby("family", sort=True).size().min()
         ),
+        "matched_occlusion_unavailable_rows_per_family": {
+            str(family): int((~group["matched_occlusion_available"]).sum())
+            for family, group in per_image.groupby("family", sort=True)
+        },
         "bootstrap": {
             "resamples": 10_000,
             "per_image_strata": ["true_label", "bbox_area_quartile"],
