@@ -1,4 +1,4 @@
-"""Build and execute the compact POLAR portfolio notebook from tracked evidence."""
+"""Build and execute the compact POLAR study notebook from tracked evidence."""
 
 from __future__ import annotations
 
@@ -80,7 +80,7 @@ def build_notebook(repository: Path) -> dict:
     notebook["cells"] = [
         markdown(
             f"""
-# Leakage-Safe Human Activity Classification
+# Source-Overlap-Controlled Human Activity Classification
 
 ## Locked POLAR benchmark
 
@@ -88,8 +88,8 @@ This notebook is the compact, executable evidence narrative for a four-class sti
 posture study. Model selection used the clean POLAR development split; nine neural fits
 and three frozen-feature probes completed before the official test cache opened once.
 
-**Locked result:** {primary['macro_f1']:.3f} macro-F1
-(95% CI [{interval['ci_95_low']:.3f}, {interval['ci_95_high']:.3f}]) and
+**Locked result:** {primary['macro_f1']:.3f} macro-F1 (95% CI
+[{interval['ci_95_low']:.3f}, {interval['ci_95_high']:.3f}]) and
 {primary['accuracy']:.3f} accuracy on {test['test_rows_read']:,} held-out images.
 
 The notebook reads only tracked, path-sanitized evidence. It performs no training and
@@ -229,8 +229,9 @@ display(probe_rows[["candidate", "macro_f1", "accuracy", "log_loss", "ece", "fit
 ## 5. External transfer
 
 The locked three-class ensemble reaches 0.961 in-domain macro-F1 but
-{external['primary_image_metrics']['macro_f1']:.3f} on {external['image_level_rows']:,}
-unambiguous V-COCO images. DINOv2-B top-four adaptation transfers best descriptively at
+{external['primary_image_metrics']['macro_f1']:.3f} on
+{external['image_level_rows']:,} unambiguous V-COCO images. DINOv2-B top-four adaptation
+transfers best descriptively at
 {external['best_observed_image_metrics']['macro_f1']:.3f}. The models were not retuned
 after this evaluation.
 
@@ -311,9 +312,8 @@ display(
 - ConvNeXt Grad-CAM passes the declared sanity checks more convincingly than DINOv2-B
   integrated gradients.
 
-No exact state-of-the-art claim is made. The most defensible public artifact is a
-reproducible technical report with explicit evidence boundaries. See
-`docs/POLAR_TECHNICAL_REPORT.md` for the full method, discussion, and references.
+No exact state-of-the-art claim is made. The full method, discussion, limitations, and
+references are documented in `docs/POLAR_PUBLIC_REPORT.md`.
 """
         ),
     ]
@@ -331,7 +331,7 @@ def main() -> None:
     )
     client.execute()
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    nbformat.write(notebook, args.output)
+    args.output.write_text(nbformat.writes(notebook), encoding="utf-8", newline="\n")
     print(f"Wrote executed notebook: {args.output.resolve()}")
 
 

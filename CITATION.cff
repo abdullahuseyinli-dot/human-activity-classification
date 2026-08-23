@@ -1,6 +1,6 @@
 cff-version: 1.2.0
-message: "If you use this code or evidence, please cite the repository and technical report."
-title: "Leakage-Safe Human Activity Classification"
+message: "If you use this software or its evidence, cite the versioned technical report under preferred-citation."
+title: "Source-Overlap-Controlled Human Activity Classification"
 type: software
 version: 2.0.0
 date-released: 2026-08-23
@@ -22,8 +22,10 @@ keywords:
   - evaluation methodology
 preferred-citation:
   type: report
-  title: "Leakage-Safe Transfer Learning for Still-Image Posture Recognition: A Locked POLAR Study with External-Transfer and Attribution Audits"
+  title: "Source-Overlap-Controlled Transfer Learning for Still-Image Posture Recognition"
+  version: 1.0.0
   year: 2026
+  url: "https://github.com/abdullahuseyinli-dot/human-activity-classification"
   authors:
     - family-names: Huseyinli
       given-names: Abdulla

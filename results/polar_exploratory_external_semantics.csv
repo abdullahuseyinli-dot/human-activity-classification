@@ -1,0 +1,7 @@
+diagnostic,numerator,denominator,fraction
+person_locomotion_labels_with_stand_source_action,1174,1261,0.9310071371927042
+locomotion_images_with_any_stand_source_action,584,621,0.9404186795491143
+locomotion_images_with_all_relevant_people_stand_tagged,562,621,0.9049919484702094
+ensemble_standing_to_locomotion_errors,1039,1255,0.8278884462151395
+ensemble_locomotion_recall_when_stand_cotagged,1074,1174,0.9148211243611585
+ensemble_locomotion_recall_without_stand_cotag,85,87,0.9770114942528736

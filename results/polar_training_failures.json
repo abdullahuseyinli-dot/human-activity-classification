@@ -17,7 +17,7 @@
   },
   {
     "disposition": "preserved; excluded from selection",
-    "error": "[Errno 2] No such file or directory: 'C:\\\\Users\\\\user\\\\Downloads\\\\github-portfolio-review-20260821\\\\human-activity-classification\\\\.runs\\\\polar_study\\\\manifests\\\\polar_clean_manifest.csv'",
+    "error": "[Errno 2] No such file or directory: '<REPO_ROOT>\\.runs\\polar_study\\manifests\\polar_clean_manifest.csv'",
     "error_type": "FileNotFoundError",
     "record_sha256": "273cc2a803d92fcb3b6436009cf04ae8f930aee294f57f4547ff2477cdb73e85",
     "run_id": "regularization/dinov2_small_context25_full_wd001_seed42",

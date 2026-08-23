@@ -1,0 +1,26 @@
+{
+  "title": "Source-Overlap-Controlled Transfer Learning for Still-Image Posture Recognition",
+  "description": "Versioned software, aggregate evidence, and an independent technical report for a source-overlap-controlled four-class POLAR benchmark with locked model selection, external V-COCO evaluation, attribution diagnostics, and bounded fault injection.",
+  "creators": [
+    {
+      "name": "Huseyinli, Abdulla"
+    }
+  ],
+  "license": "MIT",
+  "upload_type": "software",
+  "publication_date": "2026-08-23",
+  "version": "1.0.0",
+  "language": "eng",
+  "keywords": [
+    "human activity recognition",
+    "posture recognition",
+    "transfer learning",
+    "DINOv2",
+    "ConvNeXt",
+    "support vector machine",
+    "ensemble learning",
+    "domain shift",
+    "model attribution",
+    "reproducible research"
+  ]
+}

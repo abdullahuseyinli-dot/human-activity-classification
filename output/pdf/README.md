@@ -1,17 +1,19 @@
-# Technical report artifact
+# POLAR Study Report v1.0.0
 
-`polar_technical_report.pdf` is the rendered release report for the locked POLAR
-study. It is generated from tracked, hash-validated result exports and publication
-figures; rebuilding it does not train models or reopen the held-out test set.
+`polar_public_report_v1.0.0.pdf` is the canonical public research report. It extends the
+repository overview with the complete experimental design, post-lock analysis,
+statistical boundaries, integrated interpretation, and artifact map.
 
-From the repository root:
+The PDF is rendered directly from its Markdown source, so narrative and PDF content do
+not need to be maintained independently:
 
 ```bash
-python -m pip install -e ".[report]"
-python tools/render_polar_final_figures.py
-python tools/build_technical_report_pdf.py
+python tools/build_study_papers.py docs/POLAR_PUBLIC_REPORT.md \
+  -o output/pdf/polar_public_report_v1.0.0.pdf
 ```
 
-The editable narrative is maintained in
-[`docs/POLAR_TECHNICAL_REPORT.md`](../../docs/POLAR_TECHNICAL_REPORT.md). The PDF
-builder is [`tools/build_technical_report_pdf.py`](../../tools/build_technical_report_pdf.py).
+The source is `docs/POLAR_PUBLIC_REPORT.md`; layout is defined by
+`tools/build_study_papers.py`. The release-level SHA-256 inventory is
+`results/polar_study_v1.0.0_manifest.json`.
+
+This is the only report PDF intended for the versioned public release.

@@ -11,6 +11,8 @@ import pandas as pd
 
 from hac.polar import sha256_file
 
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+
 
 def json_safe(value):
     if isinstance(value, dict):
@@ -24,6 +26,17 @@ def json_safe(value):
     if isinstance(value, np.bool_):
         return bool(value)
     return value
+
+
+def portable_error(value: object) -> str:
+    """Replace a local repository prefix while preserving the failure message."""
+
+    text = str(value or "")
+    repository = str(REPOSITORY_ROOT.resolve())
+    portable = text.replace(repository, "<REPO_ROOT>").replace(
+        repository.replace("\\", "/"), "<REPO_ROOT>"
+    )
+    return portable.replace("\\\\", "\\")
 
 
 def parse_args() -> argparse.Namespace:
@@ -76,7 +89,7 @@ def failure_records(root: Path) -> list[dict]:
             {
                 "run_id": path.parent.relative_to(root).as_posix(),
                 "error_type": payload.get("error_type", ""),
-                "error": payload.get("error", ""),
+                "error": portable_error(payload.get("error", "")),
                 "disposition": payload.get("disposition", "preserved; excluded from selection"),
                 "record_sha256": sha256_file(path),
                 "test_rows_read": 0,
@@ -103,6 +116,7 @@ def main() -> None:
     (output_dir / "polar_training_failures.json").write_text(
         json.dumps(failures, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     selection = (
         frame[frame["run_role"].ne("engineering_smoke")].copy()
@@ -132,6 +146,7 @@ def main() -> None:
     (output_dir / "polar_training_summary.json").write_text(
         json.dumps(json_safe(summary), indent=2, sort_keys=True, allow_nan=False) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     print(json.dumps(json_safe(summary), indent=2, sort_keys=True, allow_nan=False), flush=True)
 

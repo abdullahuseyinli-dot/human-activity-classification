@@ -1,0 +1,3 @@
+domain,rows,component_disagreement_rate,ensemble_error_rate_when_unanimous,ensemble_error_rate_when_disagreeing,disagreement_auroc_for_ensemble_error,unanimous_errors,unanimous_standing_to_locomotion_errors,fraction_unanimous_errors_standing_to_locomotion
+POLAR,3329,0.15740462601381797,0.019964349376114084,0.2385496183206107,0.7819302968823492,56,,
+V-COCO,3761,0.31028981653815474,0.284502698535081,0.44301628106255353,0.576287348610347,738,684.0,0.926829268292683

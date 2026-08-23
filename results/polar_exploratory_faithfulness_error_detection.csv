@@ -1,0 +1,5 @@
+family,signal,rows,errors,auroc,ci_95_low,ci_95_high,resamples,seed,analysis_role
+convnext_small_full,full_crop_js_divergence,256,26,0.7117892976588629,0.595146321070234,0.8155560200668895,10000,20260873,posthoc_small_cohort_hypothesis
+convnext_small_full,one_minus_locked_confidence,256,26,0.8476588628762541,0.7745819397993312,0.9100334448160535,10000,20260874,posthoc_small_cohort_hypothesis
+dinov2_base_top4,full_crop_js_divergence,256,12,0.8683401639344263,0.7023522882513661,0.9740522540983606,10000,20260875,posthoc_small_cohort_hypothesis
+dinov2_base_top4,one_minus_locked_confidence,256,12,0.8797814207650273,0.8077100409836064,0.9409153005464481,10000,20260876,posthoc_small_cohort_hypothesis

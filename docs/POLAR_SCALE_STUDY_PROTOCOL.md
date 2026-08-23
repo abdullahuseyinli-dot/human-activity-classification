@@ -270,7 +270,7 @@ annotations, excludes mixed-label images for an image-level comparison, and
 excludes every SHA-256/perceptual duplicate of the legacy COCO corpus. Any known
 overlap with V-COCO test is listed and excluded.
 
-The final article may claim state of the art only after finding a directly
-comparable published result with the same POLAR release, target subset, splits,
-label space, and metric. Otherwise it reports a reproducible benchmark and
-explicitly labels cross-paper numbers as non-comparable.
+A state-of-the-art comparison requires a directly comparable published result using
+the same POLAR release, target subset, splits, label space, and metric. Without that
+match, the result is reported as a reproducible benchmark and cross-paper numbers are
+explicitly labelled non-comparable.

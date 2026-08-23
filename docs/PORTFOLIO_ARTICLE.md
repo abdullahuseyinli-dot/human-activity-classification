@@ -1,4 +1,4 @@
-# A 0.94 Macro-F1 Model—and the Tests That Made the Result Worth Trusting
+# A 0.94 Macro-F1 System—and the Tests That Made the Result Worth Trusting
 
 It is easy to improve an image classifier when every decision can be reconsidered after
 looking at the test set. It is much harder to improve one while preserving a clean
@@ -90,6 +90,25 @@ that the in-domain-optimal ensemble is not automatically the most transferable m
 If I extend the project, domain generalization—not another round of POLAR tuning—is the
 highest-value direction.
 
+## The external gap had more than one cause
+
+The post-lock analysis changed how I interpret that 29-point gap without changing the
+selected system or its score. V-COCO people are smaller: its median person-box area is
+roughly half the POLAR median. Performance improves for larger people in both datasets,
+but even the largest V-COCO quartile remains well below the in-domain result. Scale is
+one contributor, not a complete explanation.
+
+The annotation policies also conflict. V-COCO actions are non-exclusive, and 93.1% of
+the people mapped to walking/running also carry a source `stand` action. Under the fixed
+exclusive mapping, 82.8% of the ensemble's image-level errors are
+standing-to-locomotion. That makes the external result a test of visual and semantic
+shift together, rather than a clean replication of the POLAR task.
+
+Confidence does not solve the problem. Confidence-correctness AUROC falls from 0.923
+on POLAR to 0.584 on V-COCO, and many external errors are unanimous across all five
+components. The models become confidently wrong in the same direction, which is more
+important than the small difference between their external point estimates.
+
 ## A saliency map is not a faithfulness result
 
 The explanation audit combined four kinds of evidence: deletion/insertion curves,
@@ -128,10 +147,10 @@ hardware reliability, and it says nothing about random faults throughout the bac
 Keeping that boundary explicit prevents a useful diagnostic from becoming an inflated
 claim.
 
-## What I would publish
+## What the study contributes
 
-The work is ready as a GitHub technical report and portfolio article because its main
-contribution is the engineering and evaluation discipline around a strong benchmark:
+The main contribution is the engineering and evaluation discipline around a strong
+benchmark:
 
 - source-aware quarantine before fitting;
 - development-only selection and one-time test access;
@@ -141,11 +160,11 @@ contribution is the engineering and evaluation discipline around a strong benchm
 - external validation that exposes the domain gap;
 - attribution tests that are allowed to fail.
 
-I would not call the result state of the art. I found no published benchmark with the
-same cleaned four-class subset and protocol. For an academic preprint, I would first
-replicate on the remaining POLAR actions or an independently collected dataset with
+I do not call the result state of the art. I found no published benchmark with the same
+cleaned four-class subset and protocol. A stronger academic extension would replicate
+the method on the remaining POLAR actions or an independently collected dataset with
 subject/session identifiers, then predeclare a domain-generalization intervention.
 
 The complete methods, tables, limitations, and references are in the
-[technical report](POLAR_TECHNICAL_REPORT.md). Every promoted number is also available
-as path-free tracked evidence in `results/`.
+[independent technical report](POLAR_PUBLIC_REPORT.md). Every promoted number is also
+available as path-free tracked evidence in `results/`.

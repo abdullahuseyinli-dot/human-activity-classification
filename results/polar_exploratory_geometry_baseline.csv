@@ -1,0 +1,4 @@
+candidate,evaluation_domain,evaluation_unit,development_oof_macro_f1,test_accuracy,test_macro_f1,test_macro_f1_ci_95_low,test_macro_f1_ci_95_high,test_log_loss,test_rows,selection_role
+bbox_geometry_logistic_posthoc,POLAR,image,0.43358499359474634,0.45088615199759685,0.43096664538058904,0.4140305690985982,0.4478215009161438,1.1819357907790236,3329,posthoc_exploratory_fixed_specification
+development_majority_class,POLAR,image,,0.31060378492039653,0.11849644739857897,,,,3329,descriptive_reference
+bbox_geometry_logistic_posthoc,V-COCO,person,,0.3194277108433735,0.307343546097447,,,1.4366627336403095,6640,posthoc_external_diagnostic_no_retuning

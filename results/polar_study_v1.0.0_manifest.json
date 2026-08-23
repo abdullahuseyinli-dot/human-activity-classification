@@ -1,0 +1,199 @@
+{
+  "artifact_count": 47,
+  "artifact_scope": "Public report, post-lock analysis supplement, and release metadata",
+  "artifacts": {
+    ".zenodo.json": {
+      "sha256": "ac5476b55a0106181d93ec3d1c734db892a90eb363b7cad481cb2f99f7dc7142",
+      "size_bytes": 824
+    },
+    "CHANGELOG.md": {
+      "sha256": "78bf4ab866535363214e95e7aabeb0d759ea93804a2577a6f03c2dfb4c5f3b04",
+      "size_bytes": 1324
+    },
+    "CITATION.cff": {
+      "sha256": "0224a9266007048b285b2bf99a3132d6dcd62dd831886289e0a6d54a201d1a3f",
+      "size_bytes": 1148
+    },
+    "README.md": {
+      "sha256": "987d932e068fc54ea4a6a72afd28599b7c73839375e1d55e30d1f1a1f9b5166b",
+      "size_bytes": 12692
+    },
+    "assets/polar_exploratory_bbox_effects.png": {
+      "sha256": "910f8a9c4d18c5f62a021ebfd5172d58b7505e545c066754b6ba6e692748f904",
+      "size_bytes": 174869
+    },
+    "assets/polar_exploratory_bbox_effects.svg": {
+      "sha256": "aa6c987f084c2d088ce14b8ce2147eeb6305aca629e0ca6ee2009a768322ee6e",
+      "size_bytes": 74060
+    },
+    "assets/polar_exploratory_error_structure.png": {
+      "sha256": "fc44fbc5988bbbed4a6f821cf35ecbf5bc43166c4218c7718a235ba229f0d16c",
+      "size_bytes": 113986
+    },
+    "assets/polar_exploratory_error_structure.svg": {
+      "sha256": "b5bcbcb4660ea54e2b81c73f426c1230a2087381480687c219c3825a81394ba5",
+      "size_bytes": 65895
+    },
+    "assets/polar_exploratory_faithfulness_scale.png": {
+      "sha256": "5b5030adbe034b55ea55b049790ac473417fa5d40451526bb5d46269143fe9c4",
+      "size_bytes": 163386
+    },
+    "assets/polar_exploratory_faithfulness_scale.svg": {
+      "sha256": "820d8a638df2aa03b1b577ba13ae45d96390b3e75c4a54c62a67b030f5d287de",
+      "size_bytes": 72582
+    },
+    "assets/polar_exploratory_regularization_tradeoff.png": {
+      "sha256": "20700abf7dc29dab981654d24eb6fdffe5c96cbdb055dcadeb8b3746e937b16e",
+      "size_bytes": 86933
+    },
+    "assets/polar_exploratory_regularization_tradeoff.svg": {
+      "sha256": "6126991cc70bfa91f226916322870b6bf1759e720c2a1291f821d36c977902a8",
+      "size_bytes": 55619
+    },
+    "assets/polar_exploratory_scale_per_class.png": {
+      "sha256": "3ac19fb4bd8bc9be307507cc6a2a1820d8e339c02073398eb8a0542f9cfd901f",
+      "size_bytes": 110525
+    },
+    "assets/polar_exploratory_scale_per_class.svg": {
+      "sha256": "7010b7cf012f1fd9caba4d3619089b072c3b6960bae84a7dcfabdb0ea20e6922",
+      "size_bytes": 51036
+    },
+    "assets/polar_exploratory_selective_shift.png": {
+      "sha256": "96a5f22d1ed8c91b5fa851fa831890839ab52d7b37e5961077beeef7988f233e",
+      "size_bytes": 156386
+    },
+    "assets/polar_exploratory_selective_shift.svg": {
+      "sha256": "5ed07b8094a30fe15223e2b620d2e5ba99cf53113a2dbba6262ba51611992b70",
+      "size_bytes": 73791
+    },
+    "assets/polar_exploratory_shift_diagnostics.png": {
+      "sha256": "197bc821683875b232f6525bf552c404b41011e7048ccd13ab36db3b2bb4c704",
+      "size_bytes": 125070
+    },
+    "assets/polar_exploratory_shift_diagnostics.svg": {
+      "sha256": "e382e3613e72043b3fe2337d7886f106c5d1961695a1dbb08c534be05409d8a9",
+      "size_bytes": 68968
+    },
+    "docs/POLAR_PUBLIC_REPORT.md": {
+      "sha256": "a4e5e227e7d41d4bb5d9216bea20fa874727b6501beb348a18bd3f9ef4b1a280",
+      "size_bytes": 64495
+    },
+    "docs/releases/POLAR_STUDY_V1.0.0.md": {
+      "sha256": "8d73074d10065abae72771d7768808292b1bbad3fb32dfbeb528c75e7fe61231",
+      "size_bytes": 3480
+    },
+    "experiments/analyze_polar_exploratory.py": {
+      "sha256": "7a2065f82d192c11fd2a46f9c2e4c169fdff851d7482b28a22b603ee4ea61f2c",
+      "size_bytes": 71942
+    },
+    "output/pdf/README.md": {
+      "sha256": "9d5ad7ad7ec405ae2cc4fca523961cbe29479e71606de9fa15fde24440a72bcf",
+      "size_bytes": 773
+    },
+    "output/pdf/polar_public_report_v1.0.0.pdf": {
+      "sha256": "cdef2bce0afb23e2700526531a8a49e8d1890024ed462dbfb259c529eb2290fe",
+      "size_bytes": 1824113
+    },
+    "results/README.md": {
+      "sha256": "d12530ae8c93f98d793b94255cd1aa27d61cbf3498dc9bc26231f67d003f5723",
+      "size_bytes": 2940
+    },
+    "results/polar_exploratory_bbox_strata.csv": {
+      "sha256": "e800c21a14e3f0060240962ba3f1d02a7efd0bb62912578ce547e3ae711dee0e",
+      "size_bytes": 8434
+    },
+    "results/polar_exploratory_blend_sensitivity.csv": {
+      "sha256": "f00d997b42daa364a6fe6b52da5d58738b65dc8eea85b8889000395af8fad089",
+      "size_bytes": 935
+    },
+    "results/polar_exploratory_disagreement_shift.csv": {
+      "sha256": "836304257278ab86c0ce10b561b880002a6fa8c74e26c32a62870908aff53c17",
+      "size_bytes": 467
+    },
+    "results/polar_exploratory_domain_composition.csv": {
+      "sha256": "e18e84987b213975030e5d7a2197346a6d5af774633cf2119d38dca503313276",
+      "size_bytes": 498
+    },
+    "results/polar_exploratory_ensemble_structure.csv": {
+      "sha256": "1fd50505c44afb72326f0469cd809e8f7645e6a7febc3f613fe7cc39edb5a757",
+      "size_bytes": 650
+    },
+    "results/polar_exploratory_external_semantics.csv": {
+      "sha256": "f5251e16eb934c07c8d703260d884fd294ca45f390724e6144945c684465c475",
+      "size_bytes": 494
+    },
+    "results/polar_exploratory_faithfulness_correlations.csv": {
+      "sha256": "9b3f9b61db82048ed267e1dc68009753513660c9864587b9b0bf6903765fda0f",
+      "size_bytes": 1192
+    },
+    "results/polar_exploratory_faithfulness_error_detection.csv": {
+      "sha256": "c3562fbde6a893f52b2610a65831e265ec6afa7756e84346f506ff548199b1e5",
+      "size_bytes": 703
+    },
+    "results/polar_exploratory_faithfulness_strata.csv": {
+      "sha256": "cfbfb12b5642ea15578b3776d18de39ce09544f855d5e2febdfac0d6952d5fda",
+      "size_bytes": 1505
+    },
+    "results/polar_exploratory_fault_by_class.csv": {
+      "sha256": "8be8e984d3ae47a92a2d9b72eccb14712256cc66d93d34b85ee3ab5a9d7544b3",
+      "size_bytes": 1192
+    },
+    "results/polar_exploratory_geometry_baseline.csv": {
+      "sha256": "e27dab9e31052dcb53088e4d301109c012a19468d71e9574fcefd3cf64c2f0ba",
+      "size_bytes": 649
+    },
+    "results/polar_exploratory_mixed_scene_persons.csv": {
+      "sha256": "e3f44c60942afb1b64e719fc7df1d1104d05a4430620f11207a7c445fe71443c",
+      "size_bytes": 1064
+    },
+    "results/polar_exploratory_pairwise.csv": {
+      "sha256": "b2e18ae7f70173a06b0d690d81104d9c811b49b19d0eb6ab244351e304295227",
+      "size_bytes": 2008
+    },
+    "results/polar_exploratory_regularization.csv": {
+      "sha256": "945ec5a0ecb3ef28a54cca67c9c340ff9de0183ae8169a83988ef3d400470258",
+      "size_bytes": 789
+    },
+    "results/polar_exploratory_scale_integrity.csv": {
+      "sha256": "80e0e73e461da397ac5b5e35fe7101cca451a2a24e0322d4d1445bd71d0ee85d",
+      "size_bytes": 331
+    },
+    "results/polar_exploratory_scale_per_class.csv": {
+      "sha256": "ce21ef2aa973298b6925d82f1eec5b18437cb8e63003b1c94e89ebd2b90181d0",
+      "size_bytes": 1900
+    },
+    "results/polar_exploratory_selective_prediction.csv": {
+      "sha256": "0f0a4d1a49cd6a0329d0900c987356c28edb7d121399646d26530ff68f1e6efa",
+      "size_bytes": 6306
+    },
+    "results/polar_exploratory_summary.json": {
+      "sha256": "fca001699d5be309a78fb6afdcdf6d391f93d69e0af4569c70a4d4d1746c2a73",
+      "size_bytes": 10904
+    },
+    "results/polar_final_evidence_manifest.json": {
+      "sha256": "82ad0a37c66bc204c2d3e644d0fd20fa8639943aa76eaae5de2ae020fee7808e",
+      "size_bytes": 2892
+    },
+    "results/polar_training_failures.json": {
+      "sha256": "497d61583c408c0270084875f1c7c5ba77e3f80020308bcbe61cdf574804298b",
+      "size_bytes": 1461
+    },
+    "tools/build_study_papers.py": {
+      "sha256": "e90f85d8985957ac6a5cf7e41a92a6b56397e06ae08e189f5f5f189b330394d6",
+      "size_bytes": 34377
+    },
+    "tools/build_study_release_manifest.py": {
+      "sha256": "194a429df6191c8d28b8465726b9dc12abf3a635d739fdc742047fe5bc32b8ce",
+      "size_bytes": 5873
+    },
+    "tools/export_polar_training_results.py": {
+      "sha256": "14503ac5c91324da6c35a19452825469da44af8ace828cc6c8480b6750bb7644",
+      "size_bytes": 5672
+    }
+  },
+  "release_date": "2026-08-23",
+  "release_id": "polar-study-v1.0.0",
+  "report_version": "1.0.0",
+  "schema_version": 1,
+  "software_version": "2.0.0"
+}

@@ -28,4 +28,4 @@ makes every acceptance gate visible and avoids an accidental second test-selecti
 Long jobs are resumable when their implementation and artifact hashes match.
 
 `pipeline_source.ipynb` belongs to the historical COCO benchmark. The root notebook is
-the concise, executed portfolio narrative and reads only tracked evidence.
+the concise, executed study summary and reads only tracked evidence.

@@ -1,8 +1,9 @@
-# Leakage-Safe Human Activity Classification
+# Source-Overlap-Controlled Human Activity Classification
 
 [![Quality gates](https://github.com/abdullahuseyinli-dot/human-activity-classification/actions/workflows/ci.yml/badge.svg)](https://github.com/abdullahuseyinli-dot/human-activity-classification/actions/workflows/ci.yml)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/Code-MIT-0F766E.svg)](LICENSE)
+[![Study report: v1.0.0](https://img.shields.io/badge/study_report-v1.0.0-0F766E.svg)](output/pdf/polar_public_report_v1.0.0.pdf)
 
 A locked, leakage-audited transfer-learning study for recognizing **sitting, standing,
 walking, and running** in still images. The primary benchmark uses the POLAR dataset,
@@ -10,18 +11,25 @@ compares ConvNeXt and DINOv2 adaptation strategies, tests linear and nonlinear
 classifiers on frozen representations, and evaluates external transfer and attribution
 faithfulness without using test results for selection.
 
+The canonical research narrative is the
+[POLAR Study Report v1.0.0](output/pdf/polar_public_report_v1.0.0.pdf). Its
+[Markdown source](docs/POLAR_PUBLIC_REPORT.md),
+[release notes](docs/releases/POLAR_STUDY_V1.0.0.md), and
+[SHA-256 manifest](results/polar_study_v1.0.0_manifest.json) are tracked with the
+analysis code and aggregate evidence.
+
 ![Held-out POLAR comparison](assets/polar_test_comparison.png)
 
-The predeclared ensemble achieved **0.940 macro-F1**
-(95% stratified-bootstrap CI **[0.931,
-0.948]**) and **0.946 accuracy** on
-3,329 held-out POLAR images. Its smallest paired gain over any component was
+The predeclared ensemble achieved **0.940 macro-F1** (95%
+stratified-bootstrap CI **[0.931, 0.948]**)
+and **0.946 accuracy** on 3,329 held-out POLAR images. Its
+smallest paired gain over any component was
 **+0.013 macro-F1**, with a positive 95% interval
 **[0.007, 0.019]**.
 
-> This is a reproducible benchmark result, not a state-of-the-art claim. No published
-> result was found with the same cleaned four-class subset, quarantine policy, fixed
-> split, and metric.
+> This is a reproducible benchmark result, not a state-of-the-art claim. The literature
+> review identified no directly comparable result using the same cleaned four-class
+> subset, quarantine policy, fixed split, and metric.
 
 ## Held-out results
 
@@ -53,27 +61,31 @@ The study separates data scale, representation, adaptation depth, regularization
 model diversity instead of treating training as a single opaque run.
 
 - **Data scale mattered:** the frozen DINOv2-B validation curve rose from
-  **0.849** at 242 training images
-  to **0.915** at 9,958.
-- **Person-aware views mattered:** the strongest DINO branches use deterministic person
-  crops with declared context, while ConvNeXt retained the full frame.
+  **0.849** at 242 training
+  images to **0.915** at 9,958.
+- **Person-conditioned views contributed distinct behavior:** the strongest DINO
+  branches use deterministic person crops with declared context, while ConvNeXt
+  retained the full frame.
 - **Moderate regularization won selectively:** the locked neural configurations use
   dropout 0.10, no MixUp, no label smoothing, and either mild or moderate augmentation;
   interventions that reduced validation performance remain in the evidence tables.
 - **Complementarity mattered:** the final weights were fixed on development data as
-  ConvNeXt-S, full adaptation 20%, DINOv2-B multilayer + logistic regression 20%, DINOv2-B multilayer + calibrated RBF SVM 20%, DINOv2-B, top four blocks adapted 25%, DINOv2-S, full adaptation 15%. Every paired held-out interval favors the locked blend.
+  ConvNeXt-S 20%, DINOv2-S 15%,
+  adapted DINOv2-B 25%, logistic regression 20%,
+  and the calibrated RBF SVM 20%. Every paired
+  held-out interval favors the locked blend.
 
 ![Data-scale curve](assets/polar_scale_curve.png)
 
 ## Was an SVM useful at the final stage?
 
-Yes—as a representation probe, not as the default deployment choice. A calibrated RBF
-SVM on 7,680-dimensional DINOv2-B multilayer features reached **0.927 macro-F1**, the
-strongest standalone held-out component. The standardized multinomial logistic model
-reached **0.926**, but had better log loss (**0.176** versus **0.228**), fitted in
-13.9 seconds, and occupied 0.4
-MB. The RBF pipeline took 60.4 minutes and occupied
-870.9 MB. The nonlinear margin adds a small accuracy
+Yes, as a representation probe rather than the default deployment choice. A calibrated
+RBF SVM on 7,680-dimensional DINOv2-B multilayer features reached **0.927 macro-F1**,
+the strongest standalone held-out component. The standardized multinomial logistic
+model reached **0.926** and had better log loss (**0.176** versus **0.228**). It fitted
+in 13.9 seconds and serialized to 0.4 MB;
+the RBF pipeline took 60.4 minutes and serialized to 870.9 MB.
+The nonlinear margin adds a small accuracy
 gain, while logistic regression is the more practical calibrated endpoint.
 
 ## External transfer: the result does not travel unchanged
@@ -93,11 +105,36 @@ evaluation uses 6,640 annotations.
 ![External V-COCO transfer](assets/polar_external_validation.png)
 
 The locked ensemble falls from **0.961** in-domain three-class
-macro-F1 to **0.667** externally. The
-adapted DINOv2-B component transfers best descriptively at
+macro-F1 to **0.667** externally. Adapted
+DINOv2-B transfers best descriptively at
 **0.673**. This is evidence of a
-substantial domain and annotation-policy gap, not evidence that the external set should
-be used to retune the locked result.
+substantial domain and annotation-policy gap, not evidence that the external set
+should be used to retune the locked result.
+
+## What the post-lock analysis revealed
+
+These analyses were specified after the primary prediction arrays existed. They are
+hypothesis-generating and did not change the selected system or its test score.
+
+- **Residual errors are structured:** 173 of 181
+  ensemble errors (95.6%) occur between adjacent
+  posture states. Standing-to-walking and walking-to-standing account for
+  97 errors.
+- **View diversity helps most at small person scale:** the ensemble exceeds the RBF
+  probe by 0.0305 macro-F1 in the smallest-person quartile.
+- **External label semantics explain many apparent errors:** 93.1%
+  of mapped V-COCO locomotion people also carry a source `stand` action. Under the
+  forced exclusive mapping, 82.8% of image-level ensemble errors are
+  standing-to-locomotion.
+- **Confidence does not transfer unchanged:** confidence-correctness AUROC falls from
+  0.9225 on POLAR to 0.5835 on V-COCO.
+- **Raw attribution localization needs a geometric baseline:** person-box attribution
+  mass rises with box size, while area-normalized lift and matched occlusion tell a
+  materially different story.
+
+The tables are documented in [results/README.md](results/README.md); the analysis is
+implemented in
+[`experiments/analyze_polar_exploratory.py`](experiments/analyze_polar_exploratory.py).
 
 ## Faithfulness and fault robustness
 
@@ -107,10 +144,10 @@ of **0.163**, concentrates
 **2.37x** more attribution in the
 person box than uniform area, and produces a person-minus-context probability drop of
 **0.234**. DINOv2-B integrated
-gradients localizes on people but shows only **1.10x**
-area-normalized lift and retains high correlations after target and parameter
-randomization. It is therefore presented as a limited localization diagnostic, not a
-fully validated causal explanation.
+gradients localize on people but show only
+**1.10x** area-normalized lift and
+retain high correlations after target and parameter randomization. They are therefore
+presented as limited localization diagnostics, not fully validated causal explanations.
 
 ![BBox-aware faithfulness](assets/polar_faithfulness.png)
 
@@ -120,9 +157,10 @@ Bit-flip experiments are reported separately from faithfulness. At a 0.1% exact 
 bit-flip rate, prediction agreement with the clean models was
 **0.984** for ConvNeXt-S and
 **0.980** for DINOv2-B. Sixteen flips per
-quantized classifier weight matrix retained **1.000**
-and **1.000** agreement, respectively, on
-this cohort. These are bounded software fault-injection results, not hardware safety
+quantized classifier weight matrix retained
+**1.000** and
+**1.000** agreement, respectively, on this
+cohort. These are bounded software fault-injection results, not hardware safety
 certification.
 
 ![Fault robustness](assets/polar_fault_robustness.png)
@@ -142,8 +180,8 @@ certification.
 - Checkpoints, local image paths, dense probabilities, and full-resolution attribution
   maps remain outside Git; the tracked evidence is path-sanitized and hash-indexed.
 
-Start with the [rendered technical report](output/pdf/polar_technical_report.pdf),
-[source report](docs/POLAR_TECHNICAL_REPORT.md),
+Start with the [POLAR Study Report v1.0.0](output/pdf/polar_public_report_v1.0.0.pdf),
+[source report](docs/POLAR_PUBLIC_REPORT.md),
 [portfolio article](docs/PORTFOLIO_ARTICLE.md), and
 [result lineage](docs/RESULT_LINEAGE.md). The older 285-image COCO study is retained as
 a [historical benchmark](docs/LEGACY_COCO_STUDY.md), not the portfolio headline.
@@ -152,15 +190,15 @@ a [historical benchmark](docs/LEGACY_COCO_STUDY.md), not the portfolio headline.
 
 ```text
 .
-├── human_activity_classification.ipynb  # executed evidence narrative
-├── src/hac/                             # reusable data, model, metric, and audit code
-├── experiments/                         # staged selection, fitting, and evaluation runners
-├── tools/                               # dataset, export, validation, and figure utilities
-├── results/                             # portable locks, metrics, uncertainty, and hashes
-├── assets/                              # publication figures
-├── docs/                                # protocols, report, article, and lineage
-├── tests/                               # fast invariants and evidence-contract tests
-└── .github/workflows/ci.yml             # Linux quality gates
+|-- human_activity_classification.ipynb  # executed evidence narrative
+|-- src/hac/                             # reusable data, model, metric, and audit code
+|-- experiments/                         # staged selection, fitting, and evaluation runners
+|-- tools/                               # dataset, export, validation, and figure utilities
+|-- results/                             # portable locks, metrics, uncertainty, and hashes
+|-- assets/                              # publication figures
+|-- docs/                                # protocols, reports, release notes, and lineage
+|-- tests/                               # fast invariants and evidence-contract tests
+`-- .github/workflows/ci.yml             # Linux quality gates
 ```
 
 ## Reproduce the environment
@@ -212,6 +250,13 @@ python tools/validate_repository.py
   or causal reasoning.
 
 ## References and license
+
+GitHub's citation panel reads [`CITATION.cff`](CITATION.cff). Until a Zenodo DOI is
+assigned, cite the report as:
+
+> Huseyinli, A. (2026). *Source-Overlap-Controlled Transfer Learning for Still-Image
+> Posture Recognition* (Version 1.0.0) [Technical report].
+> https://github.com/abdullahuseyinli-dot/human-activity-classification
 
 - [POLAR dataset](https://doi.org/10.17632/hvnsh7rwz7.1)
 - [DINOv2](https://arxiv.org/abs/2304.07193)

@@ -1,4 +1,4 @@
-"""Leakage-safe recovery runner for the human-activity experiment.
+"""Selection-controlled recovery runner for the human-activity experiment.
 
 This utility reuses the training primitives from the earlier internal-CV
 notebook while enforcing the fixed test partition. Candidate

@@ -11,5 +11,5 @@ reuse. The final set covers held-out model comparison, confusion, data scale, ex
 transfer, bbox-aware faithfulness, attribution sanity, and bit-flip robustness.
 
 Files without the `polar_` prefix belong to the historical COCO benchmark. Image
-galleries contain only that study's redistributable review derivatives; raw POLAR and
+galleries contain only redistributable derivatives from that study; raw POLAR and
 V-COCO images are never copied into the repository.

@@ -1,0 +1,256 @@
+{
+  "analysis_role": "Hypothesis-generating only; no result changes the locked primary selection or confirmatory interpretation.",
+  "analysis_seed": 20260823,
+  "bootstrap_resamples": 10000,
+  "findings": {
+    "box_geometry_baseline": {
+      "class_medians": [
+        {
+          "bbox_area_fraction": 0.2172584432486139,
+          "bbox_center_x": 0.49116037586076877,
+          "bbox_center_y": 0.5145513318590241,
+          "class": "walking",
+          "log_bbox_aspect": -0.8061745844457058,
+          "log_image_aspect": -0.06378085309993697
+        },
+        {
+          "bbox_area_fraction": 0.2618948040169182,
+          "bbox_center_x": 0.4935056513322541,
+          "bbox_center_y": 0.5139082327452801,
+          "class": "running",
+          "log_bbox_aspect": -0.6857181877305143,
+          "log_image_aspect": 0.4034907738044468
+        },
+        {
+          "bbox_area_fraction": 0.3543770783866182,
+          "bbox_center_x": 0.5033703173466952,
+          "bbox_center_y": 0.5351348682354269,
+          "class": "sitting",
+          "log_bbox_aspect": -0.4482982099096706,
+          "log_image_aspect": 0.29256403410652665
+        },
+        {
+          "bbox_area_fraction": 0.2948345706486778,
+          "bbox_center_x": 0.4970414201183432,
+          "bbox_center_y": 0.5315581854043393,
+          "class": "standing",
+          "log_bbox_aspect": -0.7428458659741821,
+          "log_image_aspect": -0.26533477375978437
+        }
+      ],
+      "external_person_metrics": {
+        "accuracy": 0.3194277108433735,
+        "macro_f1": 0.307343546097447,
+        "predicted_class_proportions": {
+          "sitting": 0.26822289156626505,
+          "standing": 0.018674698795180723,
+          "walking_running": 0.7131024096385542
+        }
+      },
+      "fixed_specification": {
+        "C": 1.0,
+        "classifier": "standardized balanced multinomial logistic regression",
+        "development_cross_validation": "five-fold stratified, shuffled once",
+        "features": [
+          "log_bbox_area",
+          "log_bbox_aspect",
+          "bbox_center_x",
+          "bbox_center_y",
+          "log_image_aspect"
+        ]
+      },
+      "test_interval": {
+        "ci_95_high": 0.4478215009161438,
+        "ci_95_low": 0.4140305690985982,
+        "point_estimate": 0.43096664538058904,
+        "resamples": 10000,
+        "seed": 20260853
+      }
+    },
+    "component_oracle": {
+      "interpretation": "The oracle is an unattainable label-informed upper bound demonstrating remaining error diversity, not a deployable score.",
+      "locked_ensemble_accuracy": 0.9456293181135476,
+      "oracle_accuracy": 0.9804746170021027,
+      "oracle_headroom": 0.03484529888855514
+    },
+    "confidence_transfer": {
+      "polar_90_percent_coverage_accuracy": 0.9769692923898531,
+      "polar_correctness_auroc": 0.922522060836662,
+      "vcoco_90_percent_coverage_accuracy": 0.6861702127659575,
+      "vcoco_correctness_auroc": 0.5835050858020432
+    },
+    "disagreement_shift": {
+      "POLAR": {
+        "component_disagreement_rate": 0.15740462601381797,
+        "disagreement_auroc_for_ensemble_error": 0.7819302968823492,
+        "ensemble_error_rate_when_disagreeing": 0.2385496183206107,
+        "ensemble_error_rate_when_unanimous": 0.019964349376114084,
+        "rows": 3329,
+        "unanimous_errors": 56
+      },
+      "V-COCO": {
+        "component_disagreement_rate": 0.31028981653815474,
+        "disagreement_auroc_for_ensemble_error": 0.576287348610347,
+        "ensemble_error_rate_when_disagreeing": 0.44301628106255353,
+        "ensemble_error_rate_when_unanimous": 0.284502698535081,
+        "fraction_unanimous_errors_standing_to_locomotion": 0.926829268292683,
+        "rows": 3761,
+        "unanimous_errors": 738,
+        "unanimous_standing_to_locomotion_errors": 684.0
+      }
+    },
+    "domain_composition": {
+      "polar_median_person_box_area": 0.2955920330307308,
+      "vcoco_fraction_below_polar_q1": 0.5018072289156627,
+      "vcoco_median_person_box_area": 0.14545560834056293,
+      "vcoco_to_polar_median_ratio": 0.49208230292675326
+    },
+    "error_concentration": {
+      "adjacent_state_error_fraction": 0.9558011049723757,
+      "adjacent_state_errors": 173,
+      "standing_walking_errors": 97,
+      "total_errors": 181,
+      "walking_running_errors": 54
+    },
+    "external_label_semantics": {
+      "ensemble_locomotion_recall_when_stand_cotagged": {
+        "denominator": 1174,
+        "fraction": 0.9148211243611585,
+        "numerator": 1074
+      },
+      "ensemble_locomotion_recall_without_stand_cotag": {
+        "denominator": 87,
+        "fraction": 0.9770114942528736,
+        "numerator": 85
+      },
+      "ensemble_standing_to_locomotion_errors": {
+        "denominator": 1255,
+        "fraction": 0.8278884462151395,
+        "numerator": 1039
+      },
+      "locomotion_images_with_all_relevant_people_stand_tagged": {
+        "denominator": 621,
+        "fraction": 0.9049919484702094,
+        "numerator": 562
+      },
+      "locomotion_images_with_any_stand_source_action": {
+        "denominator": 621,
+        "fraction": 0.9404186795491143,
+        "numerator": 584
+      },
+      "person_locomotion_labels_with_stand_source_action": {
+        "denominator": 1261,
+        "fraction": 0.9310071371927042,
+        "numerator": 1174
+      }
+    },
+    "external_top4_vs_ensemble": {
+      "interpretation": "The external point-estimate ordering is not statistically resolved, while the ensemble retains better tracked log loss.",
+      "macro_f1_delta": 0.006255136874046885,
+      "paired_ci_95": [
+        -0.0016212770461903085,
+        0.014113658033813441
+      ]
+    },
+    "faithfulness_error_detection": {
+      "convnext_small_full__full_crop_js_divergence": {
+        "auroc": 0.7117892976588629,
+        "ci_95": [
+          0.595146321070234,
+          0.8155560200668895
+        ],
+        "errors": 26,
+        "rows": 256
+      },
+      "convnext_small_full__one_minus_locked_confidence": {
+        "auroc": 0.8476588628762541,
+        "ci_95": [
+          0.7745819397993312,
+          0.9100334448160535
+        ],
+        "errors": 26,
+        "rows": 256
+      },
+      "dinov2_base_top4__full_crop_js_divergence": {
+        "auroc": 0.8683401639344263,
+        "ci_95": [
+          0.7023522882513661,
+          0.9740522540983606
+        ],
+        "errors": 12,
+        "rows": 256
+      },
+      "dinov2_base_top4__one_minus_locked_confidence": {
+        "auroc": 0.8797814207650273,
+        "ci_95": [
+          0.8077100409836064,
+          0.9409153005464481
+        ],
+        "errors": 12,
+        "rows": 256
+      }
+    },
+    "mixed_scene_person_crops": {
+      "dinov2_base_minus_convnext_macro_f1": {
+        "ci_95_high": 0.19428610476921884,
+        "ci_95_low": 0.1299702997037321,
+        "point_estimate": 0.16185932417771476,
+        "probability_difference_gt_zero": 1.0,
+        "resamples": 10000,
+        "resampling_unit": "image_cluster",
+        "seed": 20260863
+      },
+      "images": 354,
+      "interpretation": "Person-conditioned crops can produce different predictions for different people in the same image; a single full-frame prediction cannot.",
+      "person_rows": 1039
+    },
+    "rbf_vs_logistic": {
+      "interpretation": "The standalone point-estimate advantage is not statistically resolved by this exploratory paired interval.",
+      "macro_f1_delta": 0.0016005122891991075,
+      "paired_ci_95": [
+        -0.005053534007169694,
+        0.008525694121685799
+      ]
+    },
+    "scale_integrity": {
+      "all_repeated_rows_identical_within_size": true,
+      "claim_boundary": "Five fixed subset points; repeated seed labels do not represent independent subset draws or stochastic fits. This is not a fitted scaling law.",
+      "descriptive_log2_linear_r_squared": 0.9719830087266577,
+      "descriptive_macro_f1_points_per_doubling": 0.011754628460114505,
+      "per_class_f1_gain_242_to_9958": {
+        "running": 0.04777967166053643,
+        "sitting": 0.03783838804899442,
+        "standing": 0.08090181907216609,
+        "walking": 0.09895474718736486
+      },
+      "recorded_rows": 15,
+      "unique_experimental_points": 5
+    },
+    "small_person_ensemble_gain": {
+      "ci_95": [
+        0.016750618211387812,
+        0.0451736523237094
+      ],
+      "ensemble_minus_rbf_macro_f1_q1": 0.03052604609351872,
+      "interpretation": "The ensemble gain is largest in the smallest-person quartile; this was not a predeclared interaction."
+    }
+  },
+  "source_hashes": {
+    ".runs/external/vcoco/audit/vcoco_person_manifest_clean.csv": "0eb0afcc7e832babc495d3d9a74981077968f401097eedc34c6aeb9a0e644cb4",
+    ".runs/polar_final/external_vcoco/external_predictions.npz": "37560bb5410e485cb497f9a07ae4113c89767164cf9ded2e45bf1122fc3c4319",
+    ".runs/polar_final/fault_robustness/fault_robustness_predictions.npz": "65389031ee8b9b107e046a94f8ff6c2bc6f13b4c47432bc0d12d09cb6c22876f",
+    ".runs/polar_final/test_evaluation/opened_test_manifest.csv": "35d2a73b33de866f52d857c266f57d3eee1259113f3da43b07bdd3e8dfa1142e",
+    ".runs/polar_final/test_evaluation/test_predictions.npz": "0f96ecb7411abf8b3385004380a5fa001965113f0855015db4337fb76078c5f9",
+    ".runs/polar_study/data/polar_clean_manifest.csv": "0c47f3eb52bc40e16303818996bc84914cb1a4ff062315dfbb2b5c3674952e93",
+    ".runs/polar_study/data/polar_development_manifest.csv": "2cc5bf62790f6064acc74f7113c341b5c2cd1124bcbfbc3d1e9eb19618a75b83",
+    ".runs/polar_study/scale/dinov2_base_full_context10/size_1000_seed_42_predictions.npz": "281798951356a420b2a9dcd3d9dec2277756ce46d99f98f78f609927bb557a8f",
+    ".runs/polar_study/scale/dinov2_base_full_context10/size_242_seed_42_predictions.npz": "f51062b5ac11658efa3fb3c8b99b5d8baf95f2b19dd2d658eaa5c728c874412d",
+    ".runs/polar_study/scale/dinov2_base_full_context10/size_3000_seed_42_predictions.npz": "392e8797d69ed0cccd2ca4e87912f9d54cb0cf2d8726e1c86f66d30fa434dd48",
+    ".runs/polar_study/scale/dinov2_base_full_context10/size_500_seed_42_predictions.npz": "f143606c2bcc7e93d4ba2c2c4f120970c349e4733af600dd562cb3eda00c0994",
+    ".runs/polar_study/scale/dinov2_base_full_context10/size_all_seed_42_predictions.npz": "15a8353917eeac7918f56ac350df2cce2c0ed6a9e61949d222e56f1fcdb30463",
+    "results/polar_faithfulness_per_image.csv": "b49303ea1e2b6ac773d0f9d21ecf7a591afeeaef4efa7b8b2f081379e4ca0fca",
+    "results/polar_scale_runs.csv": "59331a9e8cc7ccbb30b36207099497a0617cf251fd29f5d2edab562b73f9dd1b",
+    "results/polar_training_runs.csv": "590bd8d4e102012435b2ca73996c3c7d27756fac8daffe1a15ef8629137888d4"
+  },
+  "status": "POSTHOC_EXPLORATORY_ANALYSIS_COMPLETE"
+}

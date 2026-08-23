@@ -130,7 +130,6 @@ def build_estimator(candidate: Candidate, feature_count: int, seed: int) -> Base
             class_weight=params["class_weight"],
             gamma=gamma,
             kernel="rbf",
-            probability=False,
             random_state=seed,
         )
     elif candidate.family == "shrinkage_lda":
