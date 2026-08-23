@@ -30,6 +30,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--selection-lock", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, required=True)
+    parser.add_argument("--overlap-audit", type=Path, required=True)
     parser.add_argument("--final-root", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     return parser.parse_args()
@@ -134,7 +135,9 @@ def main() -> None:
         existing = json.loads(summary_path.read_text(encoding="utf-8"))
         if existing.get("status") == "LOCKED_EXTERNAL_EVALUATION_COMPLETE" and existing.get(
             "selection_lock_sha256"
-        ) == lock_hash:
+        ) == lock_hash and existing.get("overlap_audit_sha256") == sha256_file(
+            args.overlap_audit.resolve()
+        ):
             print(json.dumps(existing, indent=2, sort_keys=True), flush=True)
             return
 
@@ -147,6 +150,15 @@ def main() -> None:
     expected_manifest_hash = lock["external_validation"]["manifest_sha256"]
     if sha256_file(manifest_path) != expected_manifest_hash:
         raise RuntimeError("V-COCO clean manifest differs from the final selection lock")
+    overlap_path = args.overlap_audit.resolve()
+    overlap = json.loads(overlap_path.read_text(encoding="utf-8"))
+    if (
+        overlap.get("status") != "POLAR_VCOCO_CROSS_DATASET_OVERLAP_AUDITED"
+        or overlap.get("confirmed_source_related_pairs") != 0
+        or overlap.get("source_sha256", {}).get("vcoco_person_manifest")
+        != expected_manifest_hash
+    ):
+        raise RuntimeError("V-COCO does not have a clean cross-dataset overlap audit")
 
     inference_frame = frame.copy()
     inference_frame["coco_image_id"] = inference_frame["image_id"]
@@ -266,6 +278,8 @@ def main() -> None:
         "selection_role": "none",
         "selection_lock_sha256": lock_hash,
         "manifest_sha256": expected_manifest_hash,
+        "overlap_audit_sha256": sha256_file(overlap_path),
+        "confirmed_cross_dataset_source_related_pairs": 0,
         "person_rows": len(frame),
         "unique_images": frame["image_id"].nunique(),
         "image_level_rows": len(image_ids_reference),

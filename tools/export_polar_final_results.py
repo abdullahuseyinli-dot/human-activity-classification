@@ -64,6 +64,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--external-dir", type=Path, required=True)
     parser.add_argument("--faithfulness-dir", type=Path, required=True)
     parser.add_argument("--fault-dir", type=Path, required=True)
+    parser.add_argument("--overlap-audit", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     return parser.parse_args()
 
@@ -81,9 +82,11 @@ def main() -> None:
     output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     exported = {}
+    summaries = {}
     for group, names in GROUPS.items():
         source_dir = source_dirs[group]
         summary = json.loads((source_dir / "summary.json").read_text(encoding="utf-8"))
+        summaries[group] = summary
         if summary.get("status") != EXPECTED_STATUS[group]:
             raise RuntimeError(f"Incomplete {group} evidence: {source_dir}")
         if summary.get("selection_lock_sha256") != lock_hash:
@@ -95,6 +98,22 @@ def main() -> None:
             destination = output_dir / published_name(group, name)
             shutil.copyfile(source, destination)
             exported[destination.name] = sha256_file(destination)
+
+    lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    overlap_path = args.overlap_audit.resolve()
+    overlap = json.loads(overlap_path.read_text(encoding="utf-8"))
+    if (
+        overlap.get("status") != "POLAR_VCOCO_CROSS_DATASET_OVERLAP_AUDITED"
+        or overlap.get("confirmed_source_related_pairs") != 0
+        or overlap.get("source_sha256", {}).get("vcoco_person_manifest")
+        != lock["external_validation"]["manifest_sha256"]
+    ):
+        raise RuntimeError("Cross-dataset overlap evidence is incomplete")
+    overlap_destination = output_dir / "polar_external_overlap_audit.json"
+    if summaries["external"].get("overlap_audit_sha256") != sha256_file(overlap_path):
+        raise RuntimeError("External evaluation used a different overlap audit")
+    shutil.copyfile(overlap_path, overlap_destination)
+    exported[overlap_destination.name] = sha256_file(overlap_destination)
 
     manifest = {
         "status": "LOCKED_POLAR_PORTFOLIO_EVIDENCE",
