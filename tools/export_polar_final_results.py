@@ -49,6 +49,14 @@ EXPECTED_STATUS = {
 }
 
 
+def write_json(path: Path, payload: dict) -> None:
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+
+
 def published_name(group: str, source_name: str) -> str:
     stem = source_name
     repeated_prefix = f"{group}_"
@@ -182,9 +190,7 @@ def main() -> None:
     lock = json.loads(lock_path.read_text(encoding="utf-8"))
     fit_manifest = build_final_fit_manifest(lock, args.final_root.resolve(), lock_hash)
     fit_manifest_path = output_dir / "polar_final_fit_manifest.json"
-    fit_manifest_path.write_text(
-        json.dumps(fit_manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
+    write_json(fit_manifest_path, fit_manifest)
     exported[fit_manifest_path.name] = sha256_file(fit_manifest_path)
     for group, names in GROUPS.items():
         source_dir = source_dirs[group]
@@ -230,9 +236,7 @@ def main() -> None:
         "test_used_for_selection": False,
     }
     manifest_path = output_dir / "polar_final_evidence_manifest.json"
-    manifest_path.write_text(
-        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
+    write_json(manifest_path, manifest)
     print(json.dumps(manifest, indent=2, sort_keys=True), flush=True)
 
 

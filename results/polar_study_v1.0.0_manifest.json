@@ -83,8 +83,8 @@
       "size_bytes": 3480
     },
     "experiments/analyze_polar_exploratory.py": {
-      "sha256": "7a2065f82d192c11fd2a46f9c2e4c169fdff851d7482b28a22b603ee4ea61f2c",
-      "size_bytes": 71942
+      "sha256": "dc105714f9e162682d1057f55dc86ad29a499888e38a5f8f958ffa4cc3fe0341",
+      "size_bytes": 71987
     },
     "output/pdf/README.md": {
       "sha256": "9d5ad7ad7ec405ae2cc4fca523961cbe29479e71606de9fa15fde24440a72bcf",
@@ -167,12 +167,12 @@
       "size_bytes": 6306
     },
     "results/polar_exploratory_summary.json": {
-      "sha256": "fca001699d5be309a78fb6afdcdf6d391f93d69e0af4569c70a4d4d1746c2a73",
-      "size_bytes": 10904
+      "sha256": "75ba6a84516394ec22a1eee4d5e5e9ed508579bdf38cd4efb404eeb566168ad0",
+      "size_bytes": 10648
     },
     "results/polar_final_evidence_manifest.json": {
-      "sha256": "82ad0a37c66bc204c2d3e644d0fd20fa8639943aa76eaae5de2ae020fee7808e",
-      "size_bytes": 2892
+      "sha256": "f9fff0647bf01fce652816bf138ef62db02f794d2f887a4effdfb1621431355c",
+      "size_bytes": 2856
     },
     "results/polar_training_failures.json": {
       "sha256": "497d61583c408c0270084875f1c7c5ba77e3f80020308bcbe61cdf574804298b",
@@ -183,8 +183,8 @@
       "size_bytes": 34377
     },
     "tools/build_study_release_manifest.py": {
-      "sha256": "194a429df6191c8d28b8465726b9dc12abf3a635d739fdc742047fe5bc32b8ce",
-      "size_bytes": 5873
+      "sha256": "e23a2667008f43cbd88732b048256ff9672e790529661b638f94576401682de7",
+      "size_bytes": 6170
     },
     "tools/export_polar_training_results.py": {
       "sha256": "14503ac5c91324da6c35a19452825469da44af8ace828cc6c8480b6750bb7644",

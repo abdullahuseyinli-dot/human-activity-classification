@@ -45,6 +45,7 @@ EXPECTED_GLOB_COUNTS = {
     "results/polar_exploratory_*.csv": 17,
     "results/polar_exploratory_*.json": 1,
 }
+TEXT_ARTIFACT_SUFFIXES = frozenset({".cff", ".csv", ".json", ".md", ".py", ".svg"})
 
 
 def sha256_file(path: Path) -> str:
@@ -93,6 +94,10 @@ def build_manifest(repository: Path) -> dict:
     artifacts = {}
     for path in artifact_paths(repository):
         relative = path.relative_to(repository).as_posix()
+        if path.suffix.lower() in TEXT_ARTIFACT_SUFFIXES and b"\r" in path.read_bytes():
+            raise RuntimeError(
+                f"Release text artifact must use LF line endings: {relative}"
+            )
         artifacts[relative] = {
             "sha256": sha256_file(path),
             "size_bytes": path.stat().st_size,
