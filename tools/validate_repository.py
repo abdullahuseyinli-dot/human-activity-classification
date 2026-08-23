@@ -87,6 +87,10 @@ POLAR_REQUIRED = {
 }
 VCOCO_V2_REQUIRED = {
     "docs/VCOCO_V2_EXTERNAL_TRANSFER.md",
+    "docs/releases/POLAR_STUDY_V2.0.0.md",
+    "output/pdf/vcoco_v2_external_transfer_v2.0.0.pdf",
+    "release/POLAR_STUDY_V2.0.0_SHA256SUMS.txt",
+    "results/polar_study_v2.0.0_manifest.json",
     "tools/export_vcoco_v2_results.py",
     "tools/render_vcoco_v2_figures.py",
     "assets/vcoco_v2_development_comparison.png",
@@ -430,40 +434,90 @@ def validate_polar_release(repository: Path) -> None:
     ) != {"uint8_input_bit_flip_rate", "symmetric_int8_head_weight_bit_flips"}:
         raise RuntimeError("POLAR aggregate fault evidence is incomplete")
 
+def validate_pdf(path: Path, label: str) -> None:
+    with path.open("rb") as handle:
+        if handle.read(5) != b"%PDF-":
+            raise RuntimeError(f"{label} is not a PDF")
+        handle.seek(max(0, path.stat().st_size - 1024))
+        if b"%%EOF" not in handle.read():
+            raise RuntimeError(f"{label} PDF is incomplete")
+
+
 def validate_study_report_release(repository: Path) -> None:
-    report_source = repository / "docs/POLAR_PUBLIC_REPORT.md"
-    report_text = report_source.read_text(encoding="utf-8")
+    v1_report = repository / "docs/POLAR_PUBLIC_REPORT.md"
+    v1_text = v1_report.read_text(encoding="utf-8")
     if (
-        "version: 1.0.0" not in report_text
-        or "status: Independent technical report" not in report_text
+        "version: 1.0.0" not in v1_text
+        or "status: Independent technical report" not in v1_text
     ):
         raise RuntimeError("POLAR Study Report metadata is not final v1.0.0")
-    for stale_marker in ("0.9.0-review", "Pre-release review copy", "Review status:"):
-        if stale_marker in report_text:
-            raise RuntimeError(f"Stale report-review marker remains: {stale_marker}")
-    for relative in ("docs/POLAR_PUBLIC_REPORT.md", "docs/releases/POLAR_STUDY_V1.0.0.md"):
+
+    v2_report = repository / "docs/VCOCO_V2_EXTERNAL_TRANSFER.md"
+    v2_text = v2_report.read_text(encoding="utf-8")
+    for marker in (
+        "date: 24 August 2026",
+        "version: 2.0.0",
+        "status: Independent technical report",
+        "0.8663 official-test macro-F1",
+        "+0.1592 macro-F1",
+    ):
+        if marker not in v2_text:
+            raise RuntimeError(f"V-COCO v2 report is missing: {marker}")
+
+    release_narratives = (
+        "README.md",
+        "CHANGELOG.md",
+        "docs/POLAR_PUBLIC_REPORT.md",
+        "docs/VCOCO_V2_EXTERNAL_TRANSFER.md",
+        "docs/releases/POLAR_STUDY_V1.0.0.md",
+        "docs/releases/POLAR_STUDY_V2.0.0.md",
+        "experiments/README.md",
+        "output/pdf/README.md",
+        "results/README.md",
+        "results/vcoco_v2/README.md",
+    )
+    stale_markers = (
+        "0.9.0-review",
+        "pre-release review copy",
+        "review status:",
+    )
+    for relative in release_narratives:
         text = (repository / relative).read_text(encoding="utf-8")
+        lowered = text.lower()
+        for marker in stale_markers:
+            if marker in lowered:
+                raise RuntimeError(f"Release narrative contains '{marker}': {relative}")
         if any(ord(character) >= 128 for character in text):
             raise RuntimeError(f"Release narrative must remain ASCII-safe: {relative}")
 
-    pdf_path = repository / "output/pdf/polar_public_report_v1.0.0.pdf"
-    with pdf_path.open("rb") as handle:
-        if handle.read(5) != b"%PDF-":
-            raise RuntimeError("POLAR Study Report is not a PDF")
-        handle.seek(max(0, pdf_path.stat().st_size - 1024))
-        if b"%%EOF" not in handle.read():
-            raise RuntimeError("POLAR Study Report PDF is incomplete")
+    validate_pdf(
+        repository / "output/pdf/polar_public_report_v1.0.0.pdf",
+        "POLAR Study Report v1.0.0",
+    )
+    validate_pdf(
+        repository / "output/pdf/vcoco_v2_external_transfer_v2.0.0.pdf",
+        "V-COCO Study Report v2.0.0",
+    )
 
     zenodo = read_json(repository / ".zenodo.json")
     if (
-        zenodo.get("title")
-        != "Source-Overlap-Controlled Transfer Learning for Still-Image Posture Recognition"
-        or zenodo.get("version") != "1.0.0"
+        zenodo.get("title") != "Improving Person-Level External Transfer on V-COCO"
+        or zenodo.get("version") != "2.0.0"
+        or zenodo.get("publication_date") != "2026-08-24"
         or zenodo.get("license") != "MIT"
         or zenodo.get("upload_type") != "software"
         or zenodo.get("creators") != [{"name": "Huseyinli, Abdulla"}]
     ):
-        raise RuntimeError("Zenodo metadata does not match the v1.0.0 study release")
+        raise RuntimeError("Zenodo metadata does not match the v2.0.0 study release")
+
+    citation = (repository / "CITATION.cff").read_text(encoding="utf-8")
+    for marker in (
+        "date-released: 2026-08-24",
+        'title: "Improving Person-Level External Transfer on V-COCO"',
+        "  version: 2.0.0",
+    ):
+        if marker not in citation:
+            raise RuntimeError(f"Citation metadata is missing: {marker}")
 
     exploratory = read_json(repository / "results/polar_exploratory_summary.json")
     if (
@@ -473,15 +527,43 @@ def validate_study_report_release(repository: Path) -> None:
     ):
         raise RuntimeError("Exploratory evidence role or deterministic settings changed")
 
+    v1_manifest_path = repository / "results/polar_study_v1.0.0_manifest.json"
+    v1_manifest = read_json(v1_manifest_path)
+    if (
+        v1_manifest.get("release_id") != "polar-study-v1.0.0"
+        or v1_manifest.get("report_version") != "1.0.0"
+        or not isinstance(v1_manifest.get("artifacts"), dict)
+    ):
+        raise RuntimeError("Historical v1.0.0 release manifest is invalid")
+    v1_pdf_path = repository / "output/pdf/polar_public_report_v1.0.0.pdf"
+    expected_v1_checksums = (
+        f"{sha256_file(v1_pdf_path)}  output/pdf/polar_public_report_v1.0.0.pdf\n"
+        f"{sha256_file(v1_manifest_path)}  results/polar_study_v1.0.0_manifest.json\n"
+    )
+    v1_checksums_path = repository / "release/POLAR_STUDY_V1.0.0_SHA256SUMS.txt"
+    if v1_checksums_path.read_text(encoding="utf-8") != expected_v1_checksums:
+        raise RuntimeError("Historical v1.0.0 release checksums changed")
+
     sys.path.insert(0, str(repository / "tools"))
+    from build_readme import build_readme
     from build_study_release_manifest import build_manifest, checksum_text, encoded_manifest
 
-    manifest_path = repository / "results/polar_study_v1.0.0_manifest.json"
+    if (repository / "README.md").read_text(encoding="utf-8") != build_readme(repository):
+        raise RuntimeError("README is stale relative to locked evidence")
+
+    manifest_path = repository / "results/polar_study_v2.0.0_manifest.json"
     if manifest_path.read_bytes() != encoded_manifest(build_manifest(repository)):
-        raise RuntimeError("POLAR Study Report release manifest is stale")
-    checksums_path = repository / "release/POLAR_STUDY_V1.0.0_SHA256SUMS.txt"
+        raise RuntimeError("Study v2.0.0 release manifest is stale")
+    checksums_path = repository / "release/POLAR_STUDY_V2.0.0_SHA256SUMS.txt"
     if checksums_path.read_text(encoding="utf-8") != checksum_text(repository, manifest_path):
-        raise RuntimeError("POLAR Study Report release checksums are stale")
+        raise RuntimeError("Study v2.0.0 release checksums are stale")
+
+    notebook_text = (repository / "human_activity_classification.ipynb").read_text(
+        encoding="utf-8"
+    )
+    for marker in ("0.8663 official-test macro-F1", "## 5. Person-level V-COCO study"):
+        if marker not in notebook_text:
+            raise RuntimeError(f"Executed notebook is missing: {marker}")
 
 
 def validate_vcoco_v2_release(repository: Path) -> None:

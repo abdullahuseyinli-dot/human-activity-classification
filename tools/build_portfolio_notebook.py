@@ -1,4 +1,4 @@
-"""Build and execute the compact POLAR study notebook from tracked evidence."""
+"""Build and execute the compact POLAR and V-COCO study notebook."""
 
 from __future__ import annotations
 
@@ -25,6 +25,10 @@ REQUIRED = (
     "results/polar_faithfulness_summary.json",
     "results/polar_fault_summary.json",
     "results/polar_extension_summary.json",
+    "results/vcoco_v2/official_test_metrics.csv",
+    "results/vcoco_v2/official_test_per_class.csv",
+    "results/vcoco_v2/official_test_summary.json",
+    "results/vcoco_v2/official_test_uncertainty.json",
     "assets/polar_test_comparison.png",
     "assets/polar_confusion_matrix.png",
     "assets/polar_scale_curve.png",
@@ -32,6 +36,9 @@ REQUIRED = (
     "assets/polar_faithfulness.png",
     "assets/polar_attribution_sanity.png",
     "assets/polar_fault_robustness.png",
+    "assets/vcoco_v2_official_test_comparison.png",
+    "assets/vcoco_v2_scale_gain.png",
+    "assets/vcoco_v2_selective_prediction.png",
 )
 
 
@@ -65,6 +72,10 @@ def build_notebook(repository: Path) -> dict:
     test = read_json(repository / "results" / "polar_test_summary.json")
     uncertainty = read_json(repository / "results" / "polar_test_uncertainty.json")
     external = read_json(repository / "results" / "polar_external_summary.json")
+    vcoco = read_json(repository / "results" / "vcoco_v2" / "official_test_summary.json")
+    vcoco_interval = read_json(
+        repository / "results" / "vcoco_v2" / "official_test_uncertainty.json"
+    )
     primary = test["primary_metrics"]
     interval = uncertainty["locked_ensemble"]
 
@@ -82,7 +93,7 @@ def build_notebook(repository: Path) -> dict:
             f"""
 # Source-Overlap-Controlled Human Activity Classification
 
-## Locked POLAR benchmark
+## Locked POLAR benchmark and V-COCO follow-up
 
 This notebook is the compact, executable evidence narrative for a four-class still-image
 posture study. Model selection used the clean POLAR development split; nine neural fits
@@ -91,6 +102,12 @@ and three frozen-feature probes completed before the official test cache opened 
 **Locked result:** {primary['macro_f1']:.3f} macro-F1 (95% CI
 [{interval['ci_95_low']:.3f}, {interval['ci_95_high']:.3f}]) and
 {primary['accuracy']:.3f} accuracy on {test['test_rows_read']:,} held-out images.
+
+The person-level V-COCO follow-up reaches
+**{vcoco['primary_metrics']['macro_f1']:.4f} official-test macro-F1**, improving over
+the historical source-only DINO baseline by
+**{vcoco_interval['point_estimate']:+.4f}**, with a 95% image-cluster interval of
+[{vcoco_interval['ci_95_low']:+.4f}, {vcoco_interval['ci_95_high']:+.4f}].
 
 The notebook reads only tracked, path-sanitized evidence. It performs no training and
 makes no post-test selection decisions.
@@ -226,22 +243,39 @@ display(probe_rows[["candidate", "macro_f1", "accuracy", "log_loss", "ece", "fit
         ),
         markdown(
             f"""
-## 5. External transfer
+## 5. Person-level V-COCO study
 
-The locked three-class ensemble reaches 0.961 in-domain macro-F1 but
+The original no-retuning audit identified the external gap: the locked three-class
+POLAR ensemble reached 0.961 in-domain macro-F1 and
 {external['primary_image_metrics']['macro_f1']:.3f} on
-{external['image_level_rows']:,} unambiguous V-COCO images. DINOv2-B top-four adaptation
-transfers best descriptively at
-{external['best_observed_image_metrics']['macro_f1']:.3f}. The models were not retuned
-after this evaluation.
+{external['image_level_rows']:,} unambiguous V-COCO images.
 
-![V-COCO external validation](assets/polar_external_validation.png)
+The follow-up keeps the official V-COCO memberships, trains on the target training
+split, selects on validation, and opens the official test labels once after locking the
+final stack. Two aspect-preserving DINOv2-B person views and five geometry features
+raise person-level macro-F1 from
+{vcoco['baseline_metrics']['macro_f1']:.4f} to
+{vcoco['primary_metrics']['macro_f1']:.4f}.
+
+![Official V-COCO test comparison](assets/vcoco_v2_official_test_comparison.png)
+
+![Person-scale gain](assets/vcoco_v2_scale_gain.png)
+
+![Selective prediction](assets/vcoco_v2_selective_prediction.png)
 """
         ),
         code(
             """
-external_metrics = pd.read_csv(ROOT / "results" / "polar_external_image_metrics.csv")
-display(external_metrics[["candidate", "macro_f1", "accuracy", "log_loss", "ece"]])
+vcoco_metrics = pd.read_csv(ROOT / "results" / "vcoco_v2" / "official_test_metrics.csv")
+vcoco_per_class = pd.read_csv(
+    ROOT / "results" / "vcoco_v2" / "official_test_per_class.csv"
+)
+display(
+    vcoco_metrics[
+        ["method", "macro_f1", "accuracy", "balanced_accuracy", "log_loss", "ece"]
+    ]
+)
+display(vcoco_per_class[["method", "class", "precision", "recall", "f1", "support"]])
 """
         ),
         markdown(
@@ -308,12 +342,15 @@ display(
 - Data scale is the largest isolated performance amplifier in this study.
 - DINOv2-B representations support strong linear and nonlinear final-stage classifiers.
 - Development-locked model diversity produces a statistically supported ensemble gain.
-- V-COCO transfer falls to 0.667 macro-F1 and exposes combined domain and annotation-policy shift.
+- Person-centric scale conditioning raises official-test V-COCO macro-F1 from 0.7071
+  to 0.8663 and removes most of the historical small-person penalty.
+- Factorized posture-motion targets add a smaller, independently supported gain under
+  matched feature inputs.
 - ConvNeXt Grad-CAM passes the declared sanity checks more convincingly than DINOv2-B
   integrated gradients.
 
 The complete method, evidence lineage, discussion, and references are documented in
-`docs/POLAR_PUBLIC_REPORT.md`.
+`docs/VCOCO_V2_EXTERNAL_TRANSFER.md` and `docs/POLAR_PUBLIC_REPORT.md`.
 """
         ),
     ]

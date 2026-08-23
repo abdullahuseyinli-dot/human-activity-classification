@@ -1,0 +1,2 @@
+72c6c6906ac32f4cb6ff62e364fb74a78838445f7136c1de12c1df826c9b8090  output/pdf/vcoco_v2_external_transfer_v2.0.0.pdf
+c8e8e7c5d6dfa3d9448f536c5f8e45a77aa9ddd6018dc8430eb4b834862c2d60  results/polar_study_v2.0.0_manifest.json

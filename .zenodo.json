@@ -1,6 +1,6 @@
 {
-  "title": "Source-Overlap-Controlled Transfer Learning for Still-Image Posture Recognition",
-  "description": "Versioned software, aggregate evidence, and an independent technical report for a source-overlap-controlled four-class POLAR benchmark with locked model selection, external V-COCO evaluation, attribution diagnostics, and bounded fault injection.",
+  "title": "Improving Person-Level External Transfer on V-COCO",
+  "description": "Versioned code, portable evidence, and an independent technical report for a locked person-level V-COCO study. A scale-conditioned DINOv2 stack improves official-test macro-F1 from 0.7071 to 0.8663 under a split-preserving protocol, with paired image-cluster uncertainty, calibration analysis, mechanism studies, and a complete evidence manifest. The release also retains the source-overlap-controlled POLAR benchmark that established the historical baseline.",
   "creators": [
     {
       "name": "Huseyinli, Abdulla"
@@ -8,19 +8,22 @@
   ],
   "license": "MIT",
   "upload_type": "software",
-  "publication_date": "2026-08-23",
-  "version": "1.0.0",
+  "publication_date": "2026-08-24",
+  "version": "2.0.0",
   "language": "eng",
   "keywords": [
     "human activity recognition",
-    "posture recognition",
+    "person-level classification",
     "transfer learning",
+    "domain adaptation",
     "DINOv2",
     "ConvNeXt",
-    "support vector machine",
-    "ensemble learning",
+    "SigLIP2",
+    "multiview learning",
+    "factorized classification",
     "domain shift",
-    "model attribution",
+    "calibration",
+    "selective classification",
     "reproducible research"
   ]
 }

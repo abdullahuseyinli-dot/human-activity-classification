@@ -387,6 +387,7 @@ class StudyDocTemplate(BaseDocTemplate):
             subject=metadata.get("subject", ""),
             keywords=metadata.get("keywords", ""),
             pageCompression=1,
+            invariant=1,
         )
         self.study_metadata = metadata
         self.include_cover = include_cover

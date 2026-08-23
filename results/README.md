@@ -1,51 +1,73 @@
 # Tracked evidence
 
-This directory contains compact, path-sanitized evidence for two distinct studies.
-Files prefixed with `polar_` belong to the primary POLAR benchmark. The remaining files
-preserve the historical 285-image COCO benchmark.
+This directory contains compact, path-sanitized evidence for the repository's
+versioned studies. Dataset images, checkpoints, embeddings, fitted estimators, dense
+probabilities, and full-resolution attribution arrays remain outside Git.
 
-For the POLAR release, begin with:
+## V-COCO v2 person-level study
 
-- `polar_final_selection_lock.json` — the pre-test model, ensemble, and evaluation lock;
-- `polar_final_fit_manifest.json` — checkpoint/probe hashes, sizes, configurations, and
-  runtimes recorded before test evaluation;
-- `polar_test_summary.json` and `polar_test_uncertainty.json` — locked primary metrics
+Begin with [`vcoco_v2/README.md`](vcoco_v2/README.md) and the accompanying
+[`evidence_manifest.json`](vcoco_v2/evidence_manifest.json). The official test package
+records 6,077 people from 3,708 images. The selected scale-conditioned DINO stack
+reached 0.8663 macro-F1 and 0.8795 accuracy; the historical source-only DINO baseline
+reached 0.7071 macro-F1 and 0.7010 accuracy on the same rows.
+
+The main files are:
+
+- `vcoco_v2/protocol_lock.json`: endpoint, split, overlap, and test-access policy fixed
+  before target-domain model fitting;
+- `vcoco_v2/final_selection_lock.json`: selected stack, development comparisons,
+  implementation hashes, and final-fit artifact binding;
+- `vcoco_v2/test_access_gate.json`: persistent record of the single official test-label
+  open;
+- `vcoco_v2/official_test_summary.json`: headline metrics, paired uncertainty, and
+  evidence lineage;
+- `vcoco_v2/official_test_metrics.csv`, `official_test_per_class.csv`, and
+  `official_test_confusions.json`: aggregate, class-level, and confusion evidence;
+- `vcoco_v2/official_test_selective_metrics.json` and `official_test_strata.csv`:
+  confidence-based coverage and subgroup performance;
+- `vcoco_v2/development_candidates.csv`, `factorized_fusion.csv`, and
+  `fewshot_curve.csv`: development-only model, target-structure, and data-scale studies;
+- `vcoco_v2/mechanism_*.csv`: controlled person-scale, view, geometry, and error-shift
+  analyses.
+
+## POLAR v1 source benchmark
+
+Files prefixed with `polar_` belong to the source-overlap-controlled four-class POLAR
+study. Start with:
+
+- `polar_final_selection_lock.json`: pre-test model, classifier, ensemble, and metric
+  lock;
+- `polar_final_fit_manifest.json`: checkpoint and probe hashes, configurations,
+  runtimes, and artifact sizes;
+- `polar_test_summary.json` and `polar_test_uncertainty.json`: locked primary metrics
   and 10,000-resample uncertainty;
-- `polar_external_summary.json` — no-retuning V-COCO transfer results;
-- `polar_faithfulness_summary.json` — localization, perturbation, and randomization
+- `polar_external_summary.json`: the original source-only V-COCO transfer audit;
+- `polar_faithfulness_summary.json`: attribution localization, perturbation, and
+  randomization evidence;
+- `polar_fault_summary.json`: separately reported input and classifier-weight bit-flip
+  experiments;
+- `polar_final_evidence_manifest.json`: hash inventory for the primary and auxiliary
   evidence;
-- `polar_fault_summary.json` — separately reported bit-flip robustness;
-- `polar_final_evidence_manifest.json` — hashes for the locked primary and auxiliary
-  evidence exported before the post-lock analysis.
-- `polar_study_v1.0.0_manifest.json` — SHA-256 inventory for the public report,
-  post-lock analysis supplement, and release metadata.
+- `polar_study_v1.0.0_manifest.json`: frozen release inventory for the v1 report and
+  analysis supplement.
 
-## Post-lock exploratory analysis
+Files prefixed with `polar_exploratory_` analyze the completed v1 prediction arrays.
+They cover paired comparisons, blend sensitivity, error topology, person scale,
+dataset composition, label semantics, mixed-person scenes, selective prediction,
+faithfulness strata, and class-conditioned fault response. Their configurations and
+source hashes are recorded in `polar_exploratory_summary.json`.
 
-Files prefixed with `polar_exploratory_` are hypothesis-generating analyses of the
-already completed predictions. They do not alter the locked candidate, ensemble
-weights, or confirmatory interpretation.
+## Historical COCO benchmark
 
-- `polar_exploratory_summary.json` records the analysis role, fixed seed, 10,000-draw
-  intervals, source hashes, and the principal findings.
-- `polar_exploratory_pairwise.csv`, `polar_exploratory_blend_sensitivity.csv`, and
-  `polar_exploratory_ensemble_structure.csv` describe paired comparisons, weight
-  sensitivity, disagreement, and oracle headroom.
-- `polar_exploratory_bbox_strata.csv`, `polar_exploratory_domain_composition.csv`,
-  `polar_exploratory_external_semantics.csv`, and
-  `polar_exploratory_mixed_scene_persons.csv` examine person scale, dataset
-  composition, annotation semantics, and multi-person scenes.
-- `polar_exploratory_scale_integrity.csv`, `polar_exploratory_scale_per_class.csv`,
-  and `polar_exploratory_regularization.csv` document the fixed-subset learning curve
-  and classification-calibration tradeoffs.
-- The remaining exploratory tables cover selective prediction, geometry-only signal,
-  faithfulness strata and error detection, and class-conditioned fault response.
+Files without the `polar_` or `vcoco_v2/` prefixes preserve the earlier 285-image COCO
+benchmark. Its design and limitations are documented in
+[`docs/LEGACY_COCO_STUDY.md`](../docs/LEGACY_COCO_STUDY.md).
 
-The deterministic builder is `experiments/analyze_polar_exploratory.py`. Re-running it
-requires the ignored dense predictions and sanitized local manifests under `.runs/`;
-the portable aggregate outputs are tracked so a repository reader does not need those
-large, rights-sensitive artifacts.
+## Local artifact boundary
 
-Checkpoints, fitted RBF/logistic binaries, embeddings, local paths, dense probabilities,
-and full-resolution attribution arrays remain under ignored `.runs/` directories. They
-are not deleted, but they are not suitable for a portable Git repository.
+Long-running stages write to ignored `.runs/` directories. Those files are retained
+locally for replay and audit but are unsuitable for a portable repository because they
+contain large binaries, rights-sensitive images, dense arrays, or machine-local paths.
+Tracked summaries keep the metrics, exclusions, locks, hashes, and configurations
+needed to audit the published results.

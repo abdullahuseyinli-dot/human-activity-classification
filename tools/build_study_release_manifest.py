@@ -1,4 +1,4 @@
-"""Build or verify the POLAR Study Report v1.0.0 release manifest."""
+"""Build or verify the Human Activity Classification Study v2.0.0 manifest."""
 
 from __future__ import annotations
 
@@ -10,42 +10,62 @@ import tomllib
 from pathlib import Path, PurePosixPath
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
-RELEASE_ID = "polar-study-v1.0.0"
-REPORT_VERSION = "1.0.0"
+RELEASE_ID = "polar-study-v2.0.0"
+REPORT_VERSION = "2.0.0"
 SOFTWARE_VERSION = "2.0.0"
-DEFAULT_OUTPUT = PurePosixPath("results/polar_study_v1.0.0_manifest.json")
-DEFAULT_CHECKSUMS = PurePosixPath("release/POLAR_STUDY_V1.0.0_SHA256SUMS.txt")
+RELEASE_DATE = "2026-08-24"
+DEFAULT_OUTPUT = PurePosixPath("results/polar_study_v2.0.0_manifest.json")
+DEFAULT_CHECKSUMS = PurePosixPath("release/POLAR_STUDY_V2.0.0_SHA256SUMS.txt")
 
 CORE_ARTIFACTS = (
     ".zenodo.json",
     "CHANGELOG.md",
     "CITATION.cff",
+    "LICENSE",
     "README.md",
-    "docs/POLAR_PUBLIC_REPORT.md",
-    "docs/releases/POLAR_STUDY_V1.0.0.md",
-    "experiments/analyze_polar_exploratory.py",
+    "THIRD_PARTY_NOTICES.md",
+    "docs/VCOCO_V2_EXTERNAL_TRANSFER.md",
+    "docs/releases/POLAR_STUDY_V2.0.0.md",
+    "experiments/README.md",
+    "experiments/train_polar_candidate.py",
+    "human_activity_classification.ipynb",
     "output/pdf/README.md",
-    "output/pdf/polar_public_report_v1.0.0.pdf",
+    "output/pdf/vcoco_v2_external_transfer_v2.0.0.pdf",
+    "pyproject.toml",
+    "requirements-lock.txt",
     "results/README.md",
-    "results/polar_final_evidence_manifest.json",
-    "results/polar_training_failures.json",
+    "src/hac/augmentations.py",
+    "src/hac/metrics.py",
+    "src/hac/polar.py",
+    "src/hac/transfer.py",
+    "src/hac/vcoco.py",
+    "tests/test_metrics.py",
+    "tests/test_transfer.py",
+    "tools/build_portfolio_notebook.py",
+    "tools/build_readme.py",
     "tools/build_study_papers.py",
     "tools/build_study_release_manifest.py",
-    "tools/export_polar_training_results.py",
+    "tools/validate_repository.py",
 )
 ARTIFACT_GLOBS = (
-    "assets/polar_exploratory_*.png",
-    "assets/polar_exploratory_*.svg",
-    "results/polar_exploratory_*.csv",
-    "results/polar_exploratory_*.json",
+    "assets/vcoco_v2_*.png",
+    "assets/vcoco_v2_*.svg",
+    "experiments/*vcoco_v2*.py",
+    "results/vcoco_v2/*",
+    "tests/test_vcoco_*.py",
+    "tools/*vcoco_v2*.py",
 )
 EXPECTED_GLOB_COUNTS = {
-    "assets/polar_exploratory_*.png": 7,
-    "assets/polar_exploratory_*.svg": 7,
-    "results/polar_exploratory_*.csv": 17,
-    "results/polar_exploratory_*.json": 1,
+    "assets/vcoco_v2_*.png": 5,
+    "assets/vcoco_v2_*.svg": 5,
+    "experiments/*vcoco_v2*.py": 13,
+    "results/vcoco_v2/*": 20,
+    "tests/test_vcoco_*.py": 6,
+    "tools/*vcoco_v2*.py": 6,
 }
-TEXT_ARTIFACT_SUFFIXES = frozenset({".cff", ".csv", ".json", ".md", ".py", ".svg"})
+TEXT_ARTIFACT_SUFFIXES = frozenset(
+    {".cff", ".csv", ".ipynb", ".json", ".md", ".py", ".svg", ".toml", ".txt", ".yaml", ".yml"}
+)
 
 
 def sha256_file(path: Path) -> str:
@@ -59,7 +79,7 @@ def sha256_file(path: Path) -> str:
 def artifact_paths(repository: Path) -> list[Path]:
     paths = {repository / PurePosixPath(relative) for relative in CORE_ARTIFACTS}
     for pattern in ARTIFACT_GLOBS:
-        matches = set(repository.glob(pattern))
+        matches = {path for path in repository.glob(pattern) if path.is_file()}
         expected_count = EXPECTED_GLOB_COUNTS[pattern]
         if len(matches) != expected_count:
             raise RuntimeError(
@@ -81,11 +101,21 @@ def validate_versions(repository: Path) -> None:
             f"Expected software version {SOFTWARE_VERSION}, found {package_version}"
         )
 
-    report = (repository / "docs/POLAR_PUBLIC_REPORT.md").read_text(encoding="utf-8")
+    report = (repository / "docs/VCOCO_V2_EXTERNAL_TRANSFER.md").read_text(
+        encoding="utf-8"
+    )
     match = re.search(r"(?m)^version: ([^\s]+)$", report)
     if match is None or match.group(1) != REPORT_VERSION:
         found = match.group(1) if match else "missing"
         raise RuntimeError(f"Expected report version {REPORT_VERSION}, found {found}")
+
+    citation = (repository / "CITATION.cff").read_text(encoding="utf-8")
+    if (
+        f"version: {SOFTWARE_VERSION}" not in citation
+        or f"  version: {REPORT_VERSION}" not in citation
+        or f"date-released: {RELEASE_DATE}" not in citation
+    ):
+        raise RuntimeError("Citation metadata does not match the v2 release")
 
 
 def build_manifest(repository: Path) -> dict:
@@ -95,9 +125,7 @@ def build_manifest(repository: Path) -> dict:
     for path in artifact_paths(repository):
         relative = path.relative_to(repository).as_posix()
         if path.suffix.lower() in TEXT_ARTIFACT_SUFFIXES and b"\r" in path.read_bytes():
-            raise RuntimeError(
-                f"Release text artifact must use LF line endings: {relative}"
-            )
+            raise RuntimeError(f"Release text artifact must use LF line endings: {relative}")
         artifacts[relative] = {
             "sha256": sha256_file(path),
             "size_bytes": path.stat().st_size,
@@ -107,8 +135,11 @@ def build_manifest(repository: Path) -> dict:
         "release_id": RELEASE_ID,
         "report_version": REPORT_VERSION,
         "software_version": SOFTWARE_VERSION,
-        "release_date": "2026-08-23",
-        "artifact_scope": "Public report, post-lock analysis supplement, and release metadata",
+        "release_date": RELEASE_DATE,
+        "artifact_scope": (
+            "V-COCO v2 technical report, portable evidence, figures, metadata, "
+            "and implementation entry points"
+        ),
         "artifact_count": len(artifacts),
         "artifacts": artifacts,
     }
@@ -119,10 +150,11 @@ def encoded_manifest(payload: dict) -> bytes:
 
 
 def checksum_text(repository: Path, manifest_path: Path) -> str:
-    pdf_path = repository / "output/pdf/polar_public_report_v1.0.0.pdf"
+    pdf_path = repository / "output/pdf/vcoco_v2_external_transfer_v2.0.0.pdf"
     targets = (pdf_path, manifest_path)
     return "".join(
-        f"{sha256_file(path)}  {path.relative_to(repository).as_posix()}\n" for path in targets
+        f"{sha256_file(path)}  {path.relative_to(repository).as_posix()}\n"
+        for path in targets
     )
 
 

@@ -3,7 +3,7 @@ message: "If you use this software or its evidence, cite the versioned technical
 title: "Source-Overlap-Controlled Human Activity Classification"
 type: software
 version: 2.0.0
-date-released: 2026-08-23
+date-released: 2026-08-24
 authors:
   - family-names: Huseyinli
     given-names: Abdulla
@@ -11,19 +11,24 @@ repository-code: "https://github.com/abdullahuseyinli-dot/human-activity-classif
 url: "https://github.com/abdullahuseyinli-dot/human-activity-classification"
 license: MIT
 abstract: >-
-  A leakage-audited POLAR benchmark comparing ConvNeXt, DINOv2 adaptation,
-  frozen-feature classifiers, locked probability ensembles, external V-COCO
-  transfer, attribution faithfulness, and bounded bit-flip robustness.
+  A leakage-audited human activity classification study spanning the four-class
+  POLAR benchmark and a locked person-level V-COCO follow-up. The release includes
+  source-overlap controls, DINOv2 and ConvNeXt experiments, scale-conditioned views,
+  factorized targets, calibrated classifiers, paired uncertainty, attribution
+  diagnostics, and bounded fault injection.
 keywords:
   - human activity recognition
   - transfer learning
   - DINOv2
   - ConvNeXt
+  - V-COCO
+  - domain adaptation
+  - calibration
   - evaluation methodology
 preferred-citation:
   type: report
-  title: "Source-Overlap-Controlled Transfer Learning for Still-Image Posture Recognition"
-  version: 1.0.0
+  title: "Improving Person-Level External Transfer on V-COCO"
+  version: 2.0.0
   year: 2026
   url: "https://github.com/abdullahuseyinli-dot/human-activity-classification"
   authors:
