@@ -62,6 +62,7 @@ def validate_external_manifest(frame: pd.DataFrame) -> pd.DataFrame:
         "person_id",
         "image_id",
         "image_path",
+        "label_4",
         "label_3",
         "bbox_xmin",
         "bbox_ymin",
@@ -83,6 +84,10 @@ def validate_external_manifest(frame: pd.DataFrame) -> pd.DataFrame:
     observed = set(output["label_3"].astype(str))
     if observed != set(TASK_LABELS["label_3"]):
         raise ValueError(f"Unexpected external labels: {sorted(observed)}")
+    output["label_4"] = output["label_4"].fillna("").astype(str)
+    allowed_four = set(TASK_LABELS["label_4"]) | {""}
+    if not set(output["label_4"]).issubset(allowed_four):
+        raise ValueError("External manifest contains an unexpected four-class label")
     return output.sort_values("person_id", ignore_index=True)
 
 
@@ -164,13 +169,10 @@ def main() -> None:
     inference_frame["coco_image_id"] = inference_frame["image_id"]
     inference_frame["image_id"] = inference_frame["person_id"]
     inference_frame["split"] = "external"
-    inference_frame["label_4"] = inference_frame["label_3"].map(
-        {
-            "sitting": "sitting",
-            "standing": "standing",
-            "walking_running": "walking",
-        }
-    )
+    # Only feature extraction consumes this column. Preserve the available
+    # four-class action and use walking for rare walk+run rows whose source
+    # annotations deliberately leave the four-class label undefined.
+    inference_frame["label_4"] = inference_frame["label_4"].replace("", "walking")
 
     started = time.perf_counter()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
