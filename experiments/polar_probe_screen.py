@@ -30,6 +30,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--include-fusions", action="store_true")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--c-value",
+        action="append",
+        type=float,
+        dest="c_values",
+        help="Regularization value; repeat to override the default grid.",
+    )
     parser.add_argument("--task", choices=sorted(LABEL_ORDERS), action="append", dest="tasks")
     parser.add_argument(
         "--candidate-contains",
@@ -157,7 +164,7 @@ def main() -> None:
         label_to_index = {label: index for index, label in enumerate(class_names)}
         labels = manifest[task].map(label_to_index).to_numpy(dtype=int)
         for candidate_name, features in candidates.items():
-            for c_value in (0.01, 0.1, 1.0, 10.0, 100.0):
+            for c_value in args.c_values or (0.01, 0.1, 1.0, 10.0, 100.0):
                 for class_weight in (None, "balanced"):
                     metrics, probabilities = fit_candidate(
                         features,
@@ -230,6 +237,7 @@ def main() -> None:
         "tasks": LABEL_ORDERS,
         "executed_tasks": tasks,
         "candidate_filters": args.candidate_filters or [],
+        "c_values": args.c_values or [0.01, 0.1, 1.0, 10.0, 100.0],
         "test_rows_read": 0,
         "test_used_for_selection": False,
     }

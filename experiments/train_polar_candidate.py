@@ -73,7 +73,11 @@ def parse_args() -> argparse.Namespace:
         required=True,
     )
     parser.add_argument("--top-n-blocks", type=int)
-    parser.add_argument("--augmentation", choices=["mild", "moderate"], default="mild")
+    parser.add_argument(
+        "--augmentation",
+        choices=["mild", "moderate", "mild_no_random_erasing"],
+        default="mild",
+    )
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--grad-accum-steps", type=int, default=2)
     parser.add_argument("--workers", type=int, default=4)

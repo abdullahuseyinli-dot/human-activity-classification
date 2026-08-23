@@ -212,6 +212,7 @@ def serializable_parameters(parameters: dict[str, Any]) -> dict[str, Any]:
 def main() -> None:
     args = parse_args()
     repository_root = Path(__file__).resolve().parents[1]
+    revision_at_start = git_revision(repository_root)
     protocol_path = args.protocol.resolve()
     protocol_hash = sha256_file(protocol_path)
     protocol = json.loads(protocol_path.read_text(encoding="utf-8"))
@@ -364,7 +365,7 @@ def main() -> None:
             "selected_candidates": selected_candidates,
             "python": platform.python_version(),
             "scikit_learn": sklearn.__version__,
-            "git_revision_at_start": git_revision(repository_root),
+            "git_revision_at_start": revision_at_start,
             "implementation_sha256": {
                 "experiments/screen_polar_embedding_classifiers.py": sha256_file(
                     Path(__file__).resolve()

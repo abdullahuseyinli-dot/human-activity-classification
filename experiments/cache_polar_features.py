@@ -41,15 +41,34 @@ class PolarFeatureDataset(Dataset):
 
 
 class DinoFeatureModel(nn.Module):
-    def __init__(self, model_id: str, revision: str) -> None:
+    def __init__(self, model_id: str, revision: str, representation: str) -> None:
         super().__init__()
         self.backbone = AutoModel.from_pretrained(model_id, revision=revision)
+        self.representation = representation
 
     def forward(self, pixel_values: torch.Tensor) -> torch.Tensor:
-        output = self.backbone(pixel_values=pixel_values)
+        output = self.backbone(
+            pixel_values=pixel_values,
+            output_hidden_states=self.representation == "last4_cls_mean_patch",
+        )
+        if self.representation == "last4_cls_mean_patch":
+            return official_multilayer_features(output.hidden_states, self.backbone.layernorm)
         if getattr(output, "pooler_output", None) is not None:
             return output.pooler_output
         return output.last_hidden_state[:, 0]
+
+
+def official_multilayer_features(
+    hidden_states: tuple[torch.Tensor, ...], layernorm: nn.Module
+) -> torch.Tensor:
+    """Match the official DINOv2 four-block linear-classifier representation."""
+
+    if len(hidden_states) < 4:
+        raise ValueError("DINOv2 multi-layer features require at least four hidden states")
+    normalized = [layernorm(state) for state in hidden_states[-4:]]
+    class_tokens = [state[:, 0] for state in normalized]
+    mean_patch_token = normalized[-1][:, 1:].mean(dim=1)
+    return torch.cat([*class_tokens, mean_patch_token], dim=1)
 
 
 class ConvNeXtFeatureModel(nn.Module):
@@ -73,6 +92,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--view", choices=["full_frame", "person_context_10", "person_context_25"], required=True
+    )
+    parser.add_argument(
+        "--representation",
+        choices=["final_cls", "last4_cls_mean_patch"],
+        default="final_cls",
     )
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--workers", type=int, default=4)
@@ -113,12 +137,14 @@ def checkpoint_evidence(model_kind: str) -> dict:
     }
 
 
-def build_model(model_kind: str) -> nn.Module:
+def build_model(model_kind: str, representation: str) -> nn.Module:
     if model_kind == "convnext_small":
+        if representation != "final_cls":
+            raise ValueError("Multi-layer representation is available only for DINOv2")
         return ConvNeXtFeatureModel()
     model_id = DINO_MODEL_SPECS[model_kind]["model_id"]
     revision = DINO_MODEL_SPECS[model_kind]["revision"]
-    return DinoFeatureModel(model_id, revision)
+    return DinoFeatureModel(model_id, revision, representation)
 
 
 @torch.inference_mode()
@@ -152,6 +178,7 @@ def main() -> None:
         "status": "DEVELOPMENT_FEATURE_CACHE",
         "model_kind": args.model_kind,
         "view": args.view,
+        "representation": args.representation,
         "manifest_sha256": manifest_hash,
         "rows": len(frame),
         "test_rows": 0,
@@ -159,7 +186,13 @@ def main() -> None:
     }
     if features_path.is_file() and provenance_path.is_file() and rows_path.is_file():
         previous = json.loads(provenance_path.read_text(encoding="utf-8"))
-        if any(previous.get(key) != value for key, value in expected.items()):
+        previous_representation = previous.get("representation", "final_cls")
+        expected_without_representation = {
+            key: value for key, value in expected.items() if key != "representation"
+        }
+        if previous_representation != args.representation or any(
+            previous.get(key) != value for key, value in expected_without_representation.items()
+        ):
             raise RuntimeError("Existing feature cache provenance differs from this request")
         features = np.load(features_path, mmap_mode="r")
         if features.shape[0] != len(frame):
@@ -176,7 +209,7 @@ def main() -> None:
         pin_memory=device.type == "cuda",
         persistent_workers=args.workers > 0,
     )
-    model = build_model(args.model_kind).to(device)
+    model = build_model(args.model_kind, args.representation).to(device)
     features = extract(model, loader, device)
     np.save(features_path, features)
     pd.DataFrame(
