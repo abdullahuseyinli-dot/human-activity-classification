@@ -1,10 +1,26 @@
 [
   {
+    "disposition": "preserved; configuration rejected before model loading; excluded from selection",
+    "error": "layer-decay is reserved for full-backbone adaptation",
+    "error_type": "ValueError",
+    "record_sha256": "5f0d3eacfa1048e2e10c81d906cb1aa306c91979d041a60bc99c14e928cfb35b",
+    "run_id": "capacity/dinov2_base_context25_top4_invalid_layer_decay",
+    "test_rows_read": 0
+  },
+  {
     "disposition": "preserved; excluded from selection",
     "error": "Probability rows must sum to one",
     "error_type": "ValueError",
     "record_sha256": "6c27db6bc58b8a7539f09066831a60ad943887b63fc612ee59e6128e6321deaf",
     "run_id": "engineering_smoke/dinov2_small_context25_v2",
+    "test_rows_read": 0
+  },
+  {
+    "disposition": "preserved; excluded from selection",
+    "error": "[Errno 2] No such file or directory: 'C:\\\\Users\\\\user\\\\Downloads\\\\github-portfolio-review-20260821\\\\human-activity-classification\\\\.runs\\\\polar_study\\\\manifests\\\\polar_clean_manifest.csv'",
+    "error_type": "FileNotFoundError",
+    "record_sha256": "273cc2a803d92fcb3b6436009cf04ae8f930aee294f57f4547ff2477cdb73e85",
+    "run_id": "regularization/dinov2_small_context25_full_wd001_seed42",
     "test_rows_read": 0
   },
   {

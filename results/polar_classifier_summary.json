@@ -1,0 +1,160 @@
+{
+  "best_screen_family": {
+    "C": 10.0,
+    "accuracy": 0.9323715058611362,
+    "balanced_accuracy": 0.9259208587579326,
+    "brier_score": 0.1170334573250474,
+    "class_weight": "none",
+    "ece": 0.0283311978186221,
+    "family": "rbf_svm",
+    "feature_dimensions": 1536,
+    "final_fit_seconds": 322.76930859999266,
+    "gamma_multiplier": 1.0,
+    "inner_balanced_accuracy": 0.9114072175707404,
+    "inner_macro_f1": 0.9123112074511114,
+    "log_loss": 0.2422427992438921,
+    "macro_f1": 0.9261997137400956,
+    "shrinkage": null,
+    "train_rows": 9958,
+    "validation_rows": 3327,
+    "weighted_f1": 0.932282525655231
+  },
+  "screen_configurations": 40,
+  "source_sha256": {
+    "inner_cv": "536579cdbcd79c2574a2699bee6d82fd660575622b5e336c2fe7c3a10b579481",
+    "screen_provenance": "ce0cf6d0f5f9b245a5e5ab160c411a0fd11f062c0d111b5ad0ca269e8c6802fd",
+    "transferred_rbf_summary": "66c78f279178fb2bbb03e12c4a2fe31d4b3019d356ca363fcbc777f7a359c706",
+    "validation": "e731060731844902738eefcfc8a62e26ad564d5e2ac643db1095d5e742183c1d"
+  },
+  "status": "DEVELOPMENT_ONLY_CLASSIFIER_EVIDENCE",
+  "test_rows_read": 0,
+  "test_used_for_selection": false,
+  "transferred_multilayer_rbf": {
+    "cache_provenance": {
+      "full_frame": {
+        "checkpoint": {
+          "files": [
+            {
+              "bytes": 548,
+              "path": "config.json",
+              "sha256": "f7ff4cfa73d2f70647dbf6950541ad25d73082d54c2e7e9bded160c7656b2a70"
+            },
+            {
+              "bytes": 346345912,
+              "path": "model.safetensors",
+              "sha256": "d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841"
+            }
+          ],
+          "model_id": "facebook/dinov2-base",
+          "revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415"
+        },
+        "device": "cuda",
+        "feature_dtype": "float32",
+        "feature_shape": [
+          13285,
+          3840
+        ],
+        "manifest_sha256": "2cc5bf62790f6064acc74f7113c341b5c2cd1124bcbfbc3d1e9eb19618a75b83",
+        "model_kind": "dinov2_base",
+        "representation": "last4_cls_mean_patch",
+        "rows": 13285,
+        "status": "DEVELOPMENT_FEATURE_CACHE",
+        "test_labels_read": false,
+        "test_rows": 0,
+        "torch": "2.11.0+cu126",
+        "view": "full_frame"
+      },
+      "person_context_10": {
+        "checkpoint": {
+          "files": [
+            {
+              "bytes": 548,
+              "path": "config.json",
+              "sha256": "f7ff4cfa73d2f70647dbf6950541ad25d73082d54c2e7e9bded160c7656b2a70"
+            },
+            {
+              "bytes": 346345912,
+              "path": "model.safetensors",
+              "sha256": "d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841"
+            }
+          ],
+          "model_id": "facebook/dinov2-base",
+          "revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415"
+        },
+        "device": "cuda",
+        "feature_dtype": "float32",
+        "feature_shape": [
+          13285,
+          3840
+        ],
+        "manifest_sha256": "2cc5bf62790f6064acc74f7113c341b5c2cd1124bcbfbc3d1e9eb19618a75b83",
+        "model_kind": "dinov2_base",
+        "representation": "last4_cls_mean_patch",
+        "rows": 13285,
+        "status": "DEVELOPMENT_FEATURE_CACHE",
+        "test_labels_read": false,
+        "test_rows": 0,
+        "torch": "2.11.0+cu126",
+        "view": "person_context_10"
+      }
+    },
+    "configuration": {
+      "C": 10.0,
+      "calibration": "five_fold_sigmoid",
+      "calibration_folds": 5,
+      "class_weight": "none",
+      "family": "rbf_svm",
+      "gamma": 0.00013020833333333333,
+      "gamma_multiplier": 1.0,
+      "retuned_on_this_representation": false,
+      "seed": 42
+    },
+    "feature_dimensions": 7680,
+    "fit_seconds": 2388.9971122000134,
+    "git_revision_at_start": "f022991ef5bd7954cdb7e2cd5cf4e906de66d87d",
+    "implementation_sha256": {
+      "experiments/evaluate_polar_transferred_rbf.py": "b94c7d90ef38286f249c84f825bc2d65f6ab9abfec01091c1c468e335242de2c",
+      "experiments/screen_polar_embedding_classifiers.py": "9b13f56da186ad4655b56dfb7cd579a1f99484aaffb58aa0e1cd905cd30bb129",
+      "src/hac/metrics.py": "dbd74684fb0f1aaad341c8379935ce5ed675d2817829d49ef6065ac9bf9ba006",
+      "src/hac/polar_features.py": "fd51e2c274b6528b430e7788bd4e7699cb2b6336ecf739884e78d4321f86b87f"
+    },
+    "inference_rows_per_second": 8.322445756953096,
+    "inference_seconds": 399.7622931000078,
+    "manifest_sha256": "2cc5bf62790f6064acc74f7113c341b5c2cd1124bcbfbc3d1e9eb19618a75b83",
+    "mean_support_vectors": 4075.6,
+    "metrics": {
+      "accuracy": 0.9392846408175534,
+      "balanced_accuracy": 0.9331721120387979,
+      "brier_score": 0.10329695600961543,
+      "ece": 0.03743660190766873,
+      "log_loss": 0.22044333028117008,
+      "macro_f1": 0.9331296474233907,
+      "weighted_f1": 0.939205588289962
+    },
+    "model_bytes": 704718031,
+    "model_kind": "dinov2_base",
+    "model_sha256": "104a9b60c383cf8750ddd720ed396143be27de53886b175517b1f10418ab1f40",
+    "protocol_sha256": "89f967059a3053b3c8773ac8d8ffa0d109318417b6cb6958b83cd3814095a8de",
+    "protocol_version": "1.4.0",
+    "python": "3.11.9",
+    "representation": "last4_cls_mean_patch",
+    "scikit_learn": "1.8.0",
+    "status": "DEVELOPMENT_ONLY_TRANSFERRED_RBF",
+    "support_vector_counts_by_calibration_fold": [
+      4069,
+      4078,
+      4083,
+      4098,
+      4050
+    ],
+    "test_rows_read": 0,
+    "test_used_for_selection": false,
+    "train_rows": 9958,
+    "validation_rows": 3327,
+    "views": [
+      "full_frame",
+      "person_context_10"
+    ]
+  },
+  "validation_family_evaluations": 4
+}

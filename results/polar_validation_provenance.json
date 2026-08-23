@@ -1,0 +1,22 @@
+{
+  "artifact_rows": {
+    "convnext_small_full": 3327,
+    "dinov2_base_multilayer_logistic": 3327,
+    "dinov2_base_multilayer_rbf": 3327,
+    "dinov2_base_top4": 3327,
+    "dinov2_small_dropout02": 3327
+  },
+  "artifact_sha256": {
+    "convnext_small_full": "cf50b4d00f5cdd67e986b641a5dc2467a016df3a50e0bb5a842840f68727f7f8",
+    "dinov2_base_multilayer_logistic": "fc7568d584bcde11b86b0648143b9ab13a7411a3e2e9843f741c2a962ed45fc8",
+    "dinov2_base_multilayer_rbf": "ab9c545ccf032c3de41248429c00de16ab2e85afeeaac403b1b316ae6c36efb2",
+    "dinov2_base_top4": "7931d6aabd1ba57bb358d1d041bbd50391a42ab274b259722e49b139c636d9fc",
+    "dinov2_small_dropout02": "ce755a5aa928a4dced6ecf7ae4092401b18361aad45341eb2003f9f8b12b560f"
+  },
+  "bootstrap_resamples": 10000,
+  "bootstrap_seed": 20260822,
+  "runner_sha256": "d0c5081587e2faeb33641fdbcfb8927f0a6a1a47bc07f995c5172f64e201f177",
+  "status": "DEVELOPMENT_ONLY_VALIDATION_ANALYSIS",
+  "test_rows_read": 0,
+  "test_used_for_selection": false
+}

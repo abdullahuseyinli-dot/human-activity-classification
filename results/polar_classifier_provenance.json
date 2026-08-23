@@ -1,0 +1,112 @@
+{
+  "cache_provenance": {
+    "full_frame": {
+      "checkpoint": {
+        "files": [
+          {
+            "bytes": 548,
+            "path": "config.json",
+            "sha256": "f7ff4cfa73d2f70647dbf6950541ad25d73082d54c2e7e9bded160c7656b2a70"
+          },
+          {
+            "bytes": 346345912,
+            "path": "model.safetensors",
+            "sha256": "d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841"
+          }
+        ],
+        "model_id": "facebook/dinov2-base",
+        "revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415"
+      },
+      "device": "cuda",
+      "feature_dtype": "float32",
+      "feature_shape": [
+        13285,
+        768
+      ],
+      "manifest_sha256": "2cc5bf62790f6064acc74f7113c341b5c2cd1124bcbfbc3d1e9eb19618a75b83",
+      "model_kind": "dinov2_base",
+      "rows": 13285,
+      "status": "DEVELOPMENT_FEATURE_CACHE",
+      "test_labels_read": false,
+      "test_rows": 0,
+      "torch": "2.11.0+cu126",
+      "view": "full_frame"
+    },
+    "person_context_10": {
+      "checkpoint": {
+        "files": [
+          {
+            "bytes": 548,
+            "path": "config.json",
+            "sha256": "f7ff4cfa73d2f70647dbf6950541ad25d73082d54c2e7e9bded160c7656b2a70"
+          },
+          {
+            "bytes": 346345912,
+            "path": "model.safetensors",
+            "sha256": "d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841"
+          }
+        ],
+        "model_id": "facebook/dinov2-base",
+        "revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415"
+      },
+      "device": "cuda",
+      "feature_dtype": "float32",
+      "feature_shape": [
+        13285,
+        768
+      ],
+      "manifest_sha256": "2cc5bf62790f6064acc74f7113c341b5c2cd1124bcbfbc3d1e9eb19618a75b83",
+      "model_kind": "dinov2_base",
+      "rows": 13285,
+      "status": "DEVELOPMENT_FEATURE_CACHE",
+      "test_labels_read": false,
+      "test_rows": 0,
+      "torch": "2.11.0+cu126",
+      "view": "person_context_10"
+    }
+  },
+  "calibration_folds": 5,
+  "feature_dimensions": 1536,
+  "fusion": "feature_concatenation",
+  "git_revision_at_start": "7dd6659719999873e8880e5c5933fe2276f3aaa2",
+  "implementation_sha256": {
+    "experiments/screen_polar_embedding_classifiers.py": "50dd9b69224e7a8ee04eda44565099f76c198f7ff7d51cbdae5b66785ac59078",
+    "src/hac/metrics.py": "dbd74684fb0f1aaad341c8379935ce5ed675d2817829d49ef6065ac9bf9ba006",
+    "src/hac/polar_features.py": "fd51e2c274b6528b430e7788bd4e7699cb2b6336ecf739884e78d4321f86b87f"
+  },
+  "inner_folds": 3,
+  "manifest_sha256": "2cc5bf62790f6064acc74f7113c341b5c2cd1124bcbfbc3d1e9eb19618a75b83",
+  "model_kind": "dinov2_base",
+  "protocol_sha256": "fc292aee90cd3bf99dc93545b0c5b595e7bf993dc25cb2cb12b919f3a2ef577f",
+  "protocol_version": "1.3.0",
+  "python": "3.11.9",
+  "scikit_learn": "1.8.0",
+  "seed": 42,
+  "selected_candidates": {
+    "linear_svm": {
+      "C": 0.0001,
+      "class_weight": "balanced"
+    },
+    "multinomial_logistic": {
+      "C": 0.001,
+      "class_weight": "balanced"
+    },
+    "rbf_svm": {
+      "C": 10.0,
+      "class_weight": "none",
+      "gamma_multiplier": 1.0
+    },
+    "shrinkage_lda": {
+      "shrinkage": 0.5
+    }
+  },
+  "status": "DEVELOPMENT_ONLY_CLASSIFIER_SCREEN",
+  "test_rows_read": 0,
+  "test_used_for_selection": false,
+  "train_rows": 9958,
+  "validation_rows": 3327,
+  "views": [
+    "full_frame",
+    "person_context_10"
+  ]
+}

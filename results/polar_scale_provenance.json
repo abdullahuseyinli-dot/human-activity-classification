@@ -1,0 +1,103 @@
+{
+  "architecture": {
+    "C": 0.01,
+    "class_weight": "none",
+    "classifier": "standardized_multinomial_logistic",
+    "representation": "dinov2_base",
+    "views": [
+      "full_frame",
+      "person_context_10"
+    ]
+  },
+  "environment": {
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.11.9",
+    "scikit_learn": "1.8.0"
+  },
+  "feature_cache_provenance": {
+    "full_frame": {
+      "checkpoint": {
+        "files": [
+          {
+            "bytes": 548,
+            "path": "config.json",
+            "sha256": "f7ff4cfa73d2f70647dbf6950541ad25d73082d54c2e7e9bded160c7656b2a70"
+          },
+          {
+            "bytes": 346345912,
+            "path": "model.safetensors",
+            "sha256": "d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841"
+          }
+        ],
+        "model_id": "facebook/dinov2-base",
+        "revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415"
+      },
+      "device": "cuda",
+      "feature_dtype": "float32",
+      "feature_shape": [
+        13285,
+        768
+      ],
+      "manifest_sha256": "2cc5bf62790f6064acc74f7113c341b5c2cd1124bcbfbc3d1e9eb19618a75b83",
+      "model_kind": "dinov2_base",
+      "rows": 13285,
+      "status": "DEVELOPMENT_FEATURE_CACHE",
+      "test_labels_read": false,
+      "test_rows": 0,
+      "torch": "2.11.0+cu126",
+      "view": "full_frame"
+    },
+    "person_context_10": {
+      "checkpoint": {
+        "files": [
+          {
+            "bytes": 548,
+            "path": "config.json",
+            "sha256": "f7ff4cfa73d2f70647dbf6950541ad25d73082d54c2e7e9bded160c7656b2a70"
+          },
+          {
+            "bytes": 346345912,
+            "path": "model.safetensors",
+            "sha256": "d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841"
+          }
+        ],
+        "model_id": "facebook/dinov2-base",
+        "revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415"
+      },
+      "device": "cuda",
+      "feature_dtype": "float32",
+      "feature_shape": [
+        13285,
+        768
+      ],
+      "manifest_sha256": "2cc5bf62790f6064acc74f7113c341b5c2cd1124bcbfbc3d1e9eb19618a75b83",
+      "model_kind": "dinov2_base",
+      "rows": 13285,
+      "status": "DEVELOPMENT_FEATURE_CACHE",
+      "test_labels_read": false,
+      "test_rows": 0,
+      "torch": "2.11.0+cu126",
+      "view": "person_context_10"
+    }
+  },
+  "manifest_sha256": "2cc5bf62790f6064acc74f7113c341b5c2cd1124bcbfbc3d1e9eb19618a75b83",
+  "requested_train_sizes": [
+    "242",
+    "500",
+    "1000",
+    "3000",
+    "all"
+  ],
+  "runner_sha256": "ecfcff98f2b5b074afb0e1c0fc3608e835cf14af34d9c4b0798591a8bd8644b5",
+  "status": "DEVELOPMENT_ONLY_SCALE_STUDY",
+  "subset_seed": 20260822,
+  "task": "label_4",
+  "test_rows_read": 0,
+  "test_used_for_selection": false,
+  "training_seeds": [
+    42,
+    52,
+    62
+  ]
+}

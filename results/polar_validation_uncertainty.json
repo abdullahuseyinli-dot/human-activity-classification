@@ -1,0 +1,81 @@
+{
+  "convnext_small_full": {
+    "ci_95_high": 0.90255480065737,
+    "ci_95_low": 0.8814371444661877,
+    "point_estimate": 0.8919846094287402,
+    "resamples": 10000,
+    "seed": 20260822
+  },
+  "dinov2_base_multilayer_logistic": {
+    "ci_95_high": 0.9352927103930747,
+    "ci_95_low": 0.9170181474748177,
+    "point_estimate": 0.9262770271156358,
+    "resamples": 10000,
+    "seed": 20260822
+  },
+  "dinov2_base_multilayer_rbf": {
+    "ci_95_high": 0.9418627236810081,
+    "ci_95_low": 0.9243556491310652,
+    "point_estimate": 0.9331296474233907,
+    "resamples": 10000,
+    "seed": 20260822
+  },
+  "dinov2_base_top4": {
+    "ci_95_high": 0.9329293614656002,
+    "ci_95_low": 0.9146082637227744,
+    "point_estimate": 0.9240281821877031,
+    "resamples": 10000,
+    "seed": 20260822
+  },
+  "dinov2_small_dropout02": {
+    "ci_95_high": 0.9286643041421955,
+    "ci_95_low": 0.9095190301899313,
+    "point_estimate": 0.9191272727815051,
+    "resamples": 10000,
+    "seed": 20260822
+  },
+  "validation_locked_blend": {
+    "ci_95_high": 0.9521786085483822,
+    "ci_95_low": 0.9361804976876281,
+    "point_estimate": 0.9442471221371301,
+    "resamples": 10000,
+    "seed": 20260822
+  },
+  "validation_locked_blend_paired_deltas": {
+    "convnext_small_full": {
+      "ci_95_high": 0.06177576016116382,
+      "ci_95_low": 0.04293916027944951,
+      "point_estimate": 0.052262512708389885,
+      "resamples": 10000,
+      "seed": 20260822
+    },
+    "dinov2_base_multilayer_logistic": {
+      "ci_95_high": 0.025175977946939012,
+      "ci_95_low": 0.01074855447903809,
+      "point_estimate": 0.01797009502149438,
+      "resamples": 10000,
+      "seed": 20260822
+    },
+    "dinov2_base_multilayer_rbf": {
+      "ci_95_high": 0.018232682930103602,
+      "ci_95_low": 0.0039147940754997,
+      "point_estimate": 0.011117474713739472,
+      "resamples": 10000,
+      "seed": 20260822
+    },
+    "dinov2_base_top4": {
+      "ci_95_high": 0.027887937609029877,
+      "ci_95_low": 0.012836084340899825,
+      "point_estimate": 0.02021893994942703,
+      "resamples": 10000,
+      "seed": 20260822
+    },
+    "dinov2_small_dropout02": {
+      "ci_95_high": 0.032764918116674195,
+      "ci_95_low": 0.017488926658979626,
+      "point_estimate": 0.025119849355625057,
+      "resamples": 10000,
+      "seed": 20260822
+    }
+  }
+}
