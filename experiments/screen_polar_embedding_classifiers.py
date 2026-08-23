@@ -213,6 +213,7 @@ def main() -> None:
     args = parse_args()
     repository_root = Path(__file__).resolve().parents[1]
     protocol_path = args.protocol.resolve()
+    protocol_hash = sha256_file(protocol_path)
     protocol = json.loads(protocol_path.read_text(encoding="utf-8"))
     if protocol.get("protocol_version") != "1.3.0":
         raise RuntimeError("Classifier screen requires locked POLAR protocol 1.3.0")
@@ -347,7 +348,7 @@ def main() -> None:
             "status": "DEVELOPMENT_ONLY_CLASSIFIER_SCREEN",
             "protocol_version": "1.3.0",
             "protocol_path": str(protocol_path),
-            "protocol_sha256": sha256_file(protocol_path),
+            "protocol_sha256": protocol_hash,
             "manifest_path": str(manifest_path),
             "manifest_sha256": manifest_hash,
             "model_kind": MODEL_KIND,
