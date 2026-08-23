@@ -1,0 +1,63 @@
+{
+  "baseline_metrics": {
+    "accuracy": 0.7010037847622183,
+    "adaptive_ece": 0.22877429214950706,
+    "balanced_accuracy": 0.7674201668657884,
+    "brier_score": 0.5193826463507392,
+    "classwise_ece": 0.16552118553164655,
+    "ece": 0.2287742921495071,
+    "log_loss": 1.6525180404561772,
+    "macro_f1": 0.7071045171910892,
+    "method": "historical_v1_dino",
+    "weighted_f1": 0.7035441189228798
+  },
+  "confirmation_rule": "gain_at_least_0.01_and_image_cluster_95pct_interval_above_zero",
+  "confirmatory_success": true,
+  "historical_baseline_checkpoints": [
+    {
+      "epoch": 7,
+      "path": ".runs/polar_final/neural/dinov2_base_top4/seed_42/final_checkpoint.pt",
+      "sha256": "2e22491b4dea493f8dffea7021f3385dcbe5ed026cdb8480c29a2c5732b288c8"
+    },
+    {
+      "epoch": 7,
+      "path": ".runs/polar_final/neural/dinov2_base_top4/seed_52/final_checkpoint.pt",
+      "sha256": "46b3804d56092eb8bbc0e517497bbc8c647ef6ec01d0e2792082f1fb29d1aeb6"
+    },
+    {
+      "epoch": 7,
+      "path": ".runs/polar_final/neural/dinov2_base_top4/seed_62/final_checkpoint.pt",
+      "sha256": "f6ccdd7b07e1e496814813b704c1e446dea25b256bbcf1a627df73c3a6f143a3"
+    }
+  ],
+  "label_definition": "deterministic mapping of V-COCO action tags",
+  "official_test_label_open_count": 1,
+  "paired_macro_f1_difference": {
+    "ci_95_high": 0.17346087701413163,
+    "ci_95_low": 0.1453534652937629,
+    "clusters": 3708,
+    "point_estimate": 0.15919016751183823,
+    "resamples": 10000,
+    "seed": 20260823
+  },
+  "predictions_sha256": "b67166db79e94a00aac591c2e0c25007476d27370f0584c707ccb373b250431a",
+  "primary_method": "scale_conditioned_stacking",
+  "primary_metrics": {
+    "accuracy": 0.879545828533816,
+    "adaptive_ece": 0.010413536811934916,
+    "balanced_accuracy": 0.8635940276236589,
+    "brier_score": 0.17304638400099726,
+    "classwise_ece": 0.009808412002143605,
+    "ece": 0.007628798271701076,
+    "log_loss": 0.2901574176545104,
+    "macro_f1": 0.8662946847029275,
+    "method": "scale_conditioned_stacking",
+    "weighted_f1": 0.8788389023700168
+  },
+  "protocol_lock_sha256": "3a90d6720a6cf5250b995820801199eca611706d514e7b5de2c83bea03f5a143",
+  "selection_lock_sha256": "4c0d13c05d537e28066000092e88c37f66b937111516715c8f1756cab162e10d",
+  "source_summary_sha256": "f00c266c593f699bbe76dea86381c09fdcbf4be8b2fe07e64d5cb441c4079bf7",
+  "status": "VCOCO_V2_OFFICIAL_TEST_EVALUATION_COMPLETE",
+  "test_access_gate_sha256": "bd3e3481e5ffa134514e1a84fc25f6888825d2d2a10fc28272846bc2642e94aa",
+  "test_used_for_selection": false
+}

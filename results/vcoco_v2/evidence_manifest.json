@@ -1,0 +1,95 @@
+{
+  "artifacts": {
+    "README.md": {
+      "sha256": "c59e50414830b0adc8aeb6a72417dd6d69488ebcb9c0b466567e3fbeb577a30b",
+      "size_bytes": 1431
+    },
+    "development_candidates.csv": {
+      "sha256": "7d08bfcb71f23339bc6d2cf420d441c61f8ad6baf0a446c9e85359ee01501979",
+      "size_bytes": 2649
+    },
+    "factorized_fusion.csv": {
+      "sha256": "dcd8c1be84ec4f424f666620224ec43268492200e00ac06996f402fd8ca97a11",
+      "size_bytes": 2042
+    },
+    "factorized_fusion_per_class.csv": {
+      "sha256": "a0e1cd24ea0175058a5d6590c6532d978e935748d5413e6f81925fcc85dd0c27",
+      "size_bytes": 2819
+    },
+    "factorized_fusion_uncertainty.json": {
+      "sha256": "dd1a13b9e46b1647200a989f95f5355395e654ff833cb0a8bfde0f38efa06a5a",
+      "size_bytes": 1967
+    },
+    "fewshot_curve.csv": {
+      "sha256": "a542ca1e00028d0125fafe330fcde0d1168fbe834f44c97eb419f309ee609b9a",
+      "size_bytes": 995
+    },
+    "final_selection_lock.json": {
+      "sha256": "7de3374f057d40ad8e09d3c0f05260f6d0e951d06af690e7766871917eeb226a",
+      "size_bytes": 8678
+    },
+    "mechanism_correlations.csv": {
+      "sha256": "03353c28bce5e53230827968ee0a67af60d1ff2e05cb48269cc3b5f486db3644",
+      "size_bytes": 1957
+    },
+    "mechanism_error_transitions.csv": {
+      "sha256": "4819964570fc8a06f3aa9fc9fc66838f7eb8ff6484b7df68b40bc899c68cd6d3",
+      "size_bytes": 1026
+    },
+    "mechanism_strata.csv": {
+      "sha256": "c5b77da49e05981652471c45959c0f3b71fea9c53b7e556ba33389d5b7779095",
+      "size_bytes": 30723
+    },
+    "official_test_confusions.json": {
+      "sha256": "0531074586f447ff9f6ae5f6eab4e64a0e6170fb2cef17798e4cfc51e79aa43d",
+      "size_bytes": 1295
+    },
+    "official_test_metrics.csv": {
+      "sha256": "32dd7d3c878b97f263d0238d7cef916233505bae73e38119ba60386097bee639",
+      "size_bytes": 503
+    },
+    "official_test_per_class.csv": {
+      "sha256": "9361e25c107236de1a2d8ac851f751d63a2aa4a0b125a9954d2884e244dc110e",
+      "size_bytes": 619
+    },
+    "official_test_selective_metrics.json": {
+      "sha256": "d8bb87a23aff2b184f036538077a54070fe4c97cf10a02a4259f68bd9c4c4e3c",
+      "size_bytes": 3117
+    },
+    "official_test_strata.csv": {
+      "sha256": "75d294d89c9ccb3e8bd0ff532d456302ffed7827a380d851bfc5f13040894508",
+      "size_bytes": 8361
+    },
+    "official_test_summary.json": {
+      "sha256": "6cc0725818d38a251d41ac34e206ed17d2fd8207e6b57327ede7baf462bdf028",
+      "size_bytes": 2549
+    },
+    "official_test_uncertainty.json": {
+      "sha256": "a13b9fe3f316f3b1fd50e3776e8758997e91fcec02d65f53fc8d7c87bc839932",
+      "size_bytes": 178
+    },
+    "protocol_lock.json": {
+      "sha256": "98732a7b9af34586d52495f0c9a2505a83192006c08c4c6bf0574936b4681143",
+      "size_bytes": 3788
+    },
+    "test_access_gate.json": {
+      "sha256": "9a89953b7bd6e413e46f24104cefa2fa3a66801ca37f36039fef42b22abc5426",
+      "size_bytes": 401
+    }
+  },
+  "exporter_sha256": "6aaed095006ae2cebfa754cef0069e76ef5befeebd58bac7da57acbe8369dacf",
+  "local_artifacts_retained": [
+    "dense probability arrays",
+    "feature tensors",
+    "model checkpoints",
+    "image manifests with machine-local paths"
+  ],
+  "official_test_images": 3708,
+  "official_test_label_open_count": 1,
+  "official_test_people": 6077,
+  "protocol_lock_sha256": "3a90d6720a6cf5250b995820801199eca611706d514e7b5de2c83bea03f5a143",
+  "repository_revision_at_selection_lock": "fceba703051f66955f54934c03defaf1f9bc8e86",
+  "selection_lock_sha256": "4c0d13c05d537e28066000092e88c37f66b937111516715c8f1756cab162e10d",
+  "status": "VCOCO_V2_PORTABLE_EVIDENCE_COMPLETE",
+  "test_used_for_selection": false
+}

@@ -1,0 +1,74 @@
+{
+  "factorized_context": {
+    "ci_95_high": 0.18062431251618213,
+    "ci_95_low": 0.1415580670320262,
+    "clusters": 2199,
+    "point_estimate": 0.16154543274713584,
+    "resamples": 2000,
+    "seed": 20260823
+  },
+  "factorized_tight": {
+    "ci_95_high": 0.1724542341508247,
+    "ci_95_low": 0.13411830545231682,
+    "clusters": 2199,
+    "point_estimate": 0.15320816460253306,
+    "resamples": 2000,
+    "seed": 20260823
+  },
+  "factorized_tight_context_geometry": {
+    "ci_95_high": 0.18800136592578845,
+    "ci_95_low": 0.15047937271212122,
+    "clusters": 2199,
+    "point_estimate": 0.16911701560003645,
+    "resamples": 2000,
+    "seed": 20260823
+  },
+  "flat_context": {
+    "ci_95_high": 0.17289208458866268,
+    "ci_95_low": 0.13521783756905148,
+    "clusters": 2199,
+    "point_estimate": 0.15423463028698203,
+    "resamples": 2000,
+    "seed": 20260823
+  },
+  "flat_tight": {
+    "ci_95_high": 0.17752354620295055,
+    "ci_95_low": 0.1401260404910111,
+    "clusters": 2199,
+    "point_estimate": 0.15881113578141726,
+    "resamples": 2000,
+    "seed": 20260823
+  },
+  "flat_tight_context": {
+    "ci_95_high": 0.1804639402910772,
+    "ci_95_low": 0.14479968789036107,
+    "clusters": 2199,
+    "point_estimate": 0.16263287713867713,
+    "resamples": 2000,
+    "seed": 20260823
+  },
+  "flat_tight_context_geometry": {
+    "ci_95_high": 0.17608960574186266,
+    "ci_95_low": 0.139599244270377,
+    "clusters": 2199,
+    "point_estimate": 0.15804958316290174,
+    "resamples": 2000,
+    "seed": 20260823
+  },
+  "late_mean_tight_context": {
+    "ci_95_high": 0.18770605803630316,
+    "ci_95_low": 0.15071788997681881,
+    "clusters": 2199,
+    "point_estimate": 0.16916124134457,
+    "resamples": 2000,
+    "seed": 20260823
+  },
+  "scale_conditioned_stacking": {
+    "ci_95_high": 0.19047978705656407,
+    "ci_95_low": 0.1541615639931667,
+    "clusters": 2199,
+    "point_estimate": 0.17216764375876992,
+    "resamples": 2000,
+    "seed": 20260823
+  }
+}

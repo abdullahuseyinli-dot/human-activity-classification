@@ -1,0 +1,97 @@
+{
+  "artifact_sha256": {
+    "vcoco_test_clean.csv": "adb46314c0dd2779e17b67047619e9e53d203753b9a2523bfb28debe095696a4",
+    "vcoco_train_clean.csv": "aa0919b4283dd683d1317b1cb1621af072800aa80d7a3bc1bd8a58271ff1514b",
+    "vcoco_val_clean.csv": "837d5470e616b374471dd1b2d2723ba9e3a9861683cdf47a7c030a133a608097"
+  },
+  "known_pretraining_caveat": "V-COCO uses COCO images; COCO-fine-tuned detector or pose auxiliaries are reported separately and cannot establish clean cross-dataset transfer.",
+  "ontology": {
+    "ambiguous_source_tags_preserved": true,
+    "current_labels": "factorized V-COCO source-action labels",
+    "label_definition": "Deterministic mapping of V-COCO action tags.",
+    "test_source_class_counts_forbidden_for_selection": true
+  },
+  "primary_endpoint": "person_level_macro_f1_on_legacy_eligible_vcoco",
+  "promotion_rule": {
+    "minimum_macro_f1_gain": 0.01,
+    "paired_image_cluster_bootstrap_interval_must_exclude_zero": true,
+    "standing_or_locomotion_collapse_forbidden": true
+  },
+  "protocol_version": "2.0.0",
+  "quarantine": {
+    "legacy_overlap_test_images": 60,
+    "polar_overlap_development_confirmed_pairs": 0,
+    "polar_overlap_test_confirmed_pairs": 0
+  },
+  "repository_revision_at_lock": "83bb1285acbb3d2dd1bbfeeb2a6565a3a5662c2d",
+  "secondary_endpoints": [
+    "per_class_precision_recall_f1",
+    "balanced_accuracy",
+    "log_loss",
+    "brier_score",
+    "classwise_and_adaptive_ece",
+    "risk_coverage_auc"
+  ],
+  "selection_policy": {
+    "test": "one_final_run_after_champion_lock",
+    "train": "adaptation_and_inner_cross_validation_grouped_by_image",
+    "val": "external_model_selection_and_calibration"
+  },
+  "source_lock_sha256": "3a90d6720a6cf5250b995820801199eca611706d514e7b5de2c83bea03f5a143",
+  "source_sha256": {
+    "development_clean_manifest": "0eb0afcc7e832babc495d3d9a74981077968f401097eedc34c6aeb9a0e644cb4",
+    "development_overlap_summary": "668e0951fc2d4128559a140a306e612fb32321e246617ca0923ee380fc1cc7d0",
+    "legacy_manifest": "9014ba11dacb54a7f3df4211f66622b379a0ebe80d89377bf711dc6d42f64825",
+    "manifest_builder": "6763b23d6f91a201cf11a6d9da0052d935655f5ef2c6474d553d66b4a865806b",
+    "ontology_module": "b9164973093c4a1b793050ba7be94dea821c32fca1fdddaab78bb0401074138a",
+    "polar_clean_manifest": "0c47f3eb52bc40e16303818996bc84914cb1a4ff062315dfbb2b5c3674952e93",
+    "protocol_locker": "d642c5e7b3a8402bb19945640d709b13060b5d8abc5ce86d626db12ddb12ee5e",
+    "test_clean_manifest": "5f943ad6bd676b020f1528200d777dd6e287b9be2950dfd04137e97a3e9da85f",
+    "test_overlap_summary": "5a794687282083e0bf6fbd6736b274b3898c723bd3a323fac52f8b74e4b35682"
+  },
+  "split_summary": {
+    "test": {
+      "class_counts": {
+        "sitting": 1882,
+        "standing": 2962,
+        "walking_running": 1233
+      },
+      "image_files_present": 3708,
+      "images": 3708,
+      "people": 6077
+    },
+    "train": {
+      "class_counts": {
+        "sitting": 923,
+        "standing": 1576,
+        "walking_running": 591
+      },
+      "image_files_present": 1924,
+      "images": 1924,
+      "people": 3090
+    },
+    "val": {
+      "class_counts": {
+        "sitting": 1049,
+        "standing": 1831,
+        "walking_running": 670
+      },
+      "image_files_present": 2199,
+      "images": 2199,
+      "people": 3550
+    }
+  },
+  "status": "VCOCO_V2_PROTOCOL_LOCKED_BEFORE_NEW_MODEL_FITTING",
+  "test_access": {
+    "annotation_counts_inspected": true,
+    "images_hashed_for_overlap": true,
+    "labels_used_for_model_or_prior_selection": false,
+    "model_predictions_run": false
+  },
+  "v1_baseline": {
+    "external_image_macro_f1": 0.6669343425821733,
+    "external_person_macro_f1": 0.6840393638307938,
+    "git_tag": "polar-study-v1.0.0",
+    "selection_role": "frozen_historical_baseline"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "official_test_label_open_count": 1,
+  "opened_manifest_sha256": "e579ce696ac5fe4c871dc9cb60e272d2d63e774fb776e0b3cd35bb709796189e",
+  "selection_lock_sha256": "4c0d13c05d537e28066000092e88c37f66b937111516715c8f1756cab162e10d",
+  "status": "VCOCO_V2_OFFICIAL_TEST_GATE_OPEN",
+  "test_manifest_sha256": "adb46314c0dd2779e17b67047619e9e53d203753b9a2523bfb28debe095696a4",
+  "test_rows_read": 6077
+}

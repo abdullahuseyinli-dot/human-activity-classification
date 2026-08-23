@@ -85,6 +85,41 @@ POLAR_REQUIRED = {
     "tools/build_study_papers.py",
     "tools/build_study_release_manifest.py",
 }
+VCOCO_V2_REQUIRED = {
+    "docs/VCOCO_V2_EXTERNAL_TRANSFER.md",
+    "tools/export_vcoco_v2_results.py",
+    "tools/render_vcoco_v2_figures.py",
+    "assets/vcoco_v2_development_comparison.png",
+    "assets/vcoco_v2_development_comparison.svg",
+    "assets/vcoco_v2_fewshot_curve.png",
+    "assets/vcoco_v2_fewshot_curve.svg",
+    "assets/vcoco_v2_official_test_comparison.png",
+    "assets/vcoco_v2_official_test_comparison.svg",
+    "assets/vcoco_v2_scale_gain.png",
+    "assets/vcoco_v2_scale_gain.svg",
+    "assets/vcoco_v2_selective_prediction.png",
+    "assets/vcoco_v2_selective_prediction.svg",
+    "results/vcoco_v2/README.md",
+    "results/vcoco_v2/development_candidates.csv",
+    "results/vcoco_v2/evidence_manifest.json",
+    "results/vcoco_v2/factorized_fusion.csv",
+    "results/vcoco_v2/factorized_fusion_per_class.csv",
+    "results/vcoco_v2/factorized_fusion_uncertainty.json",
+    "results/vcoco_v2/fewshot_curve.csv",
+    "results/vcoco_v2/final_selection_lock.json",
+    "results/vcoco_v2/mechanism_correlations.csv",
+    "results/vcoco_v2/mechanism_error_transitions.csv",
+    "results/vcoco_v2/mechanism_strata.csv",
+    "results/vcoco_v2/official_test_confusions.json",
+    "results/vcoco_v2/official_test_metrics.csv",
+    "results/vcoco_v2/official_test_per_class.csv",
+    "results/vcoco_v2/official_test_selective_metrics.json",
+    "results/vcoco_v2/official_test_strata.csv",
+    "results/vcoco_v2/official_test_summary.json",
+    "results/vcoco_v2/official_test_uncertainty.json",
+    "results/vcoco_v2/protocol_lock.json",
+    "results/vcoco_v2/test_access_gate.json",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -449,11 +484,110 @@ def validate_study_report_release(repository: Path) -> None:
         raise RuntimeError("POLAR Study Report release checksums are stale")
 
 
+def validate_vcoco_v2_release(repository: Path) -> None:
+    results = repository / "results" / "vcoco_v2"
+    manifest = read_json(results / "evidence_manifest.json")
+    protocol = read_json(results / "protocol_lock.json")
+    selection = read_json(results / "final_selection_lock.json")
+    summary = read_json(results / "official_test_summary.json")
+    gate = read_json(results / "test_access_gate.json")
+    protocol_hash = protocol.get("source_lock_sha256")
+    if manifest.get("status") != "VCOCO_V2_PORTABLE_EVIDENCE_COMPLETE":
+        raise RuntimeError("V-COCO v2 evidence export is incomplete")
+    if manifest.get("exporter_sha256") != sha256_file(
+        repository / "tools" / "export_vcoco_v2_results.py"
+    ):
+        raise RuntimeError("V-COCO v2 exporter changed after evidence generation")
+    if protocol.get("status") != "VCOCO_V2_PROTOCOL_LOCKED_BEFORE_NEW_MODEL_FITTING":
+        raise RuntimeError("V-COCO v2 protocol lock is invalid")
+    if selection.get("status") != "VCOCO_V2_FINAL_SELECTION_LOCKED_PRE_TEST":
+        raise RuntimeError("V-COCO v2 selection lock is invalid")
+    if summary.get("status") != "VCOCO_V2_OFFICIAL_TEST_EVALUATION_COMPLETE":
+        raise RuntimeError("V-COCO v2 official test result is incomplete")
+    if gate.get("status") != "VCOCO_V2_OFFICIAL_TEST_GATE_OPEN":
+        raise RuntimeError("V-COCO v2 test gate is invalid")
+    if (
+        not isinstance(protocol_hash, str)
+        or manifest.get("protocol_lock_sha256") != protocol_hash
+        or selection.get("protocol_lock_sha256") != protocol_hash
+        or summary.get("protocol_lock_sha256") != protocol_hash
+    ):
+        raise RuntimeError("V-COCO v2 protocol lineage does not align")
+    selection_hash = manifest.get("selection_lock_sha256")
+    if (
+        selection.get("source_lock_sha256") != selection_hash
+        or summary.get("selection_lock_sha256") != selection_hash
+        or gate.get("selection_lock_sha256") != selection_hash
+    ):
+        raise RuntimeError("V-COCO v2 selection lineage does not align")
+    if (
+        manifest.get("official_test_label_open_count") != 1
+        or summary.get("official_test_label_open_count") != 1
+        or gate.get("official_test_label_open_count") != 1
+        or manifest.get("test_used_for_selection") is not False
+        or summary.get("test_used_for_selection") is not False
+    ):
+        raise RuntimeError("V-COCO v2 official test access contract changed")
+
+    artifact_names = {
+        path.name
+        for path in results.iterdir()
+        if path.is_file() and path.name != "evidence_manifest.json"
+    }
+    if set(manifest.get("artifacts", {})) != artifact_names:
+        raise RuntimeError("V-COCO v2 evidence inventory is incomplete")
+    for name, record in manifest["artifacts"].items():
+        path = results / name
+        if sha256_file(path) != record.get("sha256") or path.stat().st_size != record.get(
+            "size_bytes"
+        ):
+            raise RuntimeError(f"V-COCO v2 evidence artifact drift: {name}")
+
+    metrics = pd.read_csv(results / "official_test_metrics.csv").set_index("method")
+    if set(metrics.index) != {"scale_conditioned_stacking", "historical_v1_dino"}:
+        raise RuntimeError("Unexpected V-COCO v2 official test candidates")
+    champion = float(metrics.loc["scale_conditioned_stacking", "macro_f1"])
+    baseline = float(metrics.loc["historical_v1_dino", "macro_f1"])
+    uncertainty = read_json(results / "official_test_uncertainty.json")
+    if (
+        abs(champion - float(summary["primary_metrics"]["macro_f1"])) > 1e-12
+        or abs(baseline - float(summary["baseline_metrics"]["macro_f1"])) > 1e-12
+        or abs((champion - baseline) - float(uncertainty["point_estimate"])) > 1e-12
+        or float(uncertainty["point_estimate"]) < 0.01
+        or float(uncertainty["ci_95_low"]) <= 0.0
+        or uncertainty.get("resamples") != 10000
+        or uncertainty.get("clusters") != 3708
+        or summary.get("confirmatory_success") is not True
+    ):
+        raise RuntimeError("V-COCO v2 confirmatory result changed")
+    per_class = pd.read_csv(results / "official_test_per_class.csv")
+    if set(per_class["method"]) != set(metrics.index) or set(per_class["class"]) != {
+        "sitting",
+        "standing",
+        "walking_running",
+    }:
+        raise RuntimeError("V-COCO v2 per-class evidence is incomplete")
+
+    report = (repository / "docs" / "VCOCO_V2_EXTERNAL_TRANSFER.md").read_text(
+        encoding="utf-8"
+    )
+    for marker in (
+        "version: 2.0.0",
+        "status: Independent technical report",
+        "0.8663 official-test macro-F1",
+        "+0.1592 macro-F1",
+    ):
+        if marker not in report:
+            raise RuntimeError(f"V-COCO v2 report is missing: {marker}")
+
+
 def main() -> None:
     args = parse_args()
     repository = args.repository.resolve()
     missing = sorted(
-        name for name in REQUIRED | POLAR_REQUIRED if not (repository / name).is_file()
+        name
+        for name in REQUIRED | POLAR_REQUIRED | VCOCO_V2_REQUIRED
+        if not (repository / name).is_file()
     )
     if missing:
         raise RuntimeError(f"Missing release files: {missing}")
@@ -534,6 +668,7 @@ def main() -> None:
     validate_faithfulness(repository, expected_test_ids)
     validate_polar_release(repository)
     validate_study_report_release(repository)
+    validate_vcoco_v2_release(repository)
     print("Repository validation passed")
 
 

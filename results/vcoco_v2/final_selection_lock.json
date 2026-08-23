@@ -1,0 +1,174 @@
+{
+  "decision_notes": {
+    "augmix_lpft": "Statistically tied with the selected stack; paired interval includes zero.",
+    "factorized_head": "Supported over the flat matched-input control.",
+    "label_definition": "Deterministic mapping of V-COCO action tags."
+  },
+  "development_comparisons": {
+    "champion_minus_augmix_lpft": {
+      "ci_95_high": 0.010178518927065238,
+      "ci_95_low": -0.007464918452226815,
+      "clusters": 2199,
+      "point_estimate": 0.0013661298859150017,
+      "resamples": 10000,
+      "seed": 20260823
+    },
+    "champion_minus_historical_v1": {
+      "ci_95_high": 0.19072035628232378,
+      "ci_95_low": 0.1537562753074363,
+      "clusters": 2199,
+      "point_estimate": 0.17216764375876992,
+      "resamples": 10000,
+      "seed": 20260823
+    },
+    "champion_minus_single_view_dino": {
+      "ci_95_high": 0.020141801513333557,
+      "ci_95_low": 0.003670587102827186,
+      "clusters": 2199,
+      "point_estimate": 0.011823566681054443,
+      "resamples": 10000,
+      "seed": 20260823
+    },
+    "factorized_minus_flat_same_features": {
+      "ci_95_high": 0.016563421595710212,
+      "ci_95_low": 0.005642684101670273,
+      "clusters": 2199,
+      "point_estimate": 0.011067432437134705,
+      "resamples": 10000,
+      "seed": 20260823
+    }
+  },
+  "evidence_sha256": {
+    ".runs/polar_v2/background_intervention_screen/summary.json": "4fb415a152eb72c17ab06a7b5a9e31cd251644d8d94dd5f662af9eaab963b9ad",
+    ".runs/polar_v2/convnext_feature_screen/summary.json": "14f9c7ebd1e8ae7a1f7e6fc455933cbb34a1fe436b57f5f0c96b5ce6b3585765",
+    ".runs/polar_v2/factorized_fusion/dinov2_base/summary.json": "71ea8e2bcd5dd1986649e14113f18669f0c158c7e20253d68fbb24ef72ec0d13",
+    ".runs/polar_v2/feature_screen/summary.json": "8ce5e52d3bdd6c9013f661459dd84882cd3fa274515d5c8fbeaacb660d7432ae",
+    ".runs/polar_v2/fewshot/dinov2_base_tight/summary.json": "018ead4ef22105ee1676736b20034fa19503a7c44c8bcb57ee0fc72dcc6cafe3",
+    ".runs/polar_v2/final_stack_refit/summary.json": "c05fc63b4ba2ed41bec30d3afef14f4635cc694abcbe7f0934bb494a07734c46",
+    ".runs/polar_v2/mechanism_analysis/summary.json": "52bda079d511d853e42a57379294281dcb5b2cc52a28d6403babfd43d7bc0515",
+    ".runs/polar_v2/neural_evaluation/dinov2_base_lpft_top1_tight_augmix_seed42/summary.json": "27e3b085a65a7f9400dfbfb6abf383d95f1559bb84b438eed4a06e79d811359f",
+    ".runs/polar_v2/neural_evaluation/dinov2_base_lpft_top1_tight_mild_seed42/summary.json": "22bfd6c5e5db73a2a34d687f4da4f4ad3b44044235732f1ec0d1043181d946e2",
+    ".runs/polar_v2/pose_oracle_rbf/summary.json": "a5f65956146cdec908b47b9ebaaa9b47ec5b3ec4a37671b3bfc01ba543d3335d",
+    ".runs/polar_v2/siglip2_feature_screen/summary.json": "d31a513638c1c68334d59c0e341f0642d6f55765c816de3b8db4b9b453476468",
+    ".runs/polar_v2/source_model_views/dinov2_base_top4/summary.json": "98ffc41b1418614c12e30d212d05bf3f9efed0c076da4f50fe8d2ae3c4134857"
+  },
+  "final_fit": {
+    "path": ".runs/polar_v2/final_stack_refit/vcoco_v2_multiview_stack.joblib",
+    "scope": "locked_train_plus_validation_after_selection",
+    "sha256": "c83838da641be966ac657c8749c4a1801cc70dcaf7b797d1516149506cb899df",
+    "summary_sha256": "c05fc63b4ba2ed41bec30d3afef14f4635cc694abcbe7f0934bb494a07734c46",
+    "training_images": 4123,
+    "training_people": 6640
+  },
+  "final_test": {
+    "access_policy": "one_pipeline_run_after_this_lock",
+    "authorized_candidates": [
+      "scale_conditioned_stacking",
+      "historical_v1_dino"
+    ],
+    "bootstrap_resamples": 10000,
+    "bootstrap_unit": "source_image",
+    "expected_images": 3708,
+    "expected_people": 6077,
+    "manifest_sha256": "adb46314c0dd2779e17b67047619e9e53d203753b9a2523bfb28debe095696a4"
+  },
+  "historical_baseline": {
+    "checkpoints": [
+      {
+        "path": ".runs/polar_final/neural/dinov2_base_top4/seed_42/final_checkpoint.pt",
+        "sha256": "2e22491b4dea493f8dffea7021f3385dcbe5ed026cdb8480c29a2c5732b288c8"
+      },
+      {
+        "path": ".runs/polar_final/neural/dinov2_base_top4/seed_52/final_checkpoint.pt",
+        "sha256": "46b3804d56092eb8bbc0e517497bbc8c647ef6ec01d0e2792082f1fb29d1aeb6"
+      },
+      {
+        "path": ".runs/polar_final/neural/dinov2_base_top4/seed_62/final_checkpoint.pt",
+        "sha256": "f6ccdd7b07e1e496814813b704c1e446dea25b256bbcf1a627df73c3a6f143a3"
+      }
+    ],
+    "method": "polar_dinov2_base_top4_three_seed_mean_original_preprocess"
+  },
+  "protocol_lock_sha256": "3a90d6720a6cf5250b995820801199eca611706d514e7b5de2c83bea03f5a143",
+  "repository_revision_at_lock": "fceba703051f66955f54934c03defaf1f9bc8e86",
+  "selection": {
+    "base_C": 0.01,
+    "base_classifier": "multinomial_logistic",
+    "class_weight": "none",
+    "method": "scale_conditioned_stacking",
+    "model_kind": "dinov2_base",
+    "model_revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415",
+    "preprocess": "aspect_preserving_pad_224",
+    "stacker_C": 1.0,
+    "stacker_inputs": "cross_fitted_tight_and_context_log_probabilities_plus_geometry",
+    "validation_metrics": {
+      "accuracy": 0.8777464788732394,
+      "adaptive_ece": 0.015199458442943917,
+      "balanced_accuracy": 0.8557524484657447,
+      "brier_score": 0.1808313047231912,
+      "classwise_ece": 0.016284997239192568,
+      "ece": 0.01648452101357003,
+      "log_loss": 0.2983117680026055,
+      "macro_f1": 0.859400156247392,
+      "weighted_f1": 0.8769642400135288
+    },
+    "validation_per_class": [
+      {
+        "class": "sitting",
+        "f1": 0.9472182596291013,
+        "precision": 0.9449715370018975,
+        "recall": 0.9494756911344138,
+        "support": 1049
+      },
+      {
+        "class": "standing",
+        "f1": 0.8844384303112314,
+        "precision": 0.8766094420600858,
+        "recall": 0.892408519934462,
+        "support": 1831
+      },
+      {
+        "class": "walking_running",
+        "f1": 0.7465437788018433,
+        "precision": 0.7689873417721519,
+        "recall": 0.7253731343283583,
+        "support": 670
+      }
+    ],
+    "views": [
+      "person_tight",
+      "person_context_25"
+    ]
+  },
+  "source_lock_sha256": "4c0d13c05d537e28066000092e88c37f66b937111516715c8f1756cab162e10d",
+  "source_sha256": {
+    "augmix_predictions": "2c256ab3639acd55404912bf06a7885b9178593baee2ade669d098c7ed6be16d",
+    "experiments/analyze_vcoco_v2_mechanisms.py": "f105d61fa07ee4c8504feb81bae40481b694b7910d007e22440f4af5c989185c",
+    "experiments/cache_vcoco_v2_features.py": "392a0bc7a99a0ddd4d16cf48575e3a301fd8af9c4489374ed8a028f6d10ba5e8",
+    "experiments/cache_vcoco_v2_final_test_features.py": "a147178f56659eede91dcfa97499a7dc53b4f1e87614d4163725042de46074c3",
+    "experiments/evaluate_polar_final.py": "95a815ae17dc0f274c47dd28b850ef05fdc16bee1c1762a9fd8abd03924bda4a",
+    "experiments/evaluate_vcoco_v2_factorized_fusion.py": "eb6e1060fc28a7b59bbcc794a249dc10cc06c80c2f24aa8f5cb5e6003247d0ef",
+    "experiments/evaluate_vcoco_v2_final_test.py": "4ef49ecf2986ac1a3f31a3f1e239cbbf76a0f54d6d5561100e3ca9563fd3eee4",
+    "experiments/fit_vcoco_v2_final_stack.py": "b1511c00b1f11374bf6b15331f990e65a0e3f32b7ec73154f3f8008155250fc4",
+    "factor_predictions": "333286048c5171f0c3b3252c6eb6279e341f575ddd4887fa55a20e63ee698bfc",
+    "feature_predictions": "01b802cfde2727bbd36f194e330aac9df0696a91fc7361bdbe0dc91ecc91647d",
+    "src/hac/augmentations.py": "2f04dbb26f9a1c99d7cce2ff65529fb996d7739fe95c1eb95e103f55374faf1e",
+    "src/hac/config.py": "a4464cd7e50684549f93650fda6f7a52470601648bc8298d664ef822eb595aa9",
+    "src/hac/data.py": "bcfb2949e644fc989925ce3c5e0e980cd79e89ef403f9f695146ace44e79a5a8",
+    "src/hac/metrics.py": "1bca707fdd1a6383448eae4d02632650dc28d8520b1dfbaf14f24c256ba8f3a8",
+    "src/hac/models.py": "b7834038ca58c0ddac7d9f997dfd69b2b0b9b1830e5c6f26225fd5387080b436",
+    "src/hac/polar.py": "2440fbb705be0019c5d016db25bd9638708c3d8febabfe81de328e26ea5d519f",
+    "src/hac/polar_analysis.py": "0520d1a34bfec4c5ff4fc036630c2a3d29af26332659967d089f90e0caf3e027",
+    "src/hac/polar_features.py": "e20d4721b59237ce4aee0aea480994ab717a1095ef9746701465d508256777f4",
+    "src/hac/polar_models.py": "2e424ca6b9a4883ae27857e596ebbf30f521e8ddd39567345374a521767bfd6d",
+    "src/hac/polar_training.py": "30fd9adf62d7f0f635f22f6782dabd647d860e6663938c7740f9966fe6943ae6",
+    "src/hac/transfer.py": "a10366520244b6d2c57525b4966e71c371fb81bfa214272e701a13f93d34b344",
+    "tools/lock_vcoco_v2_final_selection.py": "2480851722dc05bf4e5c8d9bdb62c6e121a29f57eae872bdb47d4fba097f2e89"
+  },
+  "status": "VCOCO_V2_FINAL_SELECTION_LOCKED_PRE_TEST",
+  "test_access": {
+    "model_predictions_before_lock": false,
+    "official_test_labels_used_for_selection": false,
+    "official_test_open_count": 0
+  }
+}
