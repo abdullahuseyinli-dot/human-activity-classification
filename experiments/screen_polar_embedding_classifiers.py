@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import platform
+import subprocess
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -48,10 +49,26 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--feature-root", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument(
+        "--protocol",
+        type=Path,
+        default=Path(__file__).with_name("polar_study_protocol.json"),
+    )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--inner-folds", type=int, default=3)
     parser.add_argument("--calibration-folds", type=int, default=5)
     return parser.parse_args()
+
+
+def git_revision(repository: Path) -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=repository,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip() if result.returncode == 0 else ""
 
 
 def declared_candidates() -> list[Candidate]:
@@ -194,6 +211,16 @@ def serializable_parameters(parameters: dict[str, Any]) -> dict[str, Any]:
 
 def main() -> None:
     args = parse_args()
+    repository_root = Path(__file__).resolve().parents[1]
+    protocol_path = args.protocol.resolve()
+    protocol = json.loads(protocol_path.read_text(encoding="utf-8"))
+    if protocol.get("protocol_version") != "1.3.0":
+        raise RuntimeError("Classifier screen requires locked POLAR protocol 1.3.0")
+    screen_protocol = protocol.get("frozen_classifier_screen", {})
+    if screen_protocol.get("test_rows_read") != 0 or screen_protocol.get(
+        "test_used_for_selection"
+    ):
+        raise RuntimeError("Classifier-screen protocol violates the held-out test gate")
     output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     manifest_path = args.manifest.resolve()
@@ -319,6 +346,8 @@ def main() -> None:
         {
             "status": "DEVELOPMENT_ONLY_CLASSIFIER_SCREEN",
             "protocol_version": "1.3.0",
+            "protocol_path": str(protocol_path),
+            "protocol_sha256": sha256_file(protocol_path),
             "manifest_path": str(manifest_path),
             "manifest_sha256": manifest_hash,
             "model_kind": MODEL_KIND,
@@ -334,6 +363,16 @@ def main() -> None:
             "selected_candidates": selected_candidates,
             "python": platform.python_version(),
             "scikit_learn": sklearn.__version__,
+            "git_revision_at_start": git_revision(repository_root),
+            "implementation_sha256": {
+                "experiments/screen_polar_embedding_classifiers.py": sha256_file(
+                    Path(__file__).resolve()
+                ),
+                "src/hac/metrics.py": sha256_file(repository_root / "src/hac/metrics.py"),
+                "src/hac/polar_features.py": sha256_file(
+                    repository_root / "src/hac/polar_features.py"
+                ),
+            },
             "test_rows_read": 0,
             "test_used_for_selection": False,
         },
