@@ -142,7 +142,10 @@
     "dropout": 0.1,
     "augmentation": "mild",
     "weight_decay": 0.0001,
-    "layer_decay": 0.75,
+    "layer_decay": {
+      "top_4_blocks": null,
+      "full_backbone": 0.75
+    },
     "screen_seed": 42,
     "test_rows_read": 0,
     "test_used_for_selection": false
