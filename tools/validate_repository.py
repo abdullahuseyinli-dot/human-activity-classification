@@ -12,6 +12,7 @@ from pathlib import Path, PurePosixPath
 import pandas as pd
 
 TEXT_SUFFIXES = {".csv", ".ipynb", ".json", ".md", ".py", ".toml", ".yaml", ".yml"}
+LEGACY_FINGERPRINT_TEXT_SUFFIXES = {".csv", ".json", ".py", ".svg"}
 EXCLUDED_PARTS = {".git", ".runs", "__pycache__", ".pytest_cache", ".ruff_cache"}
 REQUIRED = {
     ".github/workflows/ci.yml",
@@ -83,6 +84,18 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def legacy_release_hashes(path: Path) -> set[str]:
+    """Return byte-equivalent hashes across historical Git line-ending checkouts."""
+
+    encoded = path.read_bytes()
+    candidates = {hashlib.sha256(encoded).hexdigest()}
+    if path.suffix.lower() in LEGACY_FINGERPRINT_TEXT_SUFFIXES:
+        linefeed = encoded.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        candidates.add(hashlib.sha256(linefeed).hexdigest())
+        candidates.add(hashlib.sha256(linefeed.replace(b"\n", b"\r\n")).hexdigest())
+    return candidates
+
+
 def validate_faithfulness(repository: Path, expected_test_ids: set[str]) -> None:
     results = repository / "results"
     with (results / "faithfulness_selection_lock.json").open(encoding="utf-8") as handle:
@@ -143,11 +156,11 @@ def validate_faithfulness(repository: Path, expected_test_ids: set[str]) -> None
         raise RuntimeError("Faithfulness release evidence was not validated before export")
     for relative, expected_hash in release.get("tracked_evidence", {}).items():
         path = repository / PurePosixPath(relative)
-        if not path.is_file() or sha256_file(path) != expected_hash:
+        if not path.is_file() or expected_hash not in legacy_release_hashes(path):
             raise RuntimeError(f"Faithfulness release fingerprint mismatch: {relative}")
     for relative, expected_hash in release.get("implementation_fingerprints", {}).items():
         path = repository / PurePosixPath(relative)
-        if not path.is_file() or sha256_file(path) != expected_hash:
+        if not path.is_file() or expected_hash not in legacy_release_hashes(path):
             raise RuntimeError(f"Faithfulness implementation fingerprint mismatch: {relative}")
 
 
