@@ -1,45 +1,65 @@
 # Result lineage
 
-The tracked release consolidates model selection, final training, uncertainty
-analysis, and promoted metrics into a single reproducible lineage. Source
-fingerprints anchor the released evidence without requiring bulky checkpoints in
-version control.
+The promoted POLAR result has one evidence chain from the pre-fit data audit to the
+portable release. Every selection decision was made on the clean development split.
+The official test manifest was opened once, after all final fits and their artifact
+hashes had been verified.
 
-## Source fingerprints
+## Release chain
 
-| Source | SHA-256 |
-|---|---|
-| Executed source pipeline | `6468a7765b5d908541a7f30cc3e5cefa3f6cd8fba14e9fba952fd0c623801efc` |
-| Cross-validation methodology source | `d455152bd24f90ddcca03297d45adaab8a7b2c877f4299104cd0bf61934fe861` |
-| Standardized source manifest | `29886b9ed2048cc1fe1d5d862afbdc5978437f237e78293acc829f8558abc09c` |
+| Gate | Tracked evidence | Outcome |
+| --- | --- | --- |
+| Data lock | `polar_data_audit.json`, `polar_quarantine.csv` | 125 source-related images quarantined before fitting |
+| Development protocol | `polar_study_protocol.json` | Models, searches, metrics, and label mappings declared |
+| Development selection | `polar_validation_*`, `polar_classifier_*`, `polar_confirmation_*` | Candidates and ensemble weights fixed without test rows |
+| Final selection lock | `polar_final_selection_lock.json` | Immutable SHA-256 `fa3fb7c80a073d29048afb8e0b8da1fb17f5ade9721630347c37523714cca187` |
+| Final-fit gate | `polar_final_fit_manifest.json` | Nine neural fits and three probes hash-verified; zero test rows read |
+| Test-access gate | `polar_test_access_gate.json` | Official test cache opened once after the lock |
+| Locked evaluation | `polar_test_*` | 3,329 test images; no post-test model selection |
+| External evaluation | `polar_external_*` | V-COCO evaluated without retuning after a clean overlap audit |
+| Explanation audit | `polar_faithfulness_*` | Fixed 256-image cohort; no attribution-method selection on test |
+| Fault audit | `polar_fault_*` | Separate input and classifier-weight bit-flip evaluation |
+| Portable export | `polar_final_evidence_manifest.json` | Path-free tracked evidence with per-file hashes |
 
-## Lineage controls
+## Data fingerprints
 
-- The selected freeze depth is passed unchanged into every DINOv2 training branch.
-- Reported epoch counts and conclusions are derived from the checkpoints represented
-  by the promoted result tables.
-- Artifacts from different split lineages are kept separate and are never combined
-  into the headline comparison.
-- Configured head dropout is recorded and applied by every model builder.
-- Full-pool training replays a fold-derived median learning-rate schedule.
-- ConvNeXt and DINOv2 share a tested `(logits, pooled_features)` adapter contract
-  without altering ConvNeXt logits.
-- Attribution methods are selected from fold-held-out development predictions;
-  the attribution lock is written before the fixed-test explanations are made.
-- Faithfulness replays the exact calibrated inference function and fingerprints
-  every contributing OOF and full-pool checkpoint.
-- Raw DINOv2 attention rollout remains visible as a class-agnostic negative
-  control and is never promoted as a faithful class explanation.
-- Release notebooks use portable paths and kernels and exclude bulky training logs.
+| Artifact | SHA-256 |
+| --- | --- |
+| Clean POLAR development manifest | `2cc5bf62790f6064acc74f7113c341b5c2cd1124bcbfbc3d1e9eb19618a75b83` |
+| Clean POLAR test manifest | `a8e01e1037e980edeb1886ef2bbbd22a07c316df044741c08e8e2afa8d32fce5` |
+| Opened test-manifest cache | `35d2a73b33de866f52d857c266f57d3eee1259113f3da43b07bdd3e8dfa1142e` |
+| Clean V-COCO person manifest | `0eb0afcc7e832babc495d3d9a74981077968f401097eedc34c6aeb9a0e644cb4` |
+| POLAR/V-COCO overlap audit | `668e0951fc2d4128559a140a306e612fb32321e246617ca0923ee380fc1cc7d0` |
 
-## Evidence handling
+## Selection boundary
 
-Interrupted smoke runs and superseded checkpoints remain under the ignored `.runs/`
-tree. They are not promoted or deleted. Tracked `results/` files are exported only
-after selection locks and validation checks pass.
+The following were fixed before the official test cache opened:
 
-The local faithfulness run additionally preserves dense perturbation traces and
-attribution arrays. The tracked release contains the OOF selection cohort and
-per-image metrics, the three lock/provenance chains, parameter-randomization and
-stability checks, aggregate curves, and review figures. Local image paths and
-checkpoint payloads are excluded from the export.
+- label spaces and primary metric;
+- image views, adaptation depths, augmentation, dropout, and fixed epoch counts;
+- seeds 42, 52, and 62 for neural fits;
+- the DINOv2 multilayer representation and linear/RBF classifier settings;
+- seed averaging and the five component ensemble weights;
+- bootstrap seed and resample count;
+- the external mapping, attribution cohort, and fault-injection levels.
+
+Test results did not break ties. The primary ensemble happened to be the strongest
+observed test candidate, but its identity and weights remained the pre-test lock.
+
+## Local versus tracked artifacts
+
+Local `.runs/` evidence retains checkpoints, fitted classifier binaries, local image
+paths, full probability arrays, full-resolution attribution maps, failures, and
+interrupted runs. These files are intentionally ignored rather than deleted.
+
+The tracked `results/` export excludes reconstructive or machine-specific artifacts.
+Its manifest records the hash of every promoted table and JSON document. The final-fit
+manifest publishes checkpoint hashes, sizes, configurations, and runtimes without
+publishing the checkpoints themselves.
+
+## Historical study
+
+The original 285-image COCO experiment has a separate selection and test lineage. It is
+preserved in the non-POLAR result files and summarized in
+[`LEGACY_COCO_STUDY.md`](LEGACY_COCO_STUDY.md). Its already-inspected 43-image test set
+was not reused to select the POLAR system, and its result is not the repository headline.

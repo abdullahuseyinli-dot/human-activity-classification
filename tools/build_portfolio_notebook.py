@@ -1,460 +1,319 @@
-"""Build and execute the compact portfolio notebook from tracked evidence."""
+"""Build and execute the compact POLAR portfolio notebook from tracked evidence."""
 
 from __future__ import annotations
 
 import argparse
-import os
+import json
 from pathlib import Path
 
 import nbformat
-import pandas as pd
 from nbclient import NotebookClient
+
+ROOT = Path(__file__).resolve().parents[1]
+
+REQUIRED = (
+    "results/polar_data_audit.json",
+    "results/polar_final_selection_lock.json",
+    "results/polar_final_fit_manifest.json",
+    "results/polar_test_access_gate.json",
+    "results/polar_test_metrics.csv",
+    "results/polar_test_uncertainty.json",
+    "results/polar_test_per_class.csv",
+    "results/polar_test_secondary_metrics.csv",
+    "results/polar_external_image_metrics.csv",
+    "results/polar_external_summary.json",
+    "results/polar_faithfulness_summary.json",
+    "results/polar_fault_summary.json",
+    "results/polar_extension_summary.json",
+    "assets/polar_test_comparison.png",
+    "assets/polar_confusion_matrix.png",
+    "assets/polar_scale_curve.png",
+    "assets/polar_external_validation.png",
+    "assets/polar_faithfulness.png",
+    "assets/polar_attribution_sanity.png",
+    "assets/polar_fault_robustness.png",
+)
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--repository", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--kernel", default="python3")
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=ROOT / "human_activity_classification.ipynb",
+    )
     return parser.parse_args()
 
 
-def code(source: str):
-    return nbformat.v4.new_code_cell(source.strip())
+def read_json(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
-def markdown(source: str):
-    return nbformat.v4.new_markdown_cell(source.strip())
+def markdown(value: str):
+    return nbformat.v4.new_markdown_cell(value.strip())
 
 
-def require_files(repository: Path) -> None:
-    required = [
-        "data/manifest.csv",
-        "results/candidate_selection_summary.csv",
-        "results/confirmation_ranking.csv",
-        "results/selection_lock.json",
-        "results/final_seed_metrics.csv",
-        "results/downstream_oof_ranking.csv",
-        "results/evaluation_policy_oof_selection.csv",
-        "results/locked_test_metrics.csv",
-        "results/test_bootstrap_intervals.csv",
-        "results/champion_paired_bootstrap_difference.csv",
-        "assets/final_method_comparison.png",
-        "assets/champion_confusion_matrix.png",
-        "assets/convnext_architecture.png",
-        "assets/dinov2_architecture.png",
-        "assets/champion_error_gallery.png",
-        "results/champion_error_analysis.csv",
-        "results/faithfulness_method_selection.csv",
-        "results/faithfulness_selection_lock.json",
-        "results/faithfulness_test_summary.csv",
-        "results/faithfulness_sanity_summary.csv",
-        "results/faithfulness_stability_summary.csv",
-        "assets/faithfulness_method_selection.png",
-        "assets/faithfulness_perturbation_curves.png",
-        "assets/convnext_small_faithfulness_gallery.jpg",
-        "assets/dinov2_small_faithfulness_gallery.jpg",
-    ]
-    missing = [name for name in required if not (repository / name).is_file()]
-    if missing:
-        raise FileNotFoundError(f"Portfolio evidence is incomplete: {missing}")
-
-
-def headline_text(
-    repository: Path,
-) -> tuple[tuple[str, str, float, float], tuple[float, float]]:
-    metrics = pd.read_csv(repository / "results" / "locked_test_metrics.csv")
-    champion = metrics.loc[metrics["selected_champion"].astype(bool)].iloc[0]
-    intervals = pd.read_csv(repository / "results" / "test_bootstrap_intervals.csv")
-    interval = intervals[
-        (intervals["method"] == champion["method"]) & (intervals["metric"] == "macro_f1")
-    ].iloc[0]
-    return (
-        str(champion["display_name"]),
-        str(champion["method"]),
-        float(champion["macro_f1"]),
-        float(champion["accuracy"]),
-    ), (float(interval["ci_2_5"]), float(interval["ci_97_5"]))
+def code(value: str):
+    return nbformat.v4.new_code_cell(value.strip())
 
 
 def build_notebook(repository: Path) -> dict:
-    (headline_name, headline_method, headline_f1, headline_accuracy), interval = headline_text(
-        repository
-    )
+    missing = [name for name in REQUIRED if not (repository / name).is_file()]
+    if missing:
+        raise RuntimeError(f"Missing notebook evidence: {missing}")
+
+    test = read_json(repository / "results" / "polar_test_summary.json")
+    uncertainty = read_json(repository / "results" / "polar_test_uncertainty.json")
+    external = read_json(repository / "results" / "polar_external_summary.json")
+    primary = test["primary_metrics"]
+    interval = uncertainty["locked_ensemble"]
+
     notebook = nbformat.v4.new_notebook()
     notebook["metadata"] = {
-        "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
+        "kernelspec": {
+            "display_name": "Python 3",
+            "language": "python",
+            "name": "python3",
+        },
         "language_info": {"name": "python", "version": "3.11"},
     }
     notebook["cells"] = [
         markdown(
             f"""
-# Human Activity Classification with ConvNeXt and DINOv2
+# Leakage-Safe Human Activity Classification
 
-This study compares supervised transfer learning and self-supervised visual
-features on 285 still images across **sitting**, **standing**, and
-**walking/running**. Model selection is isolated from the fixed 43-image test
-split through internal stratified cross-validation.
+## Locked POLAR benchmark
 
-**Locked result:** {headline_name} reached **{headline_f1:.3f} macro-F1** and
-**{headline_accuracy:.3f} accuracy**. The stratified bootstrap interval for
-macro-F1 is **[{interval[0]:.3f}, {interval[1]:.3f}]**, which is reported because
-the final test set is deliberately small.
-"""
-        ),
-        markdown(
-            """
-## Evaluation contract
+This notebook is the compact, executable evidence narrative for a four-class still-image
+posture study. Model selection used the clean POLAR development split; nine neural fits
+and three frozen-feature probes completed before the official test cache opened once.
 
-The original train and validation partitions form a 242-image development
-pool. All freeze-depth, dropout, augmentation, learning-rate, calibration,
-epoch, SVM, and ensemble decisions use out-of-fold predictions from that pool.
-The original test partition stays fixed and is evaluated only after the
-configuration and downstream-method locks are written.
+**Locked result:** {primary['macro_f1']:.3f} macro-F1
+(95% CI [{interval['ci_95_low']:.3f}, {interval['ci_95_high']:.3f}]) and
+{primary['accuracy']:.3f} accuracy on {test['test_rows_read']:,} held-out images.
+
+The notebook reads only tracked, path-sanitized evidence. It performs no training and
+makes no post-test selection decisions.
 """
         ),
         code(
             """
 import json
-import sys
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
-from IPython.display import Image, display
+from IPython.display import display
 
-ROOT = Path.cwd().resolve()
-if not (ROOT / "pyproject.toml").is_file():
+ROOT = Path.cwd()
+if not (ROOT / "results" / "polar_test_summary.json").is_file():
     raise RuntimeError("Run this notebook from the repository root.")
-sys.path.insert(0, str(ROOT / "src"))
 
-from hac.protocol import load_and_validate_manifest  # noqa: E402
+pd.set_option("display.max_columns", 20)
+pd.set_option("display.float_format", lambda value: f"{value:.4f}")
 
-sns.set_theme(style="whitegrid", context="notebook")
-manifest, protocol = load_and_validate_manifest(
-    ROOT / "data" / "manifest.csv", require_images=False
-)
-pd.DataFrame([{
-    "manifest_rows": len(manifest),
-    "development_rows": protocol.development_rows,
-    "locked_test_rows": protocol.test_rows,
-    "manifest_sha256": protocol.manifest_sha256[:12] + "…",
-    "test_id_sha256": protocol.test_image_ids_sha256[:12] + "…",
-}])
-"""
-        ),
-        markdown("## Dataset profile"),
-        code(
-            """
-split_counts = (
-    manifest.groupby(["original_split", "label"])
-    .size()
-    .rename("images")
-    .reset_index()
-)
-display(split_counts.pivot(index="original_split", columns="label", values="images"))
-
-fig, ax = plt.subplots(figsize=(8.5, 4.2))
-sns.countplot(
-    data=manifest,
-    x="label",
-    hue="original_split",
-    order=["sitting", "standing", "walking_running"],
-    hue_order=["train", "val", "test"],
-    palette="Set2",
-    ax=ax,
-)
-ax.set(xlabel="Activity", ylabel="Images", title="Class balance by fixed partition")
-ax.legend(title="Partition", frameon=False)
-fig.tight_layout()
-plt.show()
+def load_json(name):
+    return json.loads((ROOT / "results" / name).read_text(encoding="utf-8"))
 """
         ),
         markdown(
             """
-The manifest validator checks cardinality, class vocabulary, unique identifiers,
-content hashes, and the fixed split contract. It also rejects exact hashes or
-perceptual hashes within Hamming distance six when they cross the development
-and test boundary. Subject-level independence cannot be claimed because subject
-identifiers are not available.
+## 1. Evidence boundary
+
+The audit removes confirmed cross-split source relatives before supervised fitting. The
+selection lock then fixes every model, seed, epoch count, classifier setting, blend
+weight, metric, and bootstrap rule before test access.
 """
         ),
-        markdown("## Controlled regularization screen"),
         code(
             """
-candidates = pd.read_csv(ROOT / "results" / "candidate_selection_summary.csv")
-coarse = candidates[candidates["stage"] == "coarse"].copy()
-coarse["display_model"] = coarse["model_kind"].map({
-    "convnext_small": "ConvNeXt-Small",
-    "dinov2_small": "DINOv2-Small",
-})
-display(
-    coarse.sort_values(["model_kind", "oof_macro_f1"], ascending=[True, False])[
-        ["candidate_id", "display_model", "oof_macro_f1", "oof_log_loss", "derived_final_epochs"]
-    ].round(4)
-)
+audit = load_json("polar_data_audit.json")
+gate = load_json("polar_test_access_gate.json")
+fits = load_json("polar_final_fit_manifest.json")
 
-fig, axes = plt.subplots(1, 2, figsize=(13, 5), sharex=False)
-for ax, (family, rows) in zip(axes, coarse.groupby("display_model"), strict=True):
-    rows = rows.sort_values("oof_macro_f1")
-    ax.barh(rows["candidate_id"], rows["oof_macro_f1"], color="#64748B")
-    ax.set_title(family)
-    ax.set_xlabel("Three-fold OOF macro-F1")
-    ax.set_xlim(max(0.0, rows["oof_macro_f1"].min() - 0.05), min(1.0, rows["oof_macro_f1"].max() + 0.03))
-fig.suptitle("Controlled dropout, augmentation, and freeze-depth comparisons")
-fig.tight_layout()
-plt.show()
+controls = pd.DataFrame(
+    [
+        ("Clean development images", fits["development_rows"]),
+        ("Clean held-out test images", sum(audit["clean_target_counts"]["test"].values())),
+        ("Quarantined source-related images", audit["quarantine_images"]),
+        ("Verified neural final fits", sum(len(item["seeds"]) for item in fits["neural"].values())),
+        ("Verified final probes", len(fits["probes"])),
+        ("Official test-manifest opens", gate["official_test_manifest_open_count"]),
+        ("Test rows used for selection", 0),
+    ],
+    columns=["Control", "Recorded value"],
+)
+display(controls)
 """
         ),
         markdown(
             """
-Interventions are compared independently where possible: head dropout,
-full/partial/head-only adaptation, light RandAugment, random-erasing removal,
-MixUp, label smoothing, and weight decay. The purpose is not to maximize the
-number of regularizers; it is to retain only changes supported by out-of-fold
-performance and stability.
+## 2. Held-out POLAR result
+
+The primary metric is macro-F1. Confidence intervals use 10,000 class-stratified
+bootstrap resamples. The ensemble and all component rows were predeclared; the table is
+not a post-test leaderboard.
+
+![Predeclared held-out candidates](assets/polar_test_comparison.png)
 """
         ),
-        markdown("## Five-fold confirmation and configuration lock"),
         code(
             """
-confirmation = pd.read_csv(ROOT / "results" / "confirmation_ranking.csv")
-display(confirmation.round(4))
-
-with (ROOT / "results" / "selection_lock.json").open(encoding="utf-8") as handle:
-    selection_lock = json.load(handle)
-
-locked_rows = []
-for family, record in selection_lock["selected"].items():
-    locked_rows.append({
-        "model": family,
-        "candidate": record["candidate_id"],
-        "confirmation_macro_f1": record["confirmation_oof_macro_f1"],
-        "fold_macro_f1_std": record["confirmation_fold_macro_f1_std"],
-        **record["config"],
-    })
-pd.DataFrame(locked_rows).round(5)
+names = {
+    "locked_ensemble": "Locked ensemble",
+    "dinov2_base_multilayer_rbf": "DINOv2-B + RBF SVM",
+    "dinov2_base_multilayer_logistic": "DINOv2-B + logistic",
+    "dinov2_base_top4": "DINOv2-B top 4",
+    "dinov2_small_moderate": "DINOv2-S full",
+    "convnext_small_full": "ConvNeXt-S full",
+}
+metrics = pd.read_csv(ROOT / "results" / "polar_test_metrics.csv")
+intervals = load_json("polar_test_uncertainty.json")
+metrics["macro_f1_ci"] = [
+    f"[{intervals[key]['ci_95_low']:.3f}, {intervals[key]['ci_95_high']:.3f}]"
+    for key in metrics["candidate"]
+]
+metrics["candidate"] = metrics["candidate"].map(names)
+display(metrics[["candidate", "macro_f1", "macro_f1_ci", "accuracy", "log_loss", "ece"]])
 """
         ),
-        markdown("## Locked model architectures"),
+        markdown("![Locked ensemble confusion matrix](assets/polar_confusion_matrix.png)"),
         code(
             """
-display(Image(filename=str(ROOT / "assets" / "convnext_architecture.png")))
-display(Image(filename=str(ROOT / "assets" / "dinov2_architecture.png")))
+per_class = pd.read_csv(ROOT / "results" / "polar_test_per_class.csv")
+per_class = per_class[per_class["candidate"].eq("locked_ensemble")]
+display(per_class[["class", "precision", "recall", "f1", "support"]].reset_index(drop=True))
+
+secondary = pd.read_csv(ROOT / "results" / "polar_test_secondary_metrics.csv")
+display(secondary[["candidate", "macro_f1", "accuracy", "log_loss", "ece"]])
 """
         ),
         markdown(
             """
-Each locked configuration is retrained across seeds 42, 52, and 62. Five-fold
-training derives a median best-epoch count per seed. Full-pool training replays
-the median fold learning-rate state by epoch, avoiding the inherited mismatch
-where validation-driven LR reductions disappeared during final retraining.
-"""
-        ),
-        markdown("## Seed stability and calibration"),
-        code(
-            """
-seed_metrics = pd.read_csv(ROOT / "results" / "final_seed_metrics.csv")
-primary = seed_metrics[
-    seed_metrics["calibration"].isin(["temperature_scaled", "flip_tta_temperature_scaled"])
-].copy()
-display(
-    primary[
-        ["family", "seed", "calibration", "derived_final_epochs", "accuracy", "macro_f1", "log_loss", "ece"]
-    ].round(4)
-)
+## 3. What improved performance
 
-fig, ax = plt.subplots(figsize=(8, 4.5))
-sns.pointplot(
-    data=primary[primary["calibration"] == "temperature_scaled"],
-    x="family",
-    y="macro_f1",
-    hue="seed",
-    palette="viridis",
-    markers="o",
-    linestyles="none",
-    ax=ax,
-)
-ax.set(xlabel="Model family", ylabel="Locked-test macro-F1", title="Final seed variability")
-ax.legend(title="Seed", frameon=False)
-fig.tight_layout()
-plt.show()
+The frozen DINOv2-B learning curve isolates the effect of training-set size. Adaptation
+and regularization screens then test whether additional complexity earns its place.
+Dropout and image augmentation were retained; MixUp, label smoothing, inverse-frequency
+weights, and removing random erasing did not improve the relevant seed-42 baseline.
+
+![Frozen DINOv2-B learning curve](assets/polar_scale_curve.png)
 """
         ),
-        markdown("## OOF-locked downstream selection"),
         code(
             """
-policy = pd.read_csv(ROOT / "results" / "evaluation_policy_oof_selection.csv")
-ranking = pd.read_csv(ROOT / "results" / "downstream_oof_ranking.csv")
-display(policy.round(4))
-display(ranking.round(4))
+scale = pd.DataFrame(load_json("polar_extension_summary.json")["scale_curve"])
+display(scale[["actual_train_size", "macro_f1_mean", "accuracy_mean", "log_loss_mean"]])
 """
         ),
         markdown(
             """
-The downstream comparison includes calibrated seed averages, an OOF-weighted
-ConvNeXt/DINOv2 probability blend, and SVM probes over OOF embeddings. A
-center-crop versus center-plus-horizontal-flip policy is also selected per
-family using OOF predictions. The test set does not determine any of these
-choices.
-"""
-        ),
-        markdown("## Locked test results"),
-        code(
-            """
-test_metrics = pd.read_csv(ROOT / "results" / "locked_test_metrics.csv")
-display(
-    test_metrics[
-        ["display_name", "selected_champion", "accuracy", "macro_f1", "balanced_accuracy", "log_loss", "ece"]
-    ].round(4)
-)
-display(Image(filename=str(ROOT / "assets" / "final_method_comparison.png")))
-display(Image(filename=str(ROOT / "assets" / "champion_confusion_matrix.png")))
-"""
-        ),
-        markdown("## Error inspection"),
-        code(
-            """
-errors = pd.read_csv(ROOT / "results" / "champion_error_analysis.csv")
-display(
-    errors[
-        ["image_id", "true_class", "predicted_class", "confidence", "image_url"]
-    ].round(3)
-)
-display(Image(filename=str(ROOT / "assets" / "champion_error_gallery.png")))
-"""
-        ),
-        markdown(
-            """
-This gallery is diagnostic only and is generated after the downstream lock.
-No test image is relabeled, removed, or used to revise the selected method.
-"""
-        ),
-        markdown("## Attribution faithfulness"),
-        code(
-            """
-faithfulness_selection = pd.read_csv(
-    ROOT / "results" / "faithfulness_method_selection.csv"
-)
-faithfulness_test = pd.read_csv(ROOT / "results" / "faithfulness_test_summary.csv")
+## 4. Linear versus nonlinear final-stage classifiers
 
-display(
-    faithfulness_selection[faithfulness_selection["selected"].astype(bool)][
-        [
-            "family",
-            "method",
-            "road_combined_mean",
-            "selectivity_gap_mean",
-            "insertion_auc_mean",
-            "seed_agreement_mean",
-        ]
-    ].round(4)
-)
-display(
-    faithfulness_test[
-        [
-            "display_name",
-            "method",
-            "road_combined_mean",
-            "road_combined_ci_2_5",
-            "road_combined_ci_97_5",
-            "deletion_auc_mean",
-            "insertion_auc_mean",
-            "selectivity_gap_mean",
-            "faithfulness_spearman_mean",
-        ]
-    ].round(4)
-)
-display(Image(filename=str(ROOT / "assets" / "faithfulness_method_selection.png")))
-display(Image(filename=str(ROOT / "assets" / "faithfulness_perturbation_curves.png")))
-"""
-        ),
-        markdown(
-            """
-The explanation method is itself selected out of fold. ConvNeXt compares
-Grad-CAM, HiResCAM, and integrated gradients; DINOv2 compares class-specific
-gradient-attention rollout and integrated gradients. Raw attention rollout is
-kept as an ineligible class-agnostic negative control. The selected methods are
-locked before any test explanation is produced.
-
-ROAD most/least/random removal, blur deletion and insertion, and matched random
-patch removal quantify whether high-attribution regions actually control the
-locked predicted-class probability. All methods use the same 16 by 16 patch
-grid, so comparisons do not reward a model merely for producing a coarser map.
+The calibrated RBF SVM is the strongest standalone held-out component, but its gain over
+logistic regression is small. The RBF artifact is 870.9 MB and took 60.4 minutes to fit;
+the logistic artifact is 0.4 MB, fitted in 13.9 seconds, and has better log loss and ECE.
+The SVM is useful as a research probe and ensemble component; logistic regression is the
+more practical calibrated endpoint.
 """
         ),
         code(
             """
-display(Image(filename=str(ROOT / "assets" / "convnext_small_faithfulness_gallery.jpg")))
-display(Image(filename=str(ROOT / "assets" / "dinov2_small_faithfulness_gallery.jpg")))
-"""
-        ),
-        markdown("### Sanity, specificity, and stability checks"),
-        code(
-            """
-sanity = pd.read_csv(ROOT / "results" / "faithfulness_sanity_summary.csv")
-stability = pd.read_csv(ROOT / "results" / "faithfulness_stability_summary.csv")
-display(sanity.round(4))
-display(stability.round(4))
-"""
-        ),
-        markdown(
-            """
-Parameter randomization verifies that the promoted maps depend on learned
-weights. Target-class changes test class specificity; horizontal flips test
-equivariance. The class-agnostic DINOv2 control correctly remains unchanged
-when only the classifier head or target class changes, which is why it is not
-presented as a faithful class explanation.
-
-These metrics characterize this model under declared perturbations. They do
-not establish causal or human-like reasoning, and no test explanation is used
-to revise training, calibration, ensembling, or attribution selection.
-"""
-        ),
-        markdown("## Uncertainty and paired comparison"),
-        code(
-            """
-intervals = pd.read_csv(ROOT / "results" / "test_bootstrap_intervals.csv")
-differences = pd.read_csv(ROOT / "results" / "champion_paired_bootstrap_difference.csv")
-display(intervals[intervals["metric"] == "macro_f1"].round(4))
-display(differences.round(4))
+probe_rows = metrics[metrics["candidate"].isin(["DINOv2-B + RBF SVM", "DINOv2-B + logistic"])].copy()
+probe_rows["fit_seconds"] = [3625.2294, 13.9214]
+probe_rows["artifact_mb"] = [870.8566, 0.4136]
+display(probe_rows[["candidate", "macro_f1", "accuracy", "log_loss", "ece", "fit_seconds", "artifact_mb"]])
 """
         ),
         markdown(
             f"""
-## Conclusion
+## 5. External transfer
 
-The OOF selection process chose **{headline_name}** (`{headline_method}`) as the
-portfolio headline. Its fixed-test result is **{headline_f1:.3f} macro-F1** and
-**{headline_accuracy:.3f} accuracy**. This replaces the notebook's conflicting
-historical outputs with one traceable lineage: a fixed test contract, explicit
-configuration locks, three final seeds, OOF calibration, and paired uncertainty
-reporting. Its explanation layer follows the same discipline through OOF
-method selection, probability replay, perturbation tests, and parameter
-randomization.
+The locked three-class ensemble reaches 0.961 in-domain macro-F1 but
+{external['primary_image_metrics']['macro_f1']:.3f} on {external['image_level_rows']:,}
+unambiguous V-COCO images. DINOv2-B top-four adaptation transfers best descriptively at
+{external['best_observed_image_metrics']['macro_f1']:.3f}. The models were not retuned
+after this evaluation.
 
-The small test set limits precision, and the lack of subject identifiers limits
-the generalization claim. Results should be read as a careful benchmark on this
-manifest, not as a deployment guarantee.
+![V-COCO external validation](assets/polar_external_validation.png)
+"""
+        ),
+        code(
+            """
+external_metrics = pd.read_csv(ROOT / "results" / "polar_external_image_metrics.csv")
+display(external_metrics[["candidate", "macro_f1", "accuracy", "log_loss", "ece"]])
 """
         ),
         markdown(
             """
-## Reproduction
+## 6. Attribution: localization is not enough
 
-1. Install the project and notebook dependencies from `pyproject.toml`.
-2. Download the checksum-verified images with
-   `python tools/download_dataset.py --manifest data/manifest.csv`.
-3. Review `docs/EXPERIMENT_PROTOCOL.md` and the tracked configuration locks.
-4. Run the training scripts from the repository root. Bulky checkpoints and
-   local experiment artifacts stay under `.runs/` and are intentionally not
-   committed.
-5. Run the attribution evaluator only after downstream selection is locked;
-   export its compact evidence with `tools/export_faithfulness_results.py`.
+The fixed 256-image audit combines deletion/insertion, person-box localization,
+equal-area person/context occlusion, target sensitivity, and parameter randomization.
+ConvNeXt Grad-CAM has stronger causal and sanity evidence. DINOv2-B integrated gradients
+localize on people but remain highly correlated after changing the target and resetting
+learned layers, so they are not promoted as faithful causal explanations.
 
-The tracked results are sufficient to rerun this analysis notebook without
-downloading model checkpoints or the source images.
+![BBox-aware attribution audit](assets/polar_faithfulness.png)
+
+![Target and parameter randomization](assets/polar_attribution_sanity.png)
+"""
+        ),
+        code(
+            """
+faith = load_json("polar_faithfulness_summary.json")["aggregate"]
+rows = []
+for family in ("convnext_small_full", "dinov2_base_top4"):
+    rows.append(
+        {
+            "family": names[family],
+            "deletion_selectivity_gap": faith[family]["deletion_selectivity_gap"]["mean"],
+            "person_area_lift": faith[family]["person_attribution_mass_lift"]["mean"],
+            "person_minus_context_drop": faith[family]["person_minus_context_occlusion_drop"]["mean"],
+            "alternative_target_rho": faith[family]["target_vs_alternative_attribution_spearman"]["mean"],
+            "randomized_cascade_rho": faith[family]["randomized_adapted_cascade_spearman"]["mean"],
+        }
+    )
+display(pd.DataFrame(rows))
+"""
+        ),
+        markdown(
+            """
+## 7. Bounded bit-flip robustness
+
+Fault injection is reported separately from attribution faithfulness. Exact bit flips
+are applied either to the uint8 input tensor or to an int8-quantized classifier weight
+matrix. The result measures local prediction stability on the declared cohort; it is not
+hardware certification.
+
+![Fault robustness](assets/polar_fault_robustness.png)
+"""
+        ),
+        code(
+            """
+fault = pd.DataFrame(load_json("polar_fault_summary.json")["aggregate_results"])
+fault = fault[fault["fault_seed"].astype(str).isin(["none", "aggregate"])]
+display(
+    fault[[
+        "family", "condition", "level", "macro_f1",
+        "prediction_agreement_with_clean", "mean_absolute_probability_drift"
+    ]].reset_index(drop=True)
+)
+"""
+        ),
+        markdown(
+            """
+## 8. Conclusions
+
+- Data scale is the largest isolated performance amplifier in this study.
+- DINOv2-B representations support strong linear and nonlinear final-stage classifiers.
+- Development-locked model diversity produces a statistically supported ensemble gain.
+- The external-domain gap is large; the POLAR score is not a deployment guarantee.
+- ConvNeXt Grad-CAM passes the declared sanity checks more convincingly than DINOv2-B
+  integrated gradients.
+
+No exact state-of-the-art claim is made. The most defensible public artifact is a
+reproducible technical report with explicit evidence boundaries. See
+`docs/POLAR_TECHNICAL_REPORT.md` for the full method, discussion, and references.
 """
         ),
     ]
@@ -463,29 +322,15 @@ downloading model checkpoints or the source images.
 
 def main() -> None:
     args = parse_args()
-    repository = args.repository.resolve()
-    require_files(repository)
-    notebook = build_notebook(repository)
+    notebook = build_notebook(ROOT)
+    client = NotebookClient(
+        notebook,
+        timeout=180,
+        kernel_name="python3",
+        resources={"metadata": {"path": str(ROOT)}},
+    )
+    client.execute()
     args.output.parent.mkdir(parents=True, exist_ok=True)
-
-    previous_directory = Path.cwd()
-    try:
-        os.chdir(repository)
-        client = NotebookClient(
-            notebook,
-            timeout=180,
-            kernel_name=args.kernel,
-            resources={"metadata": {"path": str(repository)}},
-        )
-        client.execute()
-    finally:
-        os.chdir(previous_directory)
-
-    notebook["metadata"]["kernelspec"] = {
-        "display_name": "Python 3",
-        "language": "python",
-        "name": "python3",
-    }
     nbformat.write(notebook, args.output)
     print(f"Wrote executed notebook: {args.output.resolve()}")
 

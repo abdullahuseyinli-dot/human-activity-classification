@@ -1,18 +1,26 @@
-"""Generate the repository README from locked, tracked experiment evidence."""
+"""Generate the repository README from locked POLAR evidence."""
 
 from __future__ import annotations
 
-import argparse
 import json
 from pathlib import Path
 
 import pandas as pd
 
+ROOT = Path(__file__).resolve().parents[1]
 
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--repository", type=Path, required=True)
-    return parser.parse_args()
+DISPLAY_NAMES = {
+    "locked_ensemble": "Locked probability ensemble",
+    "dinov2_base_multilayer_rbf": "DINOv2-B multilayer + calibrated RBF SVM",
+    "dinov2_base_multilayer_logistic": "DINOv2-B multilayer + logistic regression",
+    "dinov2_base_top4": "DINOv2-B, top four blocks adapted",
+    "dinov2_small_moderate": "DINOv2-S, full adaptation",
+    "convnext_small_full": "ConvNeXt-S, full adaptation",
+}
+
+
+def read_json(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def markdown_table(headers: list[str], rows: list[list[str]]) -> str:
@@ -24,209 +32,284 @@ def markdown_table(headers: list[str], rows: list[list[str]]) -> str:
     return "\n".join(lines)
 
 
-def main() -> None:
-    args = parse_args()
-    repository = args.repository.resolve()
+def build_readme(repository: Path = ROOT) -> str:
     results = repository / "results"
-    with (results / "selection_lock.json").open(encoding="utf-8") as handle:
-        model_lock = json.load(handle)
-    with (results / "downstream_selection_lock.json").open(encoding="utf-8") as handle:
-        downstream_lock = json.load(handle)
-    test_metrics = pd.read_csv(results / "locked_test_metrics.csv")
-    champion = test_metrics.loc[test_metrics["selected_champion"].astype(bool)].iloc[0]
-    intervals = pd.read_csv(results / "test_bootstrap_intervals.csv")
-    champion_interval = intervals[
-        (intervals["method"] == champion["method"]) & (intervals["metric"] == "macro_f1")
-    ].iloc[0]
-    parameters = pd.read_csv(results / "model_parameter_summary.csv").set_index("model_kind")
-    faithfulness_selection = pd.read_csv(
-        results / "faithfulness_method_selection.csv"
-    )
-    faithfulness_test = pd.read_csv(results / "faithfulness_test_summary.csv")
+    test = read_json(results / "polar_test_summary.json")
+    external = read_json(results / "polar_external_summary.json")
+    faithfulness = read_json(results / "polar_faithfulness_summary.json")
+    fault = read_json(results / "polar_fault_summary.json")
+    evidence = read_json(results / "polar_final_evidence_manifest.json")
+    selection = read_json(results / "polar_final_selection_lock.json")
+    audit = read_json(results / "polar_data_audit.json")
+    uncertainty = read_json(results / "polar_test_uncertainty.json")
+    fit_manifest = read_json(results / "polar_final_fit_manifest.json")
+    extension = read_json(results / "polar_extension_summary.json")
 
+    required_statuses = {
+        test.get("status"): "LOCKED_FINAL_TEST_COMPLETE",
+        external.get("status"): "LOCKED_EXTERNAL_EVALUATION_COMPLETE",
+        faithfulness.get("status"): "LOCKED_POLAR_FAITHFULNESS_COMPLETE",
+        fault.get("status"): "LOCKED_POLAR_FAULT_ROBUSTNESS_COMPLETE",
+        evidence.get("status"): "LOCKED_POLAR_PORTFOLIO_EVIDENCE",
+    }
+    if any(actual != expected for actual, expected in required_statuses.items()):
+        raise RuntimeError("README generation requires complete locked evidence")
+    lock_hashes = {
+        item["selection_lock_sha256"] for item in (test, external, faithfulness, fault, evidence)
+    }
+    lock_hash = evidence["selection_lock_sha256"]
+    if lock_hashes != {lock_hash}:
+        raise RuntimeError("README evidence does not share one final selection lock")
+    if test.get("test_used_for_selection") or external.get("test_used_for_selection"):
+        raise RuntimeError("Test-selected evidence cannot be promoted")
+
+    metrics = pd.read_csv(results / "polar_test_metrics.csv")
     result_rows = []
-    for row in test_metrics.itertuples(index=False):
+    for row in metrics.itertuples(index=False):
+        interval = uncertainty[row.candidate]
         result_rows.append(
             [
-                str(row.display_name),
-                f"{row.accuracy:.3f}",
+                DISPLAY_NAMES.get(row.candidate, row.candidate),
                 f"{row.macro_f1:.3f}",
+                f"[{interval['ci_95_low']:.3f}, {interval['ci_95_high']:.3f}]",
+                f"{row.accuracy:.3f}",
                 f"{row.log_loss:.3f}",
-                "**OOF champion**" if bool(row.selected_champion) else "Comparator",
+                f"{row.ece:.3f}",
             ]
         )
-
-    config_rows = []
-    for family, display_name in (
-        ("convnext_small", "ConvNeXt-Small"),
-        ("dinov2_small", "DINOv2-Small"),
-    ):
-        record = model_lock["selected"][family]
-        config = record["config"]
-        parameter_row = parameters.loc[family]
-        strategy = str(config["unfreeze_strategy"])
-        if config.get("top_n_blocks"):
-            strategy += f" ({int(config['top_n_blocks'])} blocks)"
-        config_rows.append(
-            [
-                display_name,
-                str(record["candidate_id"]),
-                strategy,
-                f"{float(config['dropout']):.2f}",
-                str(config["augmentation_strength"]),
-                f"{float(parameter_row.trainable_percent):.1f}%",
-            ]
-        )
-
     results_table = markdown_table(
-        ["Locked method", "Accuracy", "Macro-F1", "Log-loss", "Role"], result_rows
-    )
-    config_table = markdown_table(
-        ["Family", "Candidate", "Adaptation", "Dropout", "Augmentation", "Trainable"],
-        config_rows,
+        ["Predeclared candidate", "Macro-F1", "95% CI", "Accuracy", "Log loss", "ECE"],
+        result_rows,
     )
 
-    explanation_names = {
-        "hirescam": "HiResCAM",
-        "gradient_attention_rollout": "Gradient-attention rollout",
-        "weighted_hirescam+gradient_attention_rollout": (
-            "0.1 HiResCAM + 0.9 gradient-attention rollout"
-        ),
-    }
-    faithfulness_rows = []
-    for row in faithfulness_test.itertuples(index=False):
-        faithfulness_rows.append(
-            [
-                str(row.display_name),
-                explanation_names.get(str(row.method), str(row.method)),
-                (
-                    f"{row.road_combined_mean:.3f} "
-                    f"[{row.road_combined_ci_2_5:.3f}, {row.road_combined_ci_97_5:.3f}]"
-                ),
-                f"{row.deletion_auc_mean:.3f}",
-                f"{row.insertion_auc_mean:.3f}",
-                f"{row.selectivity_gap_mean:.3f}",
-                f"{row.faithfulness_spearman_mean:.3f}",
-            ]
-        )
-    faithfulness_table = markdown_table(
+    per_class = pd.read_csv(results / "polar_test_per_class.csv")
+    per_class = per_class[per_class["candidate"].eq("locked_ensemble")]
+    per_class_table = markdown_table(
+        ["Class", "Precision", "Recall", "F1", "Support"],
         [
-            "Locked model",
-            "Explanation",
-            "ROADCombined ↑ (95% CI)",
-            "Deletion AUC ↓",
-            "Insertion AUC ↑",
-            "Random gap ↑",
-            "Subset ρ ↑",
+            [
+                str(row["class"]).replace("_", " ").title(),
+                f"{row['precision']:.3f}",
+                f"{row['recall']:.3f}",
+                f"{row['f1']:.3f}",
+                f"{int(row['support']):,}",
+            ]
+            for _, row in per_class.iterrows()
         ],
-        faithfulness_rows,
     )
-    selected_explanations = faithfulness_selection[
-        faithfulness_selection["selected"].astype(bool)
-    ].set_index("family")
-    conv_oof_road = float(selected_explanations.loc["convnext_small", "road_combined_mean"])
-    dino_oof_road = float(selected_explanations.loc["dinov2_small", "road_combined_mean"])
 
-    readme = f"""# Human Activity Classification with ConvNeXt and DINOv2
+    external_metrics = pd.read_csv(results / "polar_external_image_metrics.csv")
+    external_metrics = external_metrics[
+        external_metrics["candidate"].isin(
+            ["locked_ensemble_collapsed", "dinov2_base_top4", "dinov2_base_multilayer_rbf"]
+        )
+    ]
+    external_names = {
+        "locked_ensemble_collapsed": "Locked ensemble (collapsed to three classes)",
+        "dinov2_base_top4": "DINOv2-B, top four blocks adapted",
+        "dinov2_base_multilayer_rbf": "DINOv2-B multilayer + calibrated RBF SVM",
+    }
+    external_table = markdown_table(
+        ["External candidate", "Macro-F1", "Accuracy", "Log loss", "ECE"],
+        [
+            [
+                external_names[row.candidate],
+                f"{row.macro_f1:.3f}",
+                f"{row.accuracy:.3f}",
+                f"{row.log_loss:.3f}",
+                f"{row.ece:.3f}",
+            ]
+            for row in external_metrics.itertuples(index=False)
+        ],
+    )
 
-A leakage-safe small-data transfer-learning benchmark for classifying **sitting**,
-**standing**, and **walking/running** from still images. The project compares an
-ImageNet-pretrained ConvNeXt-Small with DINOv2-Small features, then evaluates
-OOF-locked seed ensembles, probability blending, and SVM representation probes.
+    primary = test["primary_metrics"]
+    primary_ci = uncertainty["locked_ensemble"]
+    paired = uncertainty["locked_ensemble_paired_deltas"]
+    smallest_delta = min(paired.items(), key=lambda item: item[1]["point_estimate"])
+    secondary = pd.read_csv(results / "polar_test_secondary_metrics.csv").iloc[0]
+    scale = sorted(extension["scale_curve"], key=lambda row: row["actual_train_size"])
 
-![Final method comparison](assets/final_method_comparison.png)
+    conv_faith = faithfulness["aggregate"]["convnext_small_full"]
+    dino_faith = faithfulness["aggregate"]["dinov2_base_top4"]
+    aggregate_fault = {
+        (row["family"], row["condition"], float(row["level"])): row
+        for row in fault["aggregate_results"]
+        if str(row["fault_seed"]) == "aggregate"
+    }
+    conv_input = aggregate_fault[("convnext_small_full", "uint8_input_bit_flip_rate", 0.001)]
+    dino_input = aggregate_fault[("dinov2_base_top4", "uint8_input_bit_flip_rate", 0.001)]
+    conv_head = aggregate_fault[
+        ("convnext_small_full", "symmetric_int8_head_weight_bit_flips", 16.0)
+    ]
+    dino_head = aggregate_fault[
+        ("dinov2_base_top4", "symmetric_int8_head_weight_bit_flips", 16.0)
+    ]
 
-The selected method—**{champion["display_name"]}**—reached
-**{champion["macro_f1"]:.3f} macro-F1** and **{champion["accuracy"]:.3f} accuracy**
-on the fixed 43-image test split. Its stratified-bootstrap macro-F1 interval is
-**[{champion_interval["ci_2_5"]:.3f}, {champion_interval["ci_97_5"]:.3f}]**. The
-interval matters: this is a carefully controlled small benchmark, not a claim of
-deployment-level certainty.
+    weights = selection["ensemble"]["weights"]
+    weight_text = ", ".join(
+        f"{DISPLAY_NAMES.get(name, name)} {value:.0%}" for name, value in weights.items()
+    )
+    clean_counts = audit["clean_target_counts"]
+    train_rows = sum(clean_counts["train"].values())
+    validation_rows = sum(clean_counts["val"].values())
+    test_rows = sum(clean_counts["test"].values())
+    logistic = fit_manifest["probes"]["dinov2_base_multilayer_logistic"]
+    rbf = fit_manifest["probes"]["dinov2_base_multilayer_rbf"]
 
-## Reproducibility improvements
+    return f"""# Leakage-Safe Human Activity Classification
 
-The released pipeline keeps model selection, final training, and promoted results
-within one evidence lineage. Freeze depth and dropout propagate through every
-training branch, while full-pool retraining replays the median cross-validation
-learning-rate schedule instead of silently changing optimization behaviour.
+[![Quality gates](https://github.com/abdullahuseyinli-dot/human-activity-classification/actions/workflows/ci.yml/badge.svg)](https://github.com/abdullahuseyinli-dot/human-activity-classification/actions/workflows/ci.yml)
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/Code-MIT-0F766E.svg)](LICENSE)
 
-Exact source fingerprints, selection locks, and evidence-handling rules are
-documented in [the result lineage](docs/RESULT_LINEAGE.md).
+A locked, leakage-audited transfer-learning study for recognizing **sitting, standing,
+walking, and running** in still images. The primary benchmark uses the POLAR dataset,
+compares ConvNeXt and DINOv2 adaptation strategies, tests linear and nonlinear
+classifiers on frozen representations, and evaluates external transfer and attribution
+faithfulness without using test results for selection.
 
-## Results
+![Held-out POLAR comparison](assets/polar_test_comparison.png)
+
+The predeclared ensemble achieved **{primary['macro_f1']:.3f} macro-F1**
+(95% stratified-bootstrap CI **[{primary_ci['ci_95_low']:.3f},
+{primary_ci['ci_95_high']:.3f}]**) and **{primary['accuracy']:.3f} accuracy** on
+{test_rows:,} held-out POLAR images. Its smallest paired gain over any component was
+**+{smallest_delta[1]['point_estimate']:.3f} macro-F1**, with a positive 95% interval
+**[{smallest_delta[1]['ci_95_low']:.3f}, {smallest_delta[1]['ci_95_high']:.3f}]**.
+
+> This is a reproducible benchmark result, not a state-of-the-art claim. No published
+> result was found with the same cleaned four-class subset, quarantine policy, fixed
+> split, and metric.
+
+## Held-out results
 
 {results_table}
 
-The champion is selected by pooled OOF macro-F1 before downstream test arrays are
-read. Test scores for the remaining locked comparators are reported for context,
-not used for tuning.
+The secondary three-class mapping (walking and running combined) reached
+**{secondary.macro_f1:.3f} macro-F1** and **{secondary.accuracy:.3f} accuracy**.
+Walking remains the hardest primary class.
 
-## Locked model configurations
+{per_class_table}
 
-{config_table}
+![Locked confusion matrix](assets/polar_confusion_matrix.png)
 
-![ConvNeXt architecture](assets/convnext_architecture.png)
+## What changed the result
 
-![DINOv2 architecture](assets/dinov2_architecture.png)
+The study separates data scale, representation, adaptation depth, regularization, and
+model diversity instead of treating training as a single opaque run.
 
-The experiment compares dropout, MixUp, light RandAugment, random-erasing removal,
-label smoothing, weight decay, and multiple freeze depths as controlled OOF
-interventions. A regularizer is retained only when the dataset supports it.
+- **Data scale mattered:** the frozen DINOv2-B validation curve rose from
+  **{scale[0]['macro_f1_mean']:.3f}** at {scale[0]['actual_train_size']:,} training images
+  to **{scale[-1]['macro_f1_mean']:.3f}** at {scale[-1]['actual_train_size']:,}.
+- **Person-aware views mattered:** the strongest DINO branches use deterministic person
+  crops with declared context, while ConvNeXt retained the full frame.
+- **Moderate regularization won selectively:** the locked neural configurations use
+  dropout 0.10, no MixUp, no label smoothing, and either mild or moderate augmentation;
+  interventions that reduced validation performance remain in the evidence tables.
+- **Complementarity mattered:** the final weights were fixed on development data as
+  {weight_text}. Every paired held-out interval favors the locked blend.
 
-## Attribution faithfulness
+![Data-scale curve](assets/polar_scale_curve.png)
 
-![Faithfulness perturbation curves](assets/faithfulness_perturbation_curves.png)
+## Was an SVM useful at the final stage?
 
-{faithfulness_table}
+Yes—as a representation probe, not as the default deployment choice. A calibrated RBF
+SVM on 7,680-dimensional DINOv2-B multilayer features reached **0.927 macro-F1**, the
+strongest standalone held-out component. The standardized multinomial logistic model
+reached **0.926**, but had better log loss (**0.176** versus **0.228**), fitted in
+{logistic['fit_seconds']:.1f} seconds, and occupied {logistic['pipeline_bytes'] / 1_000_000:.1f}
+MB. The RBF pipeline took {rbf['fit_seconds'] / 60:.1f} minutes and occupied
+{rbf['pipeline_bytes'] / 1_000_000:.1f} MB. The nonlinear margin adds a small accuracy
+gain, while logistic regression is the more practical calibrated endpoint.
 
-Attribution methods are selected without reading test explanations. A fixed
-36-image, class-balanced OOF audit selected HiResCAM for ConvNeXt
-(ROADCombined **{conv_oof_road:.3f}**) and class-specific gradient-attention
-rollout for DINOv2 (**{dino_oof_road:.3f}**). ConvNeXt's Grad-CAM and HiResCAM
-scores were effectively tied; the machine-readable ordering is retained rather
-than presenting the difference as a substantive gain.
+## External transfer: the result does not travel unchanged
 
-The audit perturbs a common 16 by 16 patch grid using ROAD imputation,
-blur-baseline deletion/insertion, and matched random removal. It also checks
-parameter randomization, target-class sensitivity, horizontal-flip
-equivariance, and agreement across the three final seeds. Raw DINOv2 attention
-rollout remains an ineligible class-agnostic negative control.
+The locked models were evaluated without retuning on a clean V-COCO train/validation
+subset. An exact/perceptual overlap audit compared 16,614 clean POLAR records with
+4,123 V-COCO images and found **zero confirmed source-related pairs**. Image-level
+evaluation uses {external['image_level_rows']:,} unambiguous images; person-level
+evaluation uses {external['person_rows']:,} annotations.
 
-## Evaluation design
+{external_table}
 
-- **Data:** 285 checksum-verified COCO images; 242 development and 43 fixed test.
-- **Primary metric:** pooled OOF macro-F1; lower fold variability and log-loss are
-  deterministic tie-breakers.
-- **Selection:** three-fold coarse screen followed by five-fold confirmation.
-- **Final training:** seeds 42, 52, and 62 with fixed folds and fold-derived epoch/LR
-  schedules; all full-pool models finish before the test gate opens.
-- **Calibration:** OOF temperature scaling transferred unchanged to final models.
-- **Inference:** center crop versus horizontal-flip TTA selected from OOF evidence.
-- **Downstream:** seed averaging, blend weight, and SVM parameters selected OOF-only.
-- **Uncertainty:** 2,000 stratified bootstrap resamples and paired champion deltas.
-- **Explanations:** OOF method selection followed by locked-test perturbation,
-  parameter-randomization, specificity, and stability checks.
+![External V-COCO transfer](assets/polar_external_validation.png)
 
-The complete contract is in [the experiment protocol](docs/EXPERIMENT_PROTOCOL.md).
+The locked ensemble falls from **{secondary.macro_f1:.3f}** in-domain three-class
+macro-F1 to **{external['primary_image_metrics']['macro_f1']:.3f}** externally. The
+adapted DINOv2-B component transfers best descriptively at
+**{external['best_observed_image_metrics']['macro_f1']:.3f}**. This is evidence of a
+substantial domain and annotation-policy gap, not evidence that the external set should
+be used to retune the locked result.
+
+## Faithfulness and fault robustness
+
+The attribution audit uses a deterministic 256-image cohort balanced by class and
+person-box-area quartile. ConvNeXt Grad-CAM has a targeted-versus-random deletion gap
+of **{conv_faith['deletion_selectivity_gap']['mean']:.3f}**, concentrates
+**{conv_faith['person_attribution_mass_lift']['mean']:.2f}x** more attribution in the
+person box than uniform area, and produces a person-minus-context probability drop of
+**{conv_faith['person_minus_context_occlusion_drop']['mean']:.3f}**. DINOv2-B integrated
+gradients localizes on people but shows only **{dino_faith['person_attribution_mass_lift']['mean']:.2f}x**
+area-normalized lift and retains high correlations after target and parameter
+randomization. It is therefore presented as a limited localization diagnostic, not a
+fully validated causal explanation.
+
+![BBox-aware faithfulness](assets/polar_faithfulness.png)
+
+![Attribution sanity checks](assets/polar_attribution_sanity.png)
+
+Bit-flip experiments are reported separately from faithfulness. At a 0.1% exact input
+bit-flip rate, prediction agreement with the clean models was
+**{conv_input['prediction_agreement_with_clean']:.3f}** for ConvNeXt-S and
+**{dino_input['prediction_agreement_with_clean']:.3f}** for DINOv2-B. Sixteen flips per
+quantized classifier weight matrix retained **{conv_head['prediction_agreement_with_clean']:.3f}**
+and **{dino_head['prediction_agreement_with_clean']:.3f}** agreement, respectively, on
+this cohort. These are bounded software fault-injection results, not hardware safety
+certification.
+
+![Fault robustness](assets/polar_fault_robustness.png)
+
+## Leakage controls and evidence lineage
+
+- POLAR clean split: {train_rows:,} train, {validation_rows:,} validation, and
+  {test_rows:,} test images.
+- {audit['quarantine_images']} images in {audit['quarantine_components']} confirmed
+  cross-split source-related components were quarantined before supervised fitting.
+- All candidate selection, blend weights, epochs, and classifier hyperparameters were
+  locked on development evidence before the test cache opened.
+- Nine neural fits and three frozen-feature probes completed and were hash-verified
+  before the single test evaluation.
+- The test access gate records one official open, and every exported summary shares
+  selection-lock SHA-256 `{lock_hash}`.
+- Checkpoints, local image paths, dense probabilities, and full-resolution attribution
+  maps remain outside Git; the tracked evidence is path-sanitized and hash-indexed.
+
+Start with the [rendered technical report](output/pdf/polar_technical_report.pdf),
+[source report](docs/POLAR_TECHNICAL_REPORT.md),
+[portfolio article](docs/PORTFOLIO_ARTICLE.md), and
+[result lineage](docs/RESULT_LINEAGE.md). The older 285-image COCO study is retained as
+a [historical benchmark](docs/LEGACY_COCO_STUDY.md), not the portfolio headline.
 
 ## Repository layout
 
 ```text
 .
-├── human_activity_classification.ipynb  # compact, executed portfolio narrative
-├── src/hac/                             # reusable data, model, metric, and training code
-├── experiments/                         # staged selection/final-analysis runners
-├── data/manifest.csv                    # URLs, fixed splits, labels, and checksums
-├── results/                             # compact locked evidence; no checkpoints
-├── assets/                              # tracked architecture and result figures
-├── docs/                                # protocol and result lineage
-├── tests/                               # fast protocol/config/metric tests
-└── tools/                               # download, export, and notebook build utilities
+├── human_activity_classification.ipynb  # executed evidence narrative
+├── src/hac/                             # reusable data, model, metric, and audit code
+├── experiments/                         # staged selection, fitting, and evaluation runners
+├── tools/                               # dataset, export, validation, and figure utilities
+├── results/                             # portable locks, metrics, uncertainty, and hashes
+├── assets/                              # publication figures
+├── docs/                                # protocols, report, article, and lineage
+├── tests/                               # fast invariants and evidence-contract tests
+└── .github/workflows/ci.yml             # Linux quality gates
 ```
 
-## Quick start
+## Reproduce the environment
 
-Python 3.11 is the recorded environment.
+Python 3.11 is the recorded runtime. Install the PyTorch build appropriate for the
+machine, then install the project:
 
 ```bash
 python -m venv .venv
@@ -234,61 +317,23 @@ python -m venv .venv
 # macOS/Linux: source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -e ".[notebook,dev]"
-python tools/download_dataset.py --manifest data/manifest.csv
-jupyter lab human_activity_classification.ipynb
 ```
 
-Install the PyTorch wheel appropriate for the local CUDA or CPU platform when it
-differs from the default package index. The exact recorded versions are listed in
-`requirements-lock.txt`.
-
-## Reproduce the staged experiment
-
-The code-only pipeline notebook is tracked separately from the concise portfolio
-notebook so the latter remains readable on GitHub.
+Obtain POLAR v1 from its publisher, verify the archive hashes in
+[`experiments/polar_study_protocol.json`](experiments/polar_study_protocol.json), and
+build the audited local manifest:
 
 ```bash
-python experiments/recover_experiment.py \\
-  --source-notebook experiments/pipeline_source.ipynb \\
-  --manifest data/manifest.csv \\
-  --artifact-root .runs/selection \\
-  --stage coarse
+python tools/prepare_polar.py \\
+  --annotations-dir /path/to/Annotations \\
+  --images-dir /path/to/JPEGImages \\
+  --image-sets-dir /path/to/ImageSets \\
+  --output-dir .runs/polar_data \\
+  --legacy-manifest data/manifest.csv
 ```
 
-Promote only the desired candidates to `--stage confirm`, then create the
-configuration lock:
-
-```bash
-python experiments/select_candidates.py \\
-  --selection-root .runs/selection \\
-  --output .runs/selection_lock.json
-```
-
-Final multi-seed retraining and downstream analysis are deliberately separate:
-
-```bash
-python experiments/finalize_experiment.py \\
-  --source-notebook experiments/pipeline_source.ipynb \\
-  --manifest data/manifest.csv \\
-  --artifact-root .runs/final \\
-  --selection-lock .runs/selection_lock.json
-
-python experiments/analyze_final.py \\
-  --artifact-root .runs/final \\
-  --output-dir .runs/final_analysis
-
-python experiments/evaluate_faithfulness.py \\
-  --manifest data/manifest.csv \\
-  --final-root .runs/final \\
-  --analysis-dir .runs/final_analysis \\
-  --output-dir .runs/faithfulness
-```
-
-Bulky checkpoints, logits, local paths, and interrupted runs remain under
-`.runs/` and are ignored by Git. The tracked `results/` directory contains the
-path-sanitized evidence needed to audit the notebook.
-
-## Quality gates
+The long-running stages are documented in [experiments/README.md](experiments/README.md).
+Validate a checkout with:
 
 ```bash
 python -m ruff check .
@@ -297,45 +342,36 @@ python -m pytest
 python tools/validate_repository.py
 ```
 
-The same checks run in GitHub Actions. The portable manifest is validated for
-row counts, label vocabulary, unique IDs and hashes, the fixed test contract,
-and cross-boundary perceptual near-duplicates.
+## Scope and limitations
 
-## Limitations
-
-- The test split contains 43 images, so point estimates have substantial
-  uncertainty even with careful locking.
-- Subject and capture-session identifiers are unavailable; subject-independent
+- Subject and capture-session identifiers are unavailable, so subject-independent
   generalization cannot be claimed.
-- Images come from COCO and may reward scene context as well as body pose.
-- The SVM result is a representation probe, not an end-to-end deployment stack.
-- Attribution metrics measure sensitivity under declared patch perturbations;
-  they do not prove causal or human-like reasoning.
-- Parameter-randomization, target-specificity, and flip-stability checks use a
-  deterministic nine-image class-balanced audit cohort.
+- The four-class task is a cleaned subset of POLAR, not the full nine-label benchmark.
+- V-COCO has a different source and annotation policy; its results diagnose transfer
+  rather than rank models for the POLAR task.
+- The RBF result is a large frozen-representation probe, not an end-to-end serving
+  design.
+- Attribution localization, perturbation, and randomization tests do not prove human-like
+  or causal reasoning.
 
-## Technical references
+## References and license
 
-- [ConvNeXt: A ConvNet for the 2020s](https://arxiv.org/abs/2201.03545)
-- [DINOv2: Learning Robust Visual Features without Supervision](https://arxiv.org/abs/2304.07193)
-- [Dropout](https://www.jmlr.org/papers/v15/srivastava14a.html)
-- [MixUp](https://arxiv.org/abs/1710.09412)
-- [RandAugment](https://arxiv.org/abs/1909.13719)
-- [When Does Label Smoothing Help?](https://arxiv.org/abs/1906.02629)
-- [ROAD: Remove and Debias](https://proceedings.mlr.press/v162/rong22a.html)
-- [Pixel-flipping Evaluation of Neural Explanations](https://arxiv.org/abs/1509.06321)
-- [Transformer Interpretability Beyond Attention Visualization](https://openaccess.thecvf.com/content/CVPR2021/html/Chefer_Transformer_Interpretability_Beyond_Attention_Visualization_CVPR_2021_paper.html)
-- [Sanity Checks for Saliency Maps](https://papers.neurips.cc/paper_files/paper/2018/hash/294a8ed24b1ad22ec2e7efea049b8737-Abstract.html)
+- [POLAR dataset](https://doi.org/10.17632/hvnsh7rwz7.1)
+- [DINOv2](https://arxiv.org/abs/2304.07193)
+- [ConvNeXt](https://arxiv.org/abs/2201.03545)
+- [V-COCO](https://arxiv.org/abs/1505.04474)
+- [Sanity Checks for Saliency Maps](https://arxiv.org/abs/1810.03292)
 
-## License
-
-Original source code and documentation are licensed under the [MIT License](LICENSE).
-COCO source images and pretrained model components retain their upstream terms;
-see [the third-party notices](THIRD_PARTY_NOTICES.md).
+Original code and documentation are MIT licensed. Dataset images, annotations, and
+pretrained weights retain their upstream terms; see
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 """
 
-    (repository / "README.md").write_text(readme, encoding="utf-8", newline="\n")
-    print(f"Wrote README.md for {downstream_lock['champion_method']}")
+
+def main() -> None:
+    readme = build_readme(ROOT)
+    (ROOT / "README.md").write_text(readme, encoding="utf-8", newline="\n")
+    print("Wrote README.md from locked POLAR evidence")
 
 
 if __name__ == "__main__":

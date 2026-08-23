@@ -37,9 +37,22 @@ Suggested citations:
 > Ma, W., & Liang, S. (2019). POLAR: Posture-level Action Recognition Dataset.
 > ICSAI, 427-433. https://doi.org/10.1109/ICSAI48974.2019.9010160
 
-## DINOv2-Small
+## V-COCO external dataset
 
-The DINOv2-Small pretrained model is developed by Meta AI and distributed under
+The external-transfer audit uses V-COCO annotations and locally obtained COCO images.
+No V-COCO annotation archive or source image is committed. V-COCO is provided for
+research use through its [official repository](https://github.com/s-gupta/v-coco), and
+the underlying images retain the COCO/source-image terms described above.
+
+Suggested citation:
+
+> Gupta, S., & Malik, J. (2015). Visual Semantic Role Labeling. arXiv:1505.04474.
+> https://arxiv.org/abs/1505.04474
+
+## DINOv2-Small and DINOv2-Base
+
+The DINOv2-Small and DINOv2-Base pretrained models are developed by Meta AI and
+distributed under
 the [Apache License 2.0](https://github.com/facebookresearch/dinov2/blob/main/LICENSE).
 The upstream [model card](https://github.com/facebookresearch/dinov2/blob/main/MODEL_CARD.md)
 documents the model's intended uses, limitations, and training-data context.

@@ -1,8 +1,34 @@
 # POLAR scale study protocol
 
-Protocol version: **1.2.0**
-Locked: **2026-08-22, before image download, duplicate inspection, model fitting, or
-access to POLAR test labels by the study runner**
+Protocol version: **1.4.0**
+
+Initial lock: **2026-08-22, before image download, duplicate inspection, model
+fitting, or access to POLAR test labels by the study runner**. The current
+amendment was locked on **2026-08-23 before any official test access**. Amendments
+are cumulative; the earlier controls below remain in force.
+
+### Amendment 1.4.0: source-aligned DINOv2 representation and bounded extensions
+
+Locked on **2026-08-23 with zero POLAR test rows read**. The official DINOv2
+linear-classifier representation concatenates the last four normalized class
+tokens with the final normalized mean patch token. A DINOv2-Base probe using that
+representation was therefore added as a development-only, source-aligned
+extension. The RBF configuration was transferred unchanged from the version 1.3
+train-only winner; it was not retuned on the new representation.
+
+The same pre-test amendment also bounded a DINOv2-Base adaptation comparison and
+two targeted regularization contrasts: higher weight decay and removal of random
+erasing. These candidates retained the existing development-only selection rules
+and could not use test evidence.
+
+### Amendment 1.3.0: final-stage classifier screen
+
+Locked on **2026-08-23 with zero POLAR test rows read**. Multinomial logistic
+regression, linear SVM, RBF SVM, and shrinkage LDA were compared on the strongest
+frozen DINOv2-Base representation. Hyperparameters were selected with stratified
+three-fold cross-validation on training rows only. Validation received one
+comparison per classifier family, and probability calibration was fitted without
+test data.
 
 ### Amendment 1.2.0: layer-wise decay for full adaptation
 

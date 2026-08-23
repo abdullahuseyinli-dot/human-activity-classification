@@ -1,116 +1,172 @@
-# Human Activity Classification with ConvNeXt and DINOv2
+# Leakage-Safe Human Activity Classification
 
-A leakage-safe small-data transfer-learning benchmark for classifying **sitting**,
-**standing**, and **walking/running** from still images. The project compares an
-ImageNet-pretrained ConvNeXt-Small with DINOv2-Small features, then evaluates
-OOF-locked seed ensembles, probability blending, and SVM representation probes.
+[![Quality gates](https://github.com/abdullahuseyinli-dot/human-activity-classification/actions/workflows/ci.yml/badge.svg)](https://github.com/abdullahuseyinli-dot/human-activity-classification/actions/workflows/ci.yml)
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/Code-MIT-0F766E.svg)](LICENSE)
 
-![Final method comparison](assets/final_method_comparison.png)
+A locked, leakage-audited transfer-learning study for recognizing **sitting, standing,
+walking, and running** in still images. The primary benchmark uses the POLAR dataset,
+compares ConvNeXt and DINOv2 adaptation strategies, tests linear and nonlinear
+classifiers on frozen representations, and evaluates external transfer and attribution
+faithfulness without using test results for selection.
 
-The selected method—**OOF-weighted probability blend**—reached
-**0.862 macro-F1** and **0.860 accuracy**
-on the fixed 43-image test split. Its stratified-bootstrap macro-F1 interval is
-**[0.743, 0.954]**. The
-interval matters: this is a carefully controlled small benchmark, not a claim of
-deployment-level certainty.
+![Held-out POLAR comparison](assets/polar_test_comparison.png)
 
-## Reproducibility improvements
+The predeclared ensemble achieved **0.940 macro-F1**
+(95% stratified-bootstrap CI **[0.931,
+0.948]**) and **0.946 accuracy** on
+3,329 held-out POLAR images. Its smallest paired gain over any component was
+**+0.013 macro-F1**, with a positive 95% interval
+**[0.007, 0.019]**.
 
-The released pipeline keeps model selection, final training, and promoted results
-within one evidence lineage. Freeze depth and dropout propagate through every
-training branch, while full-pool retraining replays the median cross-validation
-learning-rate schedule instead of silently changing optimization behaviour.
+> This is a reproducible benchmark result, not a state-of-the-art claim. No published
+> result was found with the same cleaned four-class subset, quarantine policy, fixed
+> split, and metric.
 
-Exact source fingerprints, selection locks, and evidence-handling rules are
-documented in [the result lineage](docs/RESULT_LINEAGE.md).
+## Held-out results
 
-## Results
-
-| Locked method | Accuracy | Macro-F1 | Log-loss | Role |
-| --- | --- | --- | --- | --- |
-| OOF-weighted probability blend | 0.860 | 0.862 | 0.493 | **OOF champion** |
-| DINOv2-Small | 0.860 | 0.862 | 0.499 | Comparator |
-| DINOv2 + RBF/linear SVM | 0.860 | 0.862 | 0.517 | Comparator |
-| ConvNeXt-Small | 0.814 | 0.815 | 0.533 | Comparator |
-| ConvNeXt + RBF/linear SVM | 0.814 | 0.815 | 0.620 | Comparator |
-
-The champion is selected by pooled OOF macro-F1 before downstream test arrays are
-read. Test scores for the remaining locked comparators are reported for context,
-not used for tuning.
-
-## Locked model configurations
-
-| Family | Candidate | Adaptation | Dropout | Augmentation | Trainable |
+| Predeclared candidate | Macro-F1 | 95% CI | Accuracy | Log loss | ECE |
 | --- | --- | --- | --- | --- | --- |
-| ConvNeXt-Small | conv_randaugment_d0 | full_backbone | 0.00 | mild_randaugment_light | 100.0% |
-| DINOv2-Small | dino_full_d10 | full_backbone | 0.10 | moderate | 100.0% |
+| Locked probability ensemble | 0.940 | [0.931, 0.948] | 0.946 | 0.156 | 0.029 |
+| DINOv2-B multilayer + calibrated RBF SVM | 0.927 | [0.918, 0.936] | 0.934 | 0.228 | 0.027 |
+| DINOv2-B multilayer + logistic regression | 0.926 | [0.916, 0.935] | 0.932 | 0.176 | 0.013 |
+| DINOv2-B, top four blocks adapted | 0.925 | [0.916, 0.934] | 0.933 | 0.217 | 0.042 |
+| DINOv2-S, full adaptation | 0.913 | [0.903, 0.923] | 0.921 | 0.239 | 0.030 |
+| ConvNeXt-S, full adaptation | 0.891 | [0.880, 0.902] | 0.899 | 0.308 | 0.043 |
 
-![ConvNeXt architecture](assets/convnext_architecture.png)
+The secondary three-class mapping (walking and running combined) reached
+**0.961 macro-F1** and **0.962 accuracy**.
+Walking remains the hardest primary class.
 
-![DINOv2 architecture](assets/dinov2_architecture.png)
+| Class | Precision | Recall | F1 | Support |
+| --- | --- | --- | --- | --- |
+| Running | 0.957 | 0.961 | 0.959 | 736 |
+| Sitting | 0.992 | 0.985 | 0.989 | 1,034 |
+| Standing | 0.925 | 0.939 | 0.932 | 921 |
+| Walking | 0.887 | 0.873 | 0.880 | 638 |
 
-The experiment compares dropout, MixUp, light RandAugment, random-erasing removal,
-label smoothing, weight decay, and multiple freeze depths as controlled OOF
-interventions. A regularizer is retained only when the dataset supports it.
+![Locked confusion matrix](assets/polar_confusion_matrix.png)
 
-## Attribution faithfulness
+## What changed the result
 
-![Faithfulness perturbation curves](assets/faithfulness_perturbation_curves.png)
+The study separates data scale, representation, adaptation depth, regularization, and
+model diversity instead of treating training as a single opaque run.
 
-| Locked model | Explanation | ROADCombined ↑ (95% CI) | Deletion AUC ↓ | Insertion AUC ↑ | Random gap ↑ | Subset ρ ↑ |
-| --- | --- | --- | --- | --- | --- | --- |
-| ConvNeXt-Small | HiResCAM | 0.242 [0.220, 0.262] | 0.416 | 0.758 | 0.163 | 0.152 |
-| DINOv2-Small | Gradient-attention rollout | 0.185 [0.165, 0.205] | 0.448 | 0.744 | 0.172 | 0.248 |
-| 0.1 ConvNeXt + 0.9 DINOv2 | 0.1 HiResCAM + 0.9 gradient-attention rollout | 0.190 [0.171, 0.208] | 0.430 | 0.730 | 0.177 | 0.235 |
+- **Data scale mattered:** the frozen DINOv2-B validation curve rose from
+  **0.849** at 242 training images
+  to **0.915** at 9,958.
+- **Person-aware views mattered:** the strongest DINO branches use deterministic person
+  crops with declared context, while ConvNeXt retained the full frame.
+- **Moderate regularization won selectively:** the locked neural configurations use
+  dropout 0.10, no MixUp, no label smoothing, and either mild or moderate augmentation;
+  interventions that reduced validation performance remain in the evidence tables.
+- **Complementarity mattered:** the final weights were fixed on development data as
+  ConvNeXt-S, full adaptation 20%, DINOv2-B multilayer + logistic regression 20%, DINOv2-B multilayer + calibrated RBF SVM 20%, DINOv2-B, top four blocks adapted 25%, DINOv2-S, full adaptation 15%. Every paired held-out interval favors the locked blend.
 
-Attribution methods are selected without reading test explanations. A fixed
-36-image, class-balanced OOF audit selected HiResCAM for ConvNeXt
-(ROADCombined **0.185**) and class-specific gradient-attention
-rollout for DINOv2 (**0.156**). ConvNeXt's Grad-CAM and HiResCAM
-scores were effectively tied; the machine-readable ordering is retained rather
-than presenting the difference as a substantive gain.
+![Data-scale curve](assets/polar_scale_curve.png)
 
-The audit perturbs a common 16 by 16 patch grid using ROAD imputation,
-blur-baseline deletion/insertion, and matched random removal. It also checks
-parameter randomization, target-class sensitivity, horizontal-flip
-equivariance, and agreement across the three final seeds. Raw DINOv2 attention
-rollout remains an ineligible class-agnostic negative control.
+## Was an SVM useful at the final stage?
 
-## Evaluation design
+Yes—as a representation probe, not as the default deployment choice. A calibrated RBF
+SVM on 7,680-dimensional DINOv2-B multilayer features reached **0.927 macro-F1**, the
+strongest standalone held-out component. The standardized multinomial logistic model
+reached **0.926**, but had better log loss (**0.176** versus **0.228**), fitted in
+13.9 seconds, and occupied 0.4
+MB. The RBF pipeline took 60.4 minutes and occupied
+870.9 MB. The nonlinear margin adds a small accuracy
+gain, while logistic regression is the more practical calibrated endpoint.
 
-- **Data:** 285 checksum-verified COCO images; 242 development and 43 fixed test.
-- **Primary metric:** pooled OOF macro-F1; lower fold variability and log-loss are
-  deterministic tie-breakers.
-- **Selection:** three-fold coarse screen followed by five-fold confirmation.
-- **Final training:** seeds 42, 52, and 62 with fixed folds and fold-derived epoch/LR
-  schedules; all full-pool models finish before the test gate opens.
-- **Calibration:** OOF temperature scaling transferred unchanged to final models.
-- **Inference:** center crop versus horizontal-flip TTA selected from OOF evidence.
-- **Downstream:** seed averaging, blend weight, and SVM parameters selected OOF-only.
-- **Uncertainty:** 2,000 stratified bootstrap resamples and paired champion deltas.
-- **Explanations:** OOF method selection followed by locked-test perturbation,
-  parameter-randomization, specificity, and stability checks.
+## External transfer: the result does not travel unchanged
 
-The complete contract is in [the experiment protocol](docs/EXPERIMENT_PROTOCOL.md).
+The locked models were evaluated without retuning on a clean V-COCO train/validation
+subset. An exact/perceptual overlap audit compared 16,614 clean POLAR records with
+4,123 V-COCO images and found **zero confirmed source-related pairs**. Image-level
+evaluation uses 3,761 unambiguous images; person-level
+evaluation uses 6,640 annotations.
+
+| External candidate | Macro-F1 | Accuracy | Log loss | ECE |
+| --- | --- | --- | --- | --- |
+| DINOv2-B, top four blocks adapted | 0.673 | 0.675 | 1.751 | 0.236 |
+| Locked ensemble (collapsed to three classes) | 0.667 | 0.666 | 1.251 | 0.192 |
+| DINOv2-B multilayer + calibrated RBF SVM | 0.650 | 0.645 | 2.080 | 0.273 |
+
+![External V-COCO transfer](assets/polar_external_validation.png)
+
+The locked ensemble falls from **0.961** in-domain three-class
+macro-F1 to **0.667** externally. The
+adapted DINOv2-B component transfers best descriptively at
+**0.673**. This is evidence of a
+substantial domain and annotation-policy gap, not evidence that the external set should
+be used to retune the locked result.
+
+## Faithfulness and fault robustness
+
+The attribution audit uses a deterministic 256-image cohort balanced by class and
+person-box-area quartile. ConvNeXt Grad-CAM has a targeted-versus-random deletion gap
+of **0.163**, concentrates
+**2.37x** more attribution in the
+person box than uniform area, and produces a person-minus-context probability drop of
+**0.234**. DINOv2-B integrated
+gradients localizes on people but shows only **1.10x**
+area-normalized lift and retains high correlations after target and parameter
+randomization. It is therefore presented as a limited localization diagnostic, not a
+fully validated causal explanation.
+
+![BBox-aware faithfulness](assets/polar_faithfulness.png)
+
+![Attribution sanity checks](assets/polar_attribution_sanity.png)
+
+Bit-flip experiments are reported separately from faithfulness. At a 0.1% exact input
+bit-flip rate, prediction agreement with the clean models was
+**0.984** for ConvNeXt-S and
+**0.980** for DINOv2-B. Sixteen flips per
+quantized classifier weight matrix retained **1.000**
+and **1.000** agreement, respectively, on
+this cohort. These are bounded software fault-injection results, not hardware safety
+certification.
+
+![Fault robustness](assets/polar_fault_robustness.png)
+
+## Leakage controls and evidence lineage
+
+- POLAR clean split: 9,958 train, 3,327 validation, and
+  3,329 test images.
+- 125 images in 61 confirmed
+  cross-split source-related components were quarantined before supervised fitting.
+- All candidate selection, blend weights, epochs, and classifier hyperparameters were
+  locked on development evidence before the test cache opened.
+- Nine neural fits and three frozen-feature probes completed and were hash-verified
+  before the single test evaluation.
+- The test access gate records one official open, and every exported summary shares
+  selection-lock SHA-256 `fa3fb7c80a073d29048afb8e0b8da1fb17f5ade9721630347c37523714cca187`.
+- Checkpoints, local image paths, dense probabilities, and full-resolution attribution
+  maps remain outside Git; the tracked evidence is path-sanitized and hash-indexed.
+
+Start with the [rendered technical report](output/pdf/polar_technical_report.pdf),
+[source report](docs/POLAR_TECHNICAL_REPORT.md),
+[portfolio article](docs/PORTFOLIO_ARTICLE.md), and
+[result lineage](docs/RESULT_LINEAGE.md). The older 285-image COCO study is retained as
+a [historical benchmark](docs/LEGACY_COCO_STUDY.md), not the portfolio headline.
 
 ## Repository layout
 
 ```text
 .
-├── human_activity_classification.ipynb  # compact, executed portfolio narrative
-├── src/hac/                             # reusable data, model, metric, and training code
-├── experiments/                         # staged selection/final-analysis runners
-├── data/manifest.csv                    # URLs, fixed splits, labels, and checksums
-├── results/                             # compact locked evidence; no checkpoints
-├── assets/                              # tracked architecture and result figures
-├── docs/                                # protocol and result lineage
-├── tests/                               # fast protocol/config/metric tests
-└── tools/                               # download, export, and notebook build utilities
+├── human_activity_classification.ipynb  # executed evidence narrative
+├── src/hac/                             # reusable data, model, metric, and audit code
+├── experiments/                         # staged selection, fitting, and evaluation runners
+├── tools/                               # dataset, export, validation, and figure utilities
+├── results/                             # portable locks, metrics, uncertainty, and hashes
+├── assets/                              # publication figures
+├── docs/                                # protocols, report, article, and lineage
+├── tests/                               # fast invariants and evidence-contract tests
+└── .github/workflows/ci.yml             # Linux quality gates
 ```
 
-## Quick start
+## Reproduce the environment
 
-Python 3.11 is the recorded environment.
+Python 3.11 is the recorded runtime. Install the PyTorch build appropriate for the
+machine, then install the project:
 
 ```bash
 python -m venv .venv
@@ -118,61 +174,23 @@ python -m venv .venv
 # macOS/Linux: source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -e ".[notebook,dev]"
-python tools/download_dataset.py --manifest data/manifest.csv
-jupyter lab human_activity_classification.ipynb
 ```
 
-Install the PyTorch wheel appropriate for the local CUDA or CPU platform when it
-differs from the default package index. The exact recorded versions are listed in
-`requirements-lock.txt`.
-
-## Reproduce the staged experiment
-
-The code-only pipeline notebook is tracked separately from the concise portfolio
-notebook so the latter remains readable on GitHub.
+Obtain POLAR v1 from its publisher, verify the archive hashes in
+[`experiments/polar_study_protocol.json`](experiments/polar_study_protocol.json), and
+build the audited local manifest:
 
 ```bash
-python experiments/recover_experiment.py \
-  --source-notebook experiments/pipeline_source.ipynb \
-  --manifest data/manifest.csv \
-  --artifact-root .runs/selection \
-  --stage coarse
+python tools/prepare_polar.py \
+  --annotations-dir /path/to/Annotations \
+  --images-dir /path/to/JPEGImages \
+  --image-sets-dir /path/to/ImageSets \
+  --output-dir .runs/polar_data \
+  --legacy-manifest data/manifest.csv
 ```
 
-Promote only the desired candidates to `--stage confirm`, then create the
-configuration lock:
-
-```bash
-python experiments/select_candidates.py \
-  --selection-root .runs/selection \
-  --output .runs/selection_lock.json
-```
-
-Final multi-seed retraining and downstream analysis are deliberately separate:
-
-```bash
-python experiments/finalize_experiment.py \
-  --source-notebook experiments/pipeline_source.ipynb \
-  --manifest data/manifest.csv \
-  --artifact-root .runs/final \
-  --selection-lock .runs/selection_lock.json
-
-python experiments/analyze_final.py \
-  --artifact-root .runs/final \
-  --output-dir .runs/final_analysis
-
-python experiments/evaluate_faithfulness.py \
-  --manifest data/manifest.csv \
-  --final-root .runs/final \
-  --analysis-dir .runs/final_analysis \
-  --output-dir .runs/faithfulness
-```
-
-Bulky checkpoints, logits, local paths, and interrupted runs remain under
-`.runs/` and are ignored by Git. The tracked `results/` directory contains the
-path-sanitized evidence needed to audit the notebook.
-
-## Quality gates
+The long-running stages are documented in [experiments/README.md](experiments/README.md).
+Validate a checkout with:
 
 ```bash
 python -m ruff check .
@@ -181,38 +199,26 @@ python -m pytest
 python tools/validate_repository.py
 ```
 
-The same checks run in GitHub Actions. The portable manifest is validated for
-row counts, label vocabulary, unique IDs and hashes, the fixed test contract,
-and cross-boundary perceptual near-duplicates.
+## Scope and limitations
 
-## Limitations
-
-- The test split contains 43 images, so point estimates have substantial
-  uncertainty even with careful locking.
-- Subject and capture-session identifiers are unavailable; subject-independent
+- Subject and capture-session identifiers are unavailable, so subject-independent
   generalization cannot be claimed.
-- Images come from COCO and may reward scene context as well as body pose.
-- The SVM result is a representation probe, not an end-to-end deployment stack.
-- Attribution metrics measure sensitivity under declared patch perturbations;
-  they do not prove causal or human-like reasoning.
-- Parameter-randomization, target-specificity, and flip-stability checks use a
-  deterministic nine-image class-balanced audit cohort.
+- The four-class task is a cleaned subset of POLAR, not the full nine-label benchmark.
+- V-COCO has a different source and annotation policy; its results diagnose transfer
+  rather than rank models for the POLAR task.
+- The RBF result is a large frozen-representation probe, not an end-to-end serving
+  design.
+- Attribution localization, perturbation, and randomization tests do not prove human-like
+  or causal reasoning.
 
-## Technical references
+## References and license
 
-- [ConvNeXt: A ConvNet for the 2020s](https://arxiv.org/abs/2201.03545)
-- [DINOv2: Learning Robust Visual Features without Supervision](https://arxiv.org/abs/2304.07193)
-- [Dropout](https://www.jmlr.org/papers/v15/srivastava14a.html)
-- [MixUp](https://arxiv.org/abs/1710.09412)
-- [RandAugment](https://arxiv.org/abs/1909.13719)
-- [When Does Label Smoothing Help?](https://arxiv.org/abs/1906.02629)
-- [ROAD: Remove and Debias](https://proceedings.mlr.press/v162/rong22a.html)
-- [Pixel-flipping Evaluation of Neural Explanations](https://arxiv.org/abs/1509.06321)
-- [Transformer Interpretability Beyond Attention Visualization](https://openaccess.thecvf.com/content/CVPR2021/html/Chefer_Transformer_Interpretability_Beyond_Attention_Visualization_CVPR_2021_paper.html)
-- [Sanity Checks for Saliency Maps](https://papers.neurips.cc/paper_files/paper/2018/hash/294a8ed24b1ad22ec2e7efea049b8737-Abstract.html)
+- [POLAR dataset](https://doi.org/10.17632/hvnsh7rwz7.1)
+- [DINOv2](https://arxiv.org/abs/2304.07193)
+- [ConvNeXt](https://arxiv.org/abs/2201.03545)
+- [V-COCO](https://arxiv.org/abs/1505.04474)
+- [Sanity Checks for Saliency Maps](https://arxiv.org/abs/1810.03292)
 
-## License
-
-Original source code and documentation are licensed under the [MIT License](LICENSE).
-COCO source images and pretrained model components retain their upstream terms;
-see [the third-party notices](THIRD_PARTY_NOTICES.md).
+Original code and documentation are MIT licensed. Dataset images, annotations, and
+pretrained weights retain their upstream terms; see
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

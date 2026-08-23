@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "human-activity-classification"
-version = "1.0.0"
+version = "2.0.0"
 description = "Leakage-safe transfer-learning benchmarks for image-based human activity classification"
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
@@ -33,6 +33,11 @@ notebook = [
   "nbformat>=5.10,<6",
 ]
 dev = ["pytest>=8.3,<10", "ruff>=0.9,<1"]
+report = [
+  "pdfplumber>=0.11,<1",
+  "pypdf>=6,<7",
+  "reportlab>=5,<6",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

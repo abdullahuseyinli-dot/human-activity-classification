@@ -1,5 +1,9 @@
 # Experiment protocol
 
+> Historical scope: this protocol governs the retained 285-image COCO baseline.
+> The current portfolio study is governed by the
+> [POLAR scale-study protocol](POLAR_SCALE_STUDY_PROTOCOL.md).
+
 ## Objective
 
 Compare ImageNet-pretrained ConvNeXt-Small and self-supervised DINOv2-Small on a

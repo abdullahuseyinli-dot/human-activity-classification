@@ -3,6 +3,7 @@ data/*
 !data/README.md
 !data/manifest.csv
 .runs/
+tmp/
 artifacts/
 checkpoints/
 *.pt
