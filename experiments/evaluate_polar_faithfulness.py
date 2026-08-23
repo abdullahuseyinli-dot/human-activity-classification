@@ -177,10 +177,27 @@ def jensen_shannon(left: np.ndarray, right: np.ndarray) -> float:
     )
 
 
-def bootstrap_mean(values: pd.Series, *, resamples: int, seed: int) -> dict:
-    array = values.to_numpy(dtype=float)
+def stratified_bootstrap_mean(
+    frame: pd.DataFrame,
+    column: str,
+    *,
+    strata: tuple[str, ...],
+    resamples: int,
+    seed: int,
+) -> dict:
+    if column not in frame or any(name not in frame for name in strata):
+        raise ValueError("Bootstrap column or stratum is missing")
+    array = frame[column].to_numpy(dtype=float)
+    if len(array) < 1 or not np.isfinite(array).all():
+        raise ValueError("Bootstrap values must be non-empty and finite")
     generator = np.random.default_rng(seed)
-    draws = generator.choice(array, size=(resamples, len(array)), replace=True).mean(axis=1)
+    draws = np.zeros(resamples, dtype=float)
+    for _, group in frame.groupby(list(strata), sort=True, observed=True):
+        values = group[column].to_numpy(dtype=float)
+        weight = len(values) / len(frame)
+        draws += weight * generator.choice(
+            values, size=(resamples, len(values)), replace=True
+        ).mean(axis=1)
     return {
         "mean": float(array.mean()),
         "ci95_low": float(np.quantile(draws, 0.025)),
@@ -582,35 +599,45 @@ def main() -> None:
     aggregate = {}
     for family, family_frame in per_image.groupby("family", sort=True):
         aggregate[family] = {
-            column: bootstrap_mean(
-                family_frame[column],
+            column: stratified_bootstrap_mean(
+                family_frame,
+                column,
+                strata=("true_label", "bbox_area_quartile"),
                 resamples=10_000,
                 seed=stable_seed("faithfulness-bootstrap", family, column),
             )
             for column in metric_columns
         }
-        aggregate[family]["pointing_game_rate"] = bootstrap_mean(
-            family_frame["pointing_game"].astype(float),
+        aggregate[family]["pointing_game_rate"] = stratified_bootstrap_mean(
+            family_frame,
+            "pointing_game",
+            strata=("true_label", "bbox_area_quartile"),
             resamples=10_000,
             seed=stable_seed("faithfulness-bootstrap", family, "pointing-game"),
         )
-        aggregate[family]["full_crop_agreement_rate"] = bootstrap_mean(
-            family_frame["full_crop_prediction_agreement"].astype(float),
+        aggregate[family]["full_crop_agreement_rate"] = stratified_bootstrap_mean(
+            family_frame,
+            "full_crop_prediction_agreement",
+            strata=("true_label", "bbox_area_quartile"),
             resamples=10_000,
             seed=stable_seed("faithfulness-bootstrap", family, "full-crop-agreement"),
         )
-        aggregate[family]["randomized_head_spearman"] = bootstrap_mean(
-            sanity.loc[sanity["family"].eq(family), "trained_vs_randomized_head_spearman"],
+        family_sanity = sanity[sanity["family"].eq(family)]
+        aggregate[family]["randomized_head_spearman"] = stratified_bootstrap_mean(
+            family_sanity,
+            "trained_vs_randomized_head_spearman",
+            strata=("true_label",),
             resamples=10_000,
             seed=stable_seed("faithfulness-bootstrap", family, "randomized-head"),
         )
-        aggregate[family]["randomized_adapted_cascade_spearman"] = bootstrap_mean(
-            sanity.loc[
-                sanity["family"].eq(family),
+        aggregate[family]["randomized_adapted_cascade_spearman"] = (
+            stratified_bootstrap_mean(
+                family_sanity,
                 "trained_vs_randomized_adapted_cascade_spearman",
-            ],
-            resamples=10_000,
-            seed=stable_seed("faithfulness-bootstrap", family, "randomized-cascade"),
+                strata=("true_label",),
+                resamples=10_000,
+                seed=stable_seed("faithfulness-bootstrap", family, "randomized-cascade"),
+            )
         )
 
     stratum_summary = (
@@ -649,6 +676,12 @@ def main() -> None:
         "parameter_randomization_rows_per_family": int(
             sanity.groupby("family", sort=True).size().min()
         ),
+        "bootstrap": {
+            "resamples": 10_000,
+            "per_image_strata": ["true_label", "bbox_area_quartile"],
+            "randomization_strata": ["true_label"],
+            "seed_policy": "sha256_stable_metric_specific",
+        },
         "aggregate": aggregate,
         "max_probability_parity_absolute_error": float(
             per_image["probability_parity_absolute_error"].max()

@@ -2,7 +2,10 @@ import numpy as np
 import pandas as pd
 import pytest
 import torch
-from evaluate_polar_faithfulness import randomized_adapted_cascade
+from evaluate_polar_faithfulness import (
+    randomized_adapted_cascade,
+    stratified_bootstrap_mean,
+)
 from torch import nn
 
 from hac.polar_faithfulness import (
@@ -116,3 +119,24 @@ def test_cascade_randomization_changes_only_head_and_adapted_stage():
     assert torch.equal(model.backbone.features[0][0].weight, early)
     assert not torch.equal(model.backbone.features[-1][0].weight, adapted)
     assert not torch.equal(model.backbone.classifier[2].weight, head)
+
+
+def test_stratified_bootstrap_preserves_fixed_group_composition():
+    frame = pd.DataFrame(
+        {
+            "label": ["a"] * 4 + ["b"] * 4,
+            "value": [0.0] * 4 + [2.0] * 4,
+        }
+    )
+
+    result = stratified_bootstrap_mean(
+        frame,
+        "value",
+        strata=("label",),
+        resamples=500,
+        seed=17,
+    )
+
+    assert result["mean"] == pytest.approx(1.0)
+    assert result["ci95_low"] == pytest.approx(1.0)
+    assert result["ci95_high"] == pytest.approx(1.0)
