@@ -4,12 +4,10 @@ It is easy to improve an image classifier when every decision can be reconsidere
 looking at the test set. It is much harder to improve one while preserving a clean
 answer to a simple question: *what did the model know before the test was opened?*
 
-This project began as a 285-image activity classifier. That version was useful for
-building a disciplined training pipeline, but its 43-image test split was too small to
-support a strong portfolio claim. I expanded the work to a cleaned four-class subset of
-POLAR, added a one-time test gate, trained ConvNeXt and DINOv2 models across three seeds,
-tested linear and RBF classifiers on multilayer embeddings, and evaluated the locked
-system on a second dataset.
+This project began as a 285-image activity classifier with a 43-image test split. The
+expanded study uses a cleaned four-class subset of POLAR, a one-time test gate,
+ConvNeXt and DINOv2 models trained across three seeds, linear and RBF classifiers on
+multilayer embeddings, and a locked evaluation on a second dataset.
 
 The final in-domain result is strong: **0.940 macro-F1 and 0.946 accuracy on 3,329 held-out
 POLAR images**. The more useful result is the full pattern around that number.
@@ -57,7 +55,7 @@ strictly positive interval.
 
 ![Locked POLAR comparison](../assets/polar_test_comparison.png)
 
-## The SVM helped—but I would not deploy it by default
+## The SVM added a small gain at high systems cost
 
 The RBF experiment was worth doing because the DINOv2 representation was already
 strong. It answered whether a nonlinear boundary could recover structure that a linear
@@ -84,11 +82,10 @@ images, it scored 0.667. Adapted DINOv2-B transferred best at 0.673.
 
 ![External transfer](../assets/polar_external_validation.png)
 
-That 29-point gap is not a footnote. It suggests the POLAR split rewards regularities
-that do not fully survive a different image and annotation distribution. It also shows
-that the in-domain-optimal ensemble is not automatically the most transferable model.
-If I extend the project, domain generalization—not another round of POLAR tuning—is the
-highest-value direction.
+The 29-point gap shows that regularities learned on POLAR transfer only partly to a
+different image and annotation distribution. Adapted DINOv2-B also transfers slightly
+better than the in-domain-optimal ensemble. Domain generalization is therefore the
+highest-value next experiment.
 
 ## The external gap had more than one cause
 
@@ -109,7 +106,7 @@ on POLAR to 0.584 on V-COCO, and many external errors are unanimous across all f
 components. The models become confidently wrong in the same direction, which is more
 important than the small difference between their external point estimates.
 
-## A saliency map is not a faithfulness result
+## Faithfulness required more than localization
 
 The explanation audit combined four kinds of evidence: deletion/insertion curves,
 person-box localization, equal-area person-versus-context occlusion, and parameter
@@ -128,9 +125,8 @@ adapted transformer blocks.
 
 ![Attribution sanity](../assets/polar_attribution_sanity.png)
 
-So I do not describe those DINO maps as faithful causal explanations. They are coarse
-localization diagnostics. This distinction is more valuable than a gallery of
-plausible-looking heatmaps.
+The DINO maps support coarse person localization. Their high target and parameter
+randomization correlations limit the class-specific interpretation of the heatmaps.
 
 ## Bit flips answered a different question
 
@@ -142,10 +138,8 @@ cohort output.
 
 ![Bit-flip robustness](../assets/polar_fault_robustness.png)
 
-This result describes bounded software fault injection on 256 images. It does not prove
-hardware reliability, and it says nothing about random faults throughout the backbone.
-Keeping that boundary explicit prevents a useful diagnostic from becoming an inflated
-claim.
+This experiment measures bounded software fault injection on 256 images. The tested
+interventions cover input tensors and classifier matrices.
 
 ## What the study contributes
 
@@ -160,10 +154,9 @@ benchmark:
 - external validation that exposes the domain gap;
 - attribution tests that are allowed to fail.
 
-I do not call the result state of the art. I found no published benchmark with the same
-cleaned four-class subset and protocol. A stronger academic extension would replicate
-the method on the remaining POLAR actions or an independently collected dataset with
-subject/session identifiers, then predeclare a domain-generalization intervention.
+The clearest extension is to apply the same locked workflow to the remaining POLAR
+actions or an independently collected dataset with subject/session identifiers, then
+predeclare a domain-generalization intervention.
 
 The complete methods, tables, limitations, and references are in the
 [independent technical report](POLAR_PUBLIC_REPORT.md). Every promoted number is also

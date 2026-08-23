@@ -124,9 +124,8 @@ The locked-test audit combines complementary checks:
 
 All perturbations target the model's locked predicted-class probability rather
 than the ground-truth label. This avoids turning explanations into an implicit
-error-correction step. Faithfulness metrics describe sensitivity of this model
-under the declared perturbation operators; they are not evidence of human-like
-reasoning or causal understanding. Test-set mean intervals use 2,000
+error-correction step. Faithfulness metrics describe model sensitivity under the
+declared perturbation operators. Test-set mean intervals use 2,000
 class-stratified bootstrap resamples; the random-subset correlation uses 16
 deterministic matched subsets per image.
 
@@ -144,6 +143,6 @@ not presented as a statistically certain improvement when the paired interval
 includes zero. Historical notebook outputs produced under a different split or
 training lineage are not mixed with corrected results.
 
-The dataset does not expose subject or capture-session identifiers. The
-experiment can prove manifest-level and duplicate-level separation, but it
-cannot claim subject-independent generalization without those metadata.
+The dataset does not expose subject or capture-session identifiers. The experiment
+therefore reports manifest-level and duplicate-level separation; subject-independent
+evaluation remains outside the available metadata.

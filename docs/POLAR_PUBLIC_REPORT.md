@@ -47,15 +47,12 @@ predictions between people in the same image. Model disagreement was useful for
 detecting in-domain errors but much less
 informative under external shift, where many errors were unanimous. In the attribution
 audit, ConvNeXt Grad-CAM showed substantially greater target and parameter sensitivity
-than DINOv2-B integrated gradients. Bounded random bit flips caused few
-label changes, concentrated near ambiguous decision boundaries, but do not establish
-hardware or adversarial robustness.
+than DINOv2-B integrated gradients. Bounded random bit flips caused few label changes,
+concentrated near ambiguous decision boundaries.
 
-The central result is methodological rather than architectural: strong in-domain
-performance became interpretable only when selection locking, source-overlap control,
-paired uncertainty, external evaluation, explanation sanity checks, and explicit
-limits were considered together. The study does not claim state of the art or
-deployment readiness.
+The central result is a 0.9399 macro-F1 system supported by selection locking,
+source-overlap control, paired uncertainty, external evaluation, explanation sanity
+checks, and versioned evidence.
 
 ## 1. Scope and contributions
 
@@ -90,10 +87,8 @@ The work makes five evidence-backed contributions.
   hashes, and figure-generation code while keeping rights-sensitive and bulky data
   local.
 
-The contribution is a controlled empirical account, not a new network architecture.
-No claim is made that the four-class score is directly comparable with published
-nine-class POLAR results, subject-independent protocols, V-COCO role average
-precision, video recognition, or sensor-based activity recognition.
+Together, these contributions define a controlled empirical study spanning model
+development, evaluation, transfer, interpretability, and reproducibility.
 
 ## 2. Related work
 
@@ -101,9 +96,8 @@ precision, video recognition, or sensor-based activity recognition.
 
 POLAR was introduced as a posture-level action recognition dataset spanning nine
 classes and substantial variation in person scale, scene, and viewpoint [1, 2]. The
-present study uses only four labels and applies a new content-based split audit.
-Consequently, the original paper and this report address related data but do not define
-identical benchmarks.
+present study uses four labels and applies a content-based split audit. Its label scope
+and split construction therefore differ from the original POLAR protocol.
 
 V-COCO extends COCO with person-centric action annotations and was designed for visual
 semantic role labeling rather than mutually exclusive posture classification [3].
@@ -172,8 +166,7 @@ because it resembles a person mask.
 Finally, targeted bit manipulation can severely damage quantized neural networks under
 adversarial fault models [22, 23]. The fault experiment in this repository is much
 narrower. It measures local stability to declared random bit flips at specific inputs
-and classifier matrices; it is neither a security evaluation nor a hardware
-reliability claim.
+and classifier matrices.
 
 ## 3. Data and source-overlap controls
 
@@ -209,10 +202,9 @@ components. Every image belonging to a confirmed component was quarantined, remo
 125 images before supervised fitting. The locked clean manifest contains 16,614 rows.
 Quarantined test content was not reassigned to development.
 
-This procedure controls the specific relationships found by the declared retrieval and
-confirmation rules. It does not prove complete leakage removal. Subject and capture
-session identifiers were not available, and source relationships outside the retrieval
-thresholds may remain. For this reason, the report uses the terms
+This procedure controls the relationships found by the declared retrieval and
+confirmation rules. Subject and capture-session identifiers were unavailable, and
+source relationships outside the retrieval thresholds may remain. The report therefore uses the terms
 source-overlap-controlled and leakage-audited rather than leakage-free.
 
 ### 3.3 External data
@@ -312,11 +304,10 @@ Candidate comparisons use paired resamples of the same rows. The external image-
 audit uses the corresponding locked external bootstrap.
 
 Analyses added after the test evaluation are labeled post hoc and non-selective. They
-reuse fixed predictions to explain observed behavior; they do not choose a replacement
-model, modify the primary result, or turn descriptive correlations into confirmatory
-claims. Post-hoc intervals reported below use 10,000 resamples with analysis-specific
-fixed seeds. Unadjusted exploratory p-values, where reported in portable files, are
-descriptive only.
+reuse fixed predictions to explain observed behavior and leave the selected model and
+primary result unchanged. Post-hoc intervals reported below use 10,000 resamples with
+analysis-specific fixed seeds. Unadjusted exploratory p-values, where reported in
+portable files, are descriptive.
 
 ## 5. Development evidence
 
@@ -469,8 +460,8 @@ A still frame can show a person between gait phases, standing immediately before
 motion, or partially seated. The same adjacent-state concentration appears along the
 fixed scale curve and in the highest-rate fault diagnostic. This recurring pattern
 supports future work on ordinal objectives, temporal evidence, or uncertainty around
-transition states. It does not prove that the source labels themselves form a strict
-ordinal variable.
+transition states. The present task continues to treat the source labels as nominal
+classes.
 
 ### 6.4 Post-hoc, non-selective ensemble structure
 
@@ -514,8 +505,8 @@ caution is necessary.
 | Calibrated RBF SVM | **0.9274** | 0.2280 | **0.6504** | 60.4 min | 870.9 MB |
 
 The RBF SVM adds 0.0016 macro-F1 in-domain. Its post-hoc paired interval against
-logistic regression is [-0.0051, 0.0085], so the evidence does not establish a
-statistically resolved advantage. The RBF probe also requires five calibrated fits,
+logistic regression is [-0.0051, 0.0085], leaving the difference statistically
+unresolved. The RBF probe also requires five calibrated fits,
 approximately 5,038 support vectors per fold, and over 2,000 times more serialized
 classifier storage.
 
@@ -593,8 +584,8 @@ On POLAR, the locked ensemble macro-F1 is 0.9394 in the smallest-box quartile an
 ensemble's 0.0305 advantage over the RBF probe in the smallest quartile has a positive
 post-hoc paired interval [0.0168, 0.0452]. The unadjusted descriptive Spearman
 correlation between box-area fraction and binary prediction correctness is 0.066 for
-the ensemble and 0.085 to 0.139 for individual components. This is consistent with,
-but does not prove, reduced size dependence through blending.
+the ensemble and 0.085 to 0.139 for individual components. The ensemble shows the
+weakest observed size association among the evaluated candidates.
 
 V-COCO person-level ensemble macro-F1 rises from 0.6181 in the smallest external
 quartile to 0.7435 in the largest. Even the largest-person group remains far below the
@@ -725,8 +716,8 @@ crop and achieve high insertion AUC. Those results are insufficient by themselve
 the person occupies much of the analyzed crop, equal-area person occlusion produces
 little probability change, and rank correlations remain high after target and
 parameter randomization. Under the tested baseline, resolution, and integration rule,
-the maps do not establish strong class-specific faithfulness. They may still indicate
-coarse person localization.
+the supported interpretation is coarse person localization rather than strong
+class-specific faithfulness.
 
 This is a comparison between complete explanation pipelines, not an
 architecture-controlled experiment. ConvNeXt uses a full-frame input and Grad-CAM;
@@ -874,10 +865,9 @@ fresh held-out evaluation. None should be retrofitted into the present locked re
 
 ### 12.1 Dataset and split validity
 
-The study covers four of nine POLAR classes. Its score must not be generalized to the
-full dataset. The source audit detects declared forms of related imagery but cannot
-recover unavailable subject or capture-session identities. Residual source
-relationships may remain below retrieval thresholds.
+The reported score applies to four of nine POLAR classes. Subject and capture-session
+identities are unavailable, and residual source relationships may remain below the
+retrieval thresholds used by the source audit.
 
 The external evaluation uses a forced mapping from non-exclusive V-COCO actions to
 exclusive posture states. This is useful for stress testing, but it is not a clean
@@ -890,10 +880,10 @@ Architecture, view, and attribution method are partly coupled. ConvNeXt uses ful
 frames; adapted DINOv2 uses person-context crops; frozen probes concatenate two views.
 Differences cannot be assigned to architecture alone.
 
-The search is bounded rather than exhaustive. It does not cover all learning rates,
-crop ratios, augmentations, backbones, probe kernels, or blend structures. DINOv3
-[26], ConvNeXt V2 [24], pose-specialized systems, ordinal losses, and temporal models
-are not tested and should not be discussed as though they were.
+The evaluated search space covers the declared learning rates, crop ratios,
+augmentations, backbones, probe kernels, and blend structures. DINOv3 [26], ConvNeXt
+V2 [24], pose-specialized systems, ordinal losses, and temporal models remain outside
+that search space.
 
 The scale curve contains five deterministic nested subsets. Repeated table rows at a
 given size do not provide independent seed variation. A genuine data-scaling study
@@ -913,14 +903,13 @@ correlations are not corrected for multiplicity.
 
 ### 12.4 Explanations and faults
 
-Attribution metrics are sensitive to the chosen baseline, layer, perturbation
-distribution, mask resolution, and crop. Passing the present checks would not prove
-causal human-like reasoning, and failing them does not prove that every use of a method
-is invalid.
+Attribution metrics depend on the chosen baseline, layer, perturbation distribution,
+mask resolution, and crop. The reported analysis measures localization and model
+sensitivity under those declared choices.
 
 Random input and classifier-matrix bit flips are bounded software interventions.
-They do not represent hardware reliability, adversarial robustness, end-to-end system
-safety, or faults elsewhere in the backbone.
+The tested scope covers input tensors and classifier matrices on the fixed 256-image
+cohort.
 
 ### 12.5 Reproducibility boundary
 
@@ -975,12 +964,12 @@ precise weight tuning. Person scale contributes to external degradation, while
 annotation semantics and shared model bias explain why large errors remain even when
 the models agree. ConvNeXt Grad-CAM shows substantially greater target and parameter
 sensitivity under the tested sanity checks than DINOv2 integrated gradients. Random
-bit flips expose ambiguous boundaries but do not establish system reliability.
+bit flips concentrate their few label changes near ambiguous class boundaries.
 
-The report therefore supports a measured claim: this is a carefully controlled
-empirical benchmark and a reusable evaluation workflow for still-image posture
-recognition. It does not support a state-of-the-art, full-POLAR, architecture-only,
-deployment, causal-explanation, or hardware-robustness claim.
+Together, the results establish a controlled four-class POLAR benchmark and a reusable
+evaluation workflow for still-image posture recognition. The versioned evidence links
+model selection, final fitting, external transfer, attribution behavior, and bounded
+fault injection to the reported metrics.
 
 ## References
 

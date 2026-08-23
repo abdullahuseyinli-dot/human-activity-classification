@@ -62,8 +62,8 @@ resized 128 by 128 grayscale pixels is at least 0.90. Every image in a connected
 cross-split component is quarantined from all primary partitions. The threshold,
 pair table, component membership, and changed class counts are preserved. The
 unfiltered official split may be reported only as a sensitivity baseline labelled
-`OFFICIAL_UNFILTERED_SOURCE_OVERLAP`; it cannot select a model or support the
-primary claim.
+`OFFICIAL_UNFILTERED_SOURCE_OVERLAP`; it remains outside model selection and primary
+evaluation.
 
 As a second audit, frozen upstream DINOv2-Small full-frame embeddings may retrieve
 cross-split neighbours with cosine similarity at least 0.985. Embedding proximity
@@ -238,8 +238,8 @@ error. Confusion matrices use counts and row-normalized rates.
 Final confidence intervals use 10,000 stratified bootstrap resamples with seed
 20260822. Model deltas use paired resampling of the same examples. Multi-seed
 predictions are averaged before primary test scoring; seed dispersion is reported
-separately. Claims such as “better” require a positive paired interval or are
-described as point-estimate differences.
+separately. A model is described as better only when the paired interval is positive;
+otherwise the result is described as a point-estimate difference.
 
 ## Complementarity, robustness, and faithfulness
 
@@ -258,19 +258,13 @@ are retained. POLAR adds annotation-grounded measures:
 - full-frame versus person-context prediction consistency;
 - results stratified by person area and class.
 
-These are localization and perturbation tests, not proof of causal or human-like
-reasoning. Attribution-method choices are made on validation and frozen before
-test evaluation.
+These tests measure localization and perturbation sensitivity. Attribution-method
+choices are made on validation and frozen before test evaluation.
 
-## External validation and claim limits
+## External validation
 
 V-COCO train/validation is an independent COCO-domain source for sitting,
 standing, and walking/running. The external evaluation uses person-level target
 annotations, excludes mixed-label images for an image-level comparison, and
 excludes every SHA-256/perceptual duplicate of the legacy COCO corpus. Any known
 overlap with V-COCO test is listed and excluded.
-
-A state-of-the-art comparison requires a directly comparable published result using
-the same POLAR release, target subset, splits, label space, and metric. Without that
-match, the result is reported as a reproducible benchmark and cross-paper numbers are
-explicitly labelled non-comparable.

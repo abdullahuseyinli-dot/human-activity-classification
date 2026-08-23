@@ -308,12 +308,12 @@ display(
 - Data scale is the largest isolated performance amplifier in this study.
 - DINOv2-B representations support strong linear and nonlinear final-stage classifiers.
 - Development-locked model diversity produces a statistically supported ensemble gain.
-- The external-domain gap is large; the POLAR score is not a deployment guarantee.
+- V-COCO transfer falls to 0.667 macro-F1 and exposes combined domain and annotation-policy shift.
 - ConvNeXt Grad-CAM passes the declared sanity checks more convincingly than DINOv2-B
   integrated gradients.
 
-No exact state-of-the-art claim is made. The full method, discussion, limitations, and
-references are documented in `docs/POLAR_PUBLIC_REPORT.md`.
+The complete method, evidence lineage, discussion, and references are documented in
+`docs/POLAR_PUBLIC_REPORT.md`.
 """
         ),
     ]

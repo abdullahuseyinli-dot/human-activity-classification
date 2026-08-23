@@ -30,11 +30,10 @@ over its corresponding constituent.
   carry a source `stand` action, explaining much of the apparent external error.
 - Attribution diagnostics that separate raw person-box mass, area-normalized lift,
   matched occlusion, target sensitivity, and parameter sensitivity.
-- Bounded random bit-flip diagnostics reported as local software interventions, not as
-  hardware or adversarial robustness claims.
+- Bounded random bit-flip diagnostics across input tensors and classifier matrices.
 
-Post-lock analyses are explicitly labelled as hypothesis-generating. They did not alter
-the selected models, ensemble weights, thresholds, test metrics, or primary claim.
+Post-lock analyses are labelled as hypothesis-generating and leave the selected models,
+ensemble weights, thresholds, and test metrics unchanged.
 
 ## Release artifacts
 
@@ -60,13 +59,6 @@ python -m pytest
 python tools/validate_repository.py
 python tools/build_study_release_manifest.py --check
 ```
-
-## Scope
-
-This is a reproducible empirical benchmark and evaluation workflow, not a claim of a
-new architecture or state of the art. It covers four of the nine POLAR labels and does
-not establish subject-independent generalization, deployment readiness, causal
-explanations, hardware reliability, or universal out-of-domain robustness.
 
 ## Versioning
 

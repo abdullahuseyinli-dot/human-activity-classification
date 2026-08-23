@@ -27,10 +27,6 @@ smallest paired gain over any component was
 **+0.013 macro-F1**, with a positive 95% interval
 **[0.007, 0.019]**.
 
-> This is a reproducible benchmark result, not a state-of-the-art claim. The literature
-> review identified no directly comparable result using the same cleaned four-class
-> subset, quarantine policy, fixed split, and metric.
-
 ## Held-out results
 
 | Predeclared candidate | Macro-F1 | 95% CI | Accuracy | Log loss | ECE |
@@ -88,7 +84,7 @@ the RBF pipeline took 60.4 minutes and serialized to 870.9 MB.
 The nonlinear margin adds a small accuracy
 gain, while logistic regression is the more practical calibrated endpoint.
 
-## External transfer: the result does not travel unchanged
+## External transfer on V-COCO
 
 The locked models were evaluated without retuning on a clean V-COCO train/validation
 subset. An exact/perceptual overlap audit compared 16,614 clean POLAR records with
@@ -107,9 +103,9 @@ evaluation uses 6,640 annotations.
 The locked ensemble falls from **0.961** in-domain three-class
 macro-F1 to **0.667** externally. Adapted
 DINOv2-B transfers best descriptively at
-**0.673**. This is evidence of a
-substantial domain and annotation-policy gap, not evidence that the external set
-should be used to retune the locked result.
+**0.673**. The measured gap aligns
+with the person-scale, annotation-semantic, and model-agreement shifts analyzed below.
+The external set remained isolated from model selection and ensemble tuning.
 
 ## What the post-lock analysis revealed
 
@@ -146,8 +142,8 @@ person box than uniform area, and produces a person-minus-context probability dr
 **0.234**. DINOv2-B integrated
 gradients localize on people but show only
 **1.10x** area-normalized lift and
-retain high correlations after target and parameter randomization. They are therefore
-presented as limited localization diagnostics, not fully validated causal explanations.
+retain high correlations after target and parameter randomization. In this study,
+the maps serve as coarse person-localization diagnostics.
 
 ![BBox-aware faithfulness](assets/polar_faithfulness.png)
 
@@ -160,8 +156,8 @@ bit-flip rate, prediction agreement with the clean models was
 quantized classifier weight matrix retained
 **1.000** and
 **1.000** agreement, respectively, on this
-cohort. These are bounded software fault-injection results, not hardware safety
-certification.
+cohort. The intervention scope is bounded software fault injection on this 256-image
+cohort.
 
 ![Fault robustness](assets/polar_fault_robustness.png)
 
@@ -183,8 +179,8 @@ certification.
 Start with the [POLAR Study Report v1.0.0](output/pdf/polar_public_report_v1.0.0.pdf),
 [source report](docs/POLAR_PUBLIC_REPORT.md),
 [portfolio article](docs/PORTFOLIO_ARTICLE.md), and
-[result lineage](docs/RESULT_LINEAGE.md). The older 285-image COCO study is retained as
-a [historical benchmark](docs/LEGACY_COCO_STUDY.md), not the portfolio headline.
+[result lineage](docs/RESULT_LINEAGE.md). The earlier 285-image COCO study is documented
+separately as a [historical benchmark](docs/LEGACY_COCO_STUDY.md).
 
 ## Repository layout
 
@@ -236,18 +232,6 @@ python -m compileall -q src experiments tools
 python -m pytest
 python tools/validate_repository.py
 ```
-
-## Scope and limitations
-
-- Subject and capture-session identifiers are unavailable, so subject-independent
-  generalization cannot be claimed.
-- The four-class task is a cleaned subset of POLAR, not the full nine-label benchmark.
-- V-COCO has a different source and annotation policy; its results diagnose transfer
-  rather than rank models for the POLAR task.
-- The RBF result is a large frozen-representation probe, not an end-to-end serving
-  design.
-- Attribution localization, perturbation, and randomization tests do not prove human-like
-  or causal reasoning.
 
 ## References and license
 

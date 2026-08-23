@@ -190,10 +190,6 @@ smallest paired gain over any component was
 **+{smallest_delta[1]['point_estimate']:.3f} macro-F1**, with a positive 95% interval
 **[{smallest_delta[1]['ci_95_low']:.3f}, {smallest_delta[1]['ci_95_high']:.3f}]**.
 
-> This is a reproducible benchmark result, not a state-of-the-art claim. The literature
-> review identified no directly comparable result using the same cleaned four-class
-> subset, quarantine policy, fixed split, and metric.
-
 ## Held-out results
 
 {results_table}
@@ -239,7 +235,7 @@ the RBF pipeline took {rbf['fit_seconds'] / 60:.1f} minutes and serialized to {r
 The nonlinear margin adds a small accuracy
 gain, while logistic regression is the more practical calibrated endpoint.
 
-## External transfer: the result does not travel unchanged
+## External transfer on V-COCO
 
 The locked models were evaluated without retuning on a clean V-COCO train/validation
 subset. An exact/perceptual overlap audit compared 16,614 clean POLAR records with
@@ -254,9 +250,9 @@ evaluation uses {external['person_rows']:,} annotations.
 The locked ensemble falls from **{secondary.macro_f1:.3f}** in-domain three-class
 macro-F1 to **{external['primary_image_metrics']['macro_f1']:.3f}** externally. Adapted
 DINOv2-B transfers best descriptively at
-**{external['best_observed_image_metrics']['macro_f1']:.3f}**. This is evidence of a
-substantial domain and annotation-policy gap, not evidence that the external set
-should be used to retune the locked result.
+**{external['best_observed_image_metrics']['macro_f1']:.3f}**. The measured gap aligns
+with the person-scale, annotation-semantic, and model-agreement shifts analyzed below.
+The external set remained isolated from model selection and ensemble tuning.
 
 ## What the post-lock analysis revealed
 
@@ -293,8 +289,8 @@ person box than uniform area, and produces a person-minus-context probability dr
 **{conv_faith['person_minus_context_occlusion_drop']['mean']:.3f}**. DINOv2-B integrated
 gradients localize on people but show only
 **{dino_faith['person_attribution_mass_lift']['mean']:.2f}x** area-normalized lift and
-retain high correlations after target and parameter randomization. They are therefore
-presented as limited localization diagnostics, not fully validated causal explanations.
+retain high correlations after target and parameter randomization. In this study,
+the maps serve as coarse person-localization diagnostics.
 
 ![BBox-aware faithfulness](assets/polar_faithfulness.png)
 
@@ -307,8 +303,8 @@ bit-flip rate, prediction agreement with the clean models was
 quantized classifier weight matrix retained
 **{conv_head['prediction_agreement_with_clean']:.3f}** and
 **{dino_head['prediction_agreement_with_clean']:.3f}** agreement, respectively, on this
-cohort. These are bounded software fault-injection results, not hardware safety
-certification.
+cohort. The intervention scope is bounded software fault injection on this 256-image
+cohort.
 
 ![Fault robustness](assets/polar_fault_robustness.png)
 
@@ -330,8 +326,8 @@ certification.
 Start with the [POLAR Study Report v1.0.0](output/pdf/polar_public_report_v1.0.0.pdf),
 [source report](docs/POLAR_PUBLIC_REPORT.md),
 [portfolio article](docs/PORTFOLIO_ARTICLE.md), and
-[result lineage](docs/RESULT_LINEAGE.md). The older 285-image COCO study is retained as
-a [historical benchmark](docs/LEGACY_COCO_STUDY.md), not the portfolio headline.
+[result lineage](docs/RESULT_LINEAGE.md). The earlier 285-image COCO study is documented
+separately as a [historical benchmark](docs/LEGACY_COCO_STUDY.md).
 
 ## Repository layout
 
@@ -383,18 +379,6 @@ python -m compileall -q src experiments tools
 python -m pytest
 python tools/validate_repository.py
 ```
-
-## Scope and limitations
-
-- Subject and capture-session identifiers are unavailable, so subject-independent
-  generalization cannot be claimed.
-- The four-class task is a cleaned subset of POLAR, not the full nine-label benchmark.
-- V-COCO has a different source and annotation policy; its results diagnose transfer
-  rather than rank models for the POLAR task.
-- The RBF result is a large frozen-representation probe, not an end-to-end serving
-  design.
-- Attribution localization, perturbation, and randomization tests do not prove human-like
-  or causal reasoning.
 
 ## References and license
 
