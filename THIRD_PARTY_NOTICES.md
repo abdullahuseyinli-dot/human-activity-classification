@@ -31,11 +31,11 @@ their intended use is permitted.
 
 Suggested citations:
 
-> Abdallah, M. et al. (2019). POLAR: A holistic dataset for human activity
-> recognition. Mendeley Data, V1. https://doi.org/10.17632/hvnsh7rwz7.1
+> Ma, W., & Liang, S. (2021). POLAR: Posture-level Action Recognition Dataset.
+> Mendeley Data, V1. https://doi.org/10.17632/hvnsh7rwz7.1
 
-> Abdallah, M. et al. (2019). Human activity recognition using recurrent neural
-> networks. ICSAI. https://doi.org/10.1109/ICSAI48974.2019.9010160
+> Ma, W., & Liang, S. (2019). POLAR: Posture-level Action Recognition Dataset.
+> ICSAI, 427-433. https://doi.org/10.1109/ICSAI48974.2019.9010160
 
 ## DINOv2-Small
 
