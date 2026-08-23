@@ -438,8 +438,13 @@ def main() -> None:
     lock = json.loads(lock_path.read_text(encoding="utf-8"))
     if lock.get("status") != "FINAL_SELECTION_LOCKED_PRE_TEST":
         raise RuntimeError("Faithfulness evaluation requires the immutable final lock")
+    output_dir = args.output_dir.resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    implementation_hash = sha256_file(Path(__file__).resolve())
+    summary_path = output_dir / "summary.json"
     evaluation_dir = args.test_evaluation_dir.resolve()
-    evaluation_summary = json.loads((evaluation_dir / "summary.json").read_text(encoding="utf-8"))
+    evaluation_summary_path = evaluation_dir / "summary.json"
+    evaluation_summary = json.loads(evaluation_summary_path.read_text(encoding="utf-8"))
     if (
         evaluation_summary.get("status") != "LOCKED_FINAL_TEST_COMPLETE"
         or evaluation_summary.get("selection_lock_sha256") != lock_hash
@@ -449,6 +454,29 @@ def main() -> None:
     gate = json.loads((evaluation_dir / "test_access_gate.json").read_text(encoding="utf-8"))
     if sha256_file(opened_manifest) != gate["opened_manifest_cache_sha256"]:
         raise RuntimeError("Opened test-manifest cache hash drift")
+    prediction_path = evaluation_dir / "test_predictions.npz"
+    if summary_path.is_file():
+        existing = json.loads(summary_path.read_text(encoding="utf-8"))
+        artifacts = existing.get("artifacts", {})
+        artifacts_valid = bool(artifacts) and all(
+            Path(name).name == name
+            and (output_dir / name).is_file()
+            and sha256_file(output_dir / name) == digest
+            for name, digest in artifacts.items()
+        )
+        if (
+            existing.get("status") == "LOCKED_POLAR_FAITHFULNESS_COMPLETE"
+            and existing.get("selection_lock_sha256") == lock_hash
+            and existing.get("implementation_sha256") == implementation_hash
+            and existing.get("test_evaluation_summary_sha256")
+            == sha256_file(evaluation_summary_path)
+            and existing.get("test_predictions_sha256") == sha256_file(prediction_path)
+            and existing.get("opened_test_manifest_cache_sha256")
+            == sha256_file(opened_manifest)
+            and artifacts_valid
+        ):
+            print(json.dumps(existing, indent=2, sort_keys=True), flush=True)
+            return
     frame = pd.read_csv(opened_manifest, dtype={"image_id": str})
     faithfulness = lock["faithfulness"]
     cohort = select_bbox_stratified_cohort(
@@ -456,14 +484,11 @@ def main() -> None:
         rows=int(faithfulness["cohort_rows"]),
         seed=int(faithfulness["cohort_seed"]),
     )
-    cohort_path = args.output_dir.resolve() / "faithfulness_cohort.csv"
-    output_dir = args.output_dir.resolve()
-    output_dir.mkdir(parents=True, exist_ok=True)
+    cohort_path = output_dir / "faithfulness_cohort.csv"
     cohort.to_csv(cohort_path, index=False)
 
     final_root = args.final_root.resolve()
     resolved = verify_final_fits(lock, final_root, lock_hash)
-    prediction_path = evaluation_dir / "test_predictions.npz"
     predictions = np.load(prediction_path, allow_pickle=False)
     prediction_ids = [str(value) for value in predictions["image_ids"]]
     index_by_id = {image_id: index for index, image_id in enumerate(prediction_ids)}
@@ -555,7 +580,7 @@ def main() -> None:
         "status": "LOCKED_POLAR_FAITHFULNESS_COMPLETE",
         "selection_role": "none",
         "selection_lock_sha256": lock_hash,
-        "test_evaluation_summary_sha256": sha256_file(evaluation_dir / "summary.json"),
+        "test_evaluation_summary_sha256": sha256_file(evaluation_summary_path),
         "test_predictions_sha256": sha256_file(prediction_path),
         "opened_test_manifest_cache_sha256": sha256_file(opened_manifest),
         "cohort_rows": len(cohort),
@@ -570,7 +595,7 @@ def main() -> None:
             for path in sorted(output_dir.iterdir())
             if path.is_file() and path.name != "summary.json"
         },
-        "implementation_sha256": sha256_file(Path(__file__).resolve()),
+        "implementation_sha256": implementation_hash,
         "runtime_seconds": time.perf_counter() - started,
         "environment": {
             "python": platform.python_version(),
@@ -582,7 +607,7 @@ def main() -> None:
         "test_used_for_attribution_selection": False,
         "test_used_for_model_selection": False,
     }
-    write_json(output_dir / "summary.json", summary)
+    write_json(summary_path, summary)
     print(json.dumps(json_safe(summary), indent=2, sort_keys=True), flush=True)
 
 

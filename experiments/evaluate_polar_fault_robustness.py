@@ -146,6 +146,9 @@ def main() -> None:
     lock_path = args.selection_lock.resolve()
     lock_hash = sha256_file(lock_path)
     lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    output_dir = args.output_dir.resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    implementation_hash = sha256_file(Path(__file__).resolve())
     evaluation_dir = args.test_evaluation_dir.resolve()
     evaluation_summary = json.loads((evaluation_dir / "summary.json").read_text(encoding="utf-8"))
     if (
@@ -158,6 +161,26 @@ def main() -> None:
         raise RuntimeError("Bit-flip evidence must remain separate from faithfulness")
 
     cohort_path = args.cohort.resolve()
+    test_predictions_path = evaluation_dir / "test_predictions.npz"
+    summary_path = output_dir / "summary.json"
+    if summary_path.is_file():
+        existing = json.loads(summary_path.read_text(encoding="utf-8"))
+        metrics_path = output_dir / "fault_robustness_metrics.csv"
+        predictions_path = output_dir / "fault_robustness_predictions.npz"
+        if (
+            existing.get("status") == "LOCKED_POLAR_FAULT_ROBUSTNESS_COMPLETE"
+            and existing.get("selection_lock_sha256") == lock_hash
+            and existing.get("cohort_sha256") == sha256_file(cohort_path)
+            and existing.get("implementation_sha256") == implementation_hash
+            and existing.get("test_predictions_sha256")
+            == sha256_file(test_predictions_path)
+            and metrics_path.is_file()
+            and sha256_file(metrics_path) == existing.get("metrics_sha256")
+            and predictions_path.is_file()
+            and sha256_file(predictions_path) == existing.get("predictions_sha256")
+        ):
+            print(json.dumps(existing, indent=2, sort_keys=True), flush=True)
+            return
     cohort = pd.read_csv(cohort_path, dtype={"image_id": str})
     if len(cohort) != int(lock["faithfulness"]["cohort_rows"]):
         raise RuntimeError("Fault cohort differs from the locked faithfulness cohort")
@@ -165,7 +188,7 @@ def main() -> None:
     class_to_index = {name: index for index, name in enumerate(class_names)}
     labels = cohort["label_4"].map(class_to_index).to_numpy(dtype=int)
 
-    prediction_artifact = np.load(evaluation_dir / "test_predictions.npz", allow_pickle=False)
+    prediction_artifact = np.load(test_predictions_path, allow_pickle=False)
     all_ids = [str(value) for value in prediction_artifact["image_ids"]]
     index_by_id = {value: index for index, value in enumerate(all_ids)}
     order = np.asarray([index_by_id[value] for value in cohort["image_id"].astype(str)])
@@ -311,8 +334,6 @@ def main() -> None:
         if device.type == "cuda":
             torch.cuda.empty_cache()
 
-    output_dir = args.output_dir.resolve()
-    output_dir.mkdir(parents=True, exist_ok=True)
     result_frame = pd.DataFrame(rows)
     result_frame.to_csv(output_dir / "fault_robustness_metrics.csv", index=False)
     np.savez_compressed(
@@ -332,13 +353,14 @@ def main() -> None:
         "selection_lock_sha256": lock_hash,
         "cohort_sha256": sha256_file(cohort_path),
         "cohort_rows": len(cohort),
+        "test_predictions_sha256": sha256_file(test_predictions_path),
         "protocol": protocol,
         "parameter_fault_scope": "per-model symmetric-int8 classifier weight matrix",
         "input_fault_scope": "post-resize uint8 RGB tensor before ImageNet normalization",
         "aggregate_results": aggregate_rows.to_dict("records"),
         "metrics_sha256": sha256_file(output_dir / "fault_robustness_metrics.csv"),
         "predictions_sha256": sha256_file(output_dir / "fault_robustness_predictions.npz"),
-        "implementation_sha256": sha256_file(Path(__file__).resolve()),
+        "implementation_sha256": implementation_hash,
         "runtime_seconds": time.perf_counter() - started,
         "environment": {
             "python": platform.python_version(),
@@ -349,7 +371,7 @@ def main() -> None:
         "test_rows_read": len(cohort),
         "test_used_for_selection": False,
     }
-    write_json(output_dir / "summary.json", summary)
+    write_json(summary_path, summary)
     print(json.dumps(json_safe(summary), indent=2, sort_keys=True), flush=True)
 
 
