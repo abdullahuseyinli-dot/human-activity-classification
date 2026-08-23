@@ -138,12 +138,23 @@ def main() -> None:
 
     implementation_paths = [
         Path(__file__).resolve(),
+        root / "experiments" / "analyze_vcoco_v2_mechanisms.py",
+        root / "experiments" / "cache_vcoco_v2_final_test_features.py",
+        root / "experiments" / "evaluate_polar_final.py",
+        root / "experiments" / "evaluate_vcoco_v2_final_test.py",
         root / "experiments" / "fit_vcoco_v2_final_stack.py",
         root / "experiments" / "cache_vcoco_v2_features.py",
         root / "experiments" / "evaluate_vcoco_v2_factorized_fusion.py",
         root / "src" / "hac" / "augmentations.py",
+        root / "src" / "hac" / "config.py",
+        root / "src" / "hac" / "data.py",
         root / "src" / "hac" / "metrics.py",
+        root / "src" / "hac" / "models.py",
         root / "src" / "hac" / "polar.py",
+        root / "src" / "hac" / "polar_analysis.py",
+        root / "src" / "hac" / "polar_features.py",
+        root / "src" / "hac" / "polar_models.py",
+        root / "src" / "hac" / "polar_training.py",
         root / "src" / "hac" / "transfer.py",
     ]
     result = {
@@ -199,7 +210,10 @@ def main() -> None:
             "factor_predictions": sha256_file(factor_path),
             "feature_predictions": sha256_file(feature_path),
             "augmix_predictions": sha256_file(args.augmix_predictions.resolve()),
-            **{str(path.relative_to(root)): sha256_file(path) for path in implementation_paths},
+            **{
+                path.relative_to(root).as_posix(): sha256_file(path)
+                for path in implementation_paths
+            },
         },
         "evidence_sha256": {str(path): sha256_file(path) for path in evidence_paths},
         "test_access": {

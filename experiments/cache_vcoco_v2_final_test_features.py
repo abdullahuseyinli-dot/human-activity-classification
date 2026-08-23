@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import time
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import numpy as np
 import pandas as pd
@@ -45,6 +45,15 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def verify_locked_sources(selection: dict, repository_root: Path) -> None:
+    for relative, expected in selection.get("source_sha256", {}).items():
+        if not str(relative).endswith(".py"):
+            continue
+        path = repository_root.joinpath(*PurePosixPath(str(relative)).parts)
+        if not path.is_file() or sha256_file(path) != expected:
+            raise RuntimeError(f"Locked implementation drift: {relative}")
+
+
 def main() -> None:
     args = parse_args()
     if args.batch_size < 1 or args.workers < 0:
@@ -56,6 +65,7 @@ def main() -> None:
     selection_hash = sha256_file(selection_path)
     protocol = json.loads(protocol_path.read_text(encoding="utf-8"))
     selection = json.loads(selection_path.read_text(encoding="utf-8"))
+    verify_locked_sources(selection, Path(__file__).resolve().parents[1])
     if protocol.get("status") != "VCOCO_V2_PROTOCOL_LOCKED_BEFORE_NEW_MODEL_FITTING":
         raise RuntimeError("Official-test extraction requires the v2 protocol lock")
     if (

@@ -6,7 +6,7 @@ import argparse
 import gc
 import io
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import joblib
 import numpy as np
@@ -61,6 +61,15 @@ def write_json(path: Path, payload) -> None:
         json.dumps(json_safe(payload), indent=2, sort_keys=True, allow_nan=False) + "\n",
         encoding="utf-8",
     )
+
+
+def verify_locked_sources(selection: dict, repository_root: Path) -> None:
+    for relative, expected in selection.get("source_sha256", {}).items():
+        if not str(relative).endswith(".py"):
+            continue
+        path = repository_root.joinpath(*PurePosixPath(str(relative)).parts)
+        if not path.is_file() or sha256_file(path) != expected:
+            raise RuntimeError(f"Locked implementation drift: {relative}")
 
 
 def open_test_manifest_once(
@@ -184,6 +193,7 @@ def main() -> None:
     protocol_hash = sha256_file(protocol_path)
     selection_hash = sha256_file(selection_path)
     selection = json.loads(selection_path.read_text(encoding="utf-8"))
+    verify_locked_sources(selection, Path(__file__).resolve().parents[1])
     if (
         selection.get("status") != "VCOCO_V2_FINAL_SELECTION_LOCKED_PRE_TEST"
         or selection.get("protocol_lock_sha256") != protocol_hash
