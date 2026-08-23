@@ -1,21 +1,21 @@
 {
   "artifact_sha256": {
-    "convnext_small_full": "cf50b4d00f5cdd67e986b641a5dc2467a016df3a50e0bb5a842840f68727f7f8",
+    "convnext_small_full": "a1362f93f63635cf2b4b0246387bf7ec16aab6d117e087e5804547e5af1992f9",
     "dinov2_base_multilayer_logistic": "fc7568d584bcde11b86b0648143b9ab13a7411a3e2e9843f741c2a962ed45fc8",
     "dinov2_base_multilayer_rbf": "ab9c545ccf032c3de41248429c00de16ab2e85afeeaac403b1b316ae6c36efb2",
-    "dinov2_base_top4": "7931d6aabd1ba57bb358d1d041bbd50391a42ab274b259722e49b139c636d9fc",
-    "dinov2_small_dropout02": "ce755a5aa928a4dced6ecf7ae4092401b18361aad45341eb2003f9f8b12b560f"
+    "dinov2_base_top4": "fd0fbd03244c51dbff5319715b93bdf930c1ade394883317cb0a3ac0df9e5ed9",
+    "dinov2_small_moderate": "b96adf5a2a1d6ecb8e6436a9e1b0085d8f8a05f21fc975551fff70b2cac9e7d8"
   },
   "best_validation_candidate": {
-    "accuracy": 0.9486023444544636,
-    "balanced_accuracy": 0.9446085472772386,
-    "brier_score": 0.0847030810340135,
+    "accuracy": 0.9507063420498948,
+    "balanced_accuracy": 0.9466875126862996,
+    "brier_score": 0.0821925807199839,
     "candidate": "validation_locked_blend",
     "candidate_type": "blend",
-    "ece": 0.0310470522074732,
-    "log_loss": 0.1608901467921531,
-    "macro_f1": 0.94424712213713,
-    "weighted_f1": 0.9487142545039452
+    "ece": 0.0346166036703782,
+    "log_loss": 0.157359191628384,
+    "macro_f1": 0.946482408716873,
+    "weighted_f1": 0.9507631909250056
   },
   "scale_architecture": {
     "C": 0.01,
@@ -96,16 +96,16 @@
   ],
   "source_sha256": {
     "scale_provenance": "5ad17b31fe60196edd16bffcb13fffce41b1ee88d5f61a1112dd477b923da4f2",
-    "validation_provenance": "bb058a2dc9f56040246872c627581d1aa0e4274e22bdf40cd9e932f504d610c8"
+    "validation_provenance": "6049377e53f0147df610bb661f0140ac21763879db4ccf06c8395978b30e2015"
   },
   "status": "DEVELOPMENT_ONLY_POLAR_EXTENSION_EVIDENCE",
   "test_rows_read": 0,
   "test_used_for_selection": false,
   "validation_blend_weights": {
-    "convnext_small_full": 0.25,
+    "convnext_small_full": 0.2,
     "dinov2_base_multilayer_logistic": 0.2,
     "dinov2_base_multilayer_rbf": 0.2,
-    "dinov2_base_top4": 0.2,
-    "dinov2_small_dropout02": 0.15
+    "dinov2_base_top4": 0.25,
+    "dinov2_small_moderate": 0.15
   }
 }

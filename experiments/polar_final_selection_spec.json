@@ -1,0 +1,409 @@
+{
+  "calibration": {
+    "ensemble_posthoc_calibration": "none",
+    "logistic_components": "native_multinomial_probabilities",
+    "neural_components": "native_softmax",
+    "rbf_component": "five_fold_sigmoid_calibration",
+    "selection_metric_includes": [
+      "log_loss",
+      "ece_15"
+    ]
+  },
+  "confirmation_run_ids": [
+    "adaptation/convnext_small_full_backbone_ld070_seed42",
+    "ensemble_confirmation/convnext_small_full_backbone_ld070_seed52",
+    "ensemble_confirmation/convnext_small_full_backbone_ld070_seed62",
+    "capacity/dinov2_base_context25_top4_seed42",
+    "ensemble_confirmation/dinov2_base_context25_top4_seed52",
+    "ensemble_confirmation/dinov2_base_context25_top4_seed62",
+    "regularization/dinov2_small_context25_full_moderate_seed42",
+    "confirmation/dinov2_small_context25_full_moderate_seed52",
+    "confirmation/dinov2_small_context25_full_moderate_seed62"
+  ],
+  "data": {
+    "development_manifest_sha256": "2cc5bf62790f6064acc74f7113c341b5c2cd1124bcbfbc3d1e9eb19618a75b83",
+    "development_rows": 13285,
+    "quarantine_sha256": "5ed193e060dda3aface520bd141b9053ffda91e1fa7cf8055fcff8df42cae06f"
+  },
+  "ensemble": {
+    "aggregation": "weighted_arithmetic_mean_of_probability_rows",
+    "components": {
+      "convnext_small_full": {
+        "confirmation_macro_f1": [
+          0.8919846094287402,
+          0.8894931178892485,
+          0.8915353286572767
+        ],
+        "confirmation_run_ids": [
+          "adaptation/convnext_small_full_backbone_ld070_seed42",
+          "ensemble_confirmation/convnext_small_full_backbone_ld070_seed52",
+          "ensemble_confirmation/convnext_small_full_backbone_ld070_seed62"
+        ],
+        "kind": "three_seed_neural_probability_mean",
+        "summary_sha256": {
+          "42": "d35ca1fc2e6d804ba5891221921883214a755d567e4542a4c1a54ceb359943e8",
+          "52": "000ff01bacc0e373aa76aecf39316e3f9e2471e38bf9a93f720eb1b94e7c4162",
+          "62": "d8c050e5853d9134f4b643138c4a0e32e9a4be5e1bbe9bf2f0897fe2a13229d9"
+        }
+      },
+      "dinov2_base_multilayer_logistic": {
+        "development_macro_f1": 0.9262770271156358,
+        "kind": "frozen_feature_classifier",
+        "probe_results_sha256": "743d91c6c1383de8b1c38162551ad0f6dfb0e19301d1e86e3b49eae5b81a178c"
+      },
+      "dinov2_base_multilayer_rbf": {
+        "development_macro_f1": 0.9331296474233907,
+        "kind": "frozen_feature_classifier",
+        "rbf_summary_sha256": "66c78f279178fb2bbb03e12c4a2fe31d4b3019d356ca363fcbc777f7a359c706"
+      },
+      "dinov2_base_top4": {
+        "confirmation_macro_f1": [
+          0.9240281821877031,
+          0.9234666351227019,
+          0.93208842451249
+        ],
+        "confirmation_run_ids": [
+          "capacity/dinov2_base_context25_top4_seed42",
+          "ensemble_confirmation/dinov2_base_context25_top4_seed52",
+          "ensemble_confirmation/dinov2_base_context25_top4_seed62"
+        ],
+        "kind": "three_seed_neural_probability_mean",
+        "summary_sha256": {
+          "42": "e7934735d23799863e8b63422ed893164259e097caf13d3bc4f16005202db3ec",
+          "52": "829527ee4d14519e13e7051ea0afce4d0f79f046c84b73c7455c64f4e737b794",
+          "62": "609b2307d6d0ce2823ecc4f666d7dd64b4385512f5ee5773711f6293b5d4e275"
+        }
+      },
+      "dinov2_small_moderate": {
+        "confirmation_macro_f1": [
+          0.9182352214762706,
+          0.9090402280641325,
+          0.9164619774745633
+        ],
+        "confirmation_run_ids": [
+          "regularization/dinov2_small_context25_full_moderate_seed42",
+          "confirmation/dinov2_small_context25_full_moderate_seed52",
+          "confirmation/dinov2_small_context25_full_moderate_seed62"
+        ],
+        "kind": "three_seed_neural_probability_mean",
+        "summary_sha256": {
+          "42": "89c23bdeb506bcb658031d0a36ea793ca6c7e18a0a5399f5b0b5fe747775789b",
+          "52": "c8fe1b561a05fa985c235f9cc8ea8a1c97871e1015b6bd6f5bf1e5ca5ab6de5a",
+          "62": "1433559e1c5c100ecefa797f207c0025df7b688f943da8cbbba3d08747c680a9"
+        }
+      }
+    },
+    "development_metrics": {
+      "accuracy": 0.9507063420498948,
+      "balanced_accuracy": 0.9466875126862995,
+      "brier_score": 0.0821925807199839,
+      "ece": 0.034616603670378276,
+      "log_loss": 0.15735919162838402,
+      "macro_f1": 0.946482408716873,
+      "weighted_f1": 0.9507631909250055
+    },
+    "frozen_probe_component": "dinov2_base_multilayer_logistic",
+    "neural_seed_aggregation": "arithmetic_mean_before_component_weighting",
+    "weights": {
+      "convnext_small_full": 0.2,
+      "dinov2_base_multilayer_logistic": 0.2,
+      "dinov2_base_multilayer_rbf": 0.2,
+      "dinov2_base_top4": 0.25,
+      "dinov2_small_moderate": 0.15
+    }
+  },
+  "evaluation": {
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 20260822,
+    "primary_metric": "macro_f1",
+    "primary_task": "label_4",
+    "report_component_results": true,
+    "secondary_task": "label_3"
+  },
+  "external_validation": {
+    "dataset": "V-COCO trainval",
+    "image_level_unambiguous_rows": 5589,
+    "manifest_sha256": "0eb0afcc7e832babc495d3d9a74981077968f401097eedc34c6aeb9a0e644cb4",
+    "mixed_image_policy": "exclude_from_image_level_evaluation",
+    "person_rows": 6640,
+    "polar_test_rows_read": 0,
+    "selection_role": "none",
+    "unique_images": 4123
+  },
+  "faithfulness": {
+    "attribution_methods": {
+      "convnext_small_full": "gradcam",
+      "dinov2_base_top4": "integrated_gradients"
+    },
+    "cohort_rows": 256,
+    "cohort_sampling": "deterministic_class_and_bbox_area_stratified",
+    "cohort_seed": 20260822,
+    "deletion_insertion_fractions": [
+      0.0,
+      0.1,
+      0.2,
+      0.4,
+      0.6,
+      0.8,
+      1.0
+    ],
+    "families": [
+      "convnext_small_full",
+      "dinov2_base_top4"
+    ],
+    "integrated_gradient_steps": 16,
+    "metrics": [
+      "deletion_auc",
+      "insertion_auc",
+      "random_deletion_auc",
+      "positive_attribution_mass_in_person_bbox",
+      "pointing_game",
+      "person_vs_matched_context_occlusion",
+      "full_crop_probability_consistency",
+      "target_sensitivity",
+      "parameter_randomization_sanity"
+    ],
+    "perturbation_grid": [
+      8,
+      8
+    ],
+    "selection_role": "none",
+    "strata": [
+      "class",
+      "bbox_area_quartile"
+    ],
+    "target": "locked_predicted_class_probability",
+    "test_used_for_attribution_selection": false
+  },
+  "fault_robustness": {
+    "head_parameter_bit_flips": [
+      0,
+      1,
+      4,
+      16
+    ],
+    "input_pixel_bit_flip_rates": [
+      0.0,
+      1e-05,
+      0.0001,
+      0.001
+    ],
+    "reported_separately_from_faithfulness": true,
+    "seeds": [
+      20260822,
+      20260823,
+      20260824
+    ],
+    "selection_role": "none"
+  },
+  "final_neural_fits": {
+    "convnext_small_full": {
+      "configuration": {
+        "augmentation": "mild",
+        "backbone_lr": 3e-05,
+        "batch_size": 16,
+        "class_balance": "unweighted",
+        "dropout": 0.1,
+        "effective_batch_size": 64,
+        "fixed_epochs": 12,
+        "grad_accum_steps": 4,
+        "gradient_clip": 1.0,
+        "head_lr": 0.001,
+        "label_smoothing": 0.0,
+        "layer_decay": 0.7,
+        "mixup_alpha": 0.0,
+        "model_kind": "convnext_small",
+        "task": "label_4",
+        "top_n_blocks": null,
+        "unfreeze_strategy": "full_backbone",
+        "view": "full_frame",
+        "warmup_fraction": 0.1,
+        "weight_decay": 0.0001,
+        "workers": 4
+      },
+      "confirmation_best_epochs": [
+        17,
+        11,
+        12
+      ],
+      "epoch_rule": "median_best_epoch_across_three_confirmation_seeds",
+      "output_dir_pattern": "neural/convnext_small_full/seed_{seed}",
+      "seeds": [
+        42,
+        52,
+        62
+      ]
+    },
+    "dinov2_base_top4": {
+      "configuration": {
+        "augmentation": "mild",
+        "backbone_lr": 5e-06,
+        "batch_size": 16,
+        "class_balance": "unweighted",
+        "dropout": 0.1,
+        "effective_batch_size": 64,
+        "fixed_epochs": 7,
+        "grad_accum_steps": 4,
+        "gradient_clip": 1.0,
+        "head_lr": 0.001,
+        "label_smoothing": 0.0,
+        "layer_decay": null,
+        "mixup_alpha": 0.0,
+        "model_kind": "dinov2_base",
+        "task": "label_4",
+        "top_n_blocks": 4,
+        "unfreeze_strategy": "top_blocks",
+        "view": "person_context_25",
+        "warmup_fraction": 0.1,
+        "weight_decay": 0.0001,
+        "workers": 4
+      },
+      "confirmation_best_epochs": [
+        7,
+        3,
+        15
+      ],
+      "epoch_rule": "median_best_epoch_across_three_confirmation_seeds",
+      "output_dir_pattern": "neural/dinov2_base_top4/seed_{seed}",
+      "seeds": [
+        42,
+        52,
+        62
+      ]
+    },
+    "dinov2_small_moderate": {
+      "configuration": {
+        "augmentation": "moderate",
+        "backbone_lr": 5e-06,
+        "batch_size": 32,
+        "class_balance": "unweighted",
+        "dropout": 0.1,
+        "effective_batch_size": 64,
+        "fixed_epochs": 12,
+        "grad_accum_steps": 2,
+        "gradient_clip": 1.0,
+        "head_lr": 0.001,
+        "label_smoothing": 0.0,
+        "layer_decay": 0.75,
+        "mixup_alpha": 0.0,
+        "model_kind": "dinov2_small",
+        "task": "label_4",
+        "top_n_blocks": null,
+        "unfreeze_strategy": "full_backbone",
+        "view": "person_context_25",
+        "warmup_fraction": 0.1,
+        "weight_decay": 0.0001,
+        "workers": 4
+      },
+      "confirmation_best_epochs": [
+        19,
+        7,
+        12
+      ],
+      "epoch_rule": "median_best_epoch_across_three_confirmation_seeds",
+      "output_dir_pattern": "neural/dinov2_small_moderate/seed_{seed}",
+      "seeds": [
+        42,
+        52,
+        62
+      ]
+    }
+  },
+  "final_probe_fits": {
+    "dinov2_base_multilayer_logistic": {
+      "configuration": {
+        "C": 0.001,
+        "class_weight": "balanced",
+        "classifier": "standardized_multinomial_logistic",
+        "max_iter": 2000,
+        "model_kind": "dinov2_base",
+        "representation": "last4_cls_mean_patch",
+        "seed": 42,
+        "solver": "lbfgs",
+        "task": "label_4",
+        "tol": 1e-05,
+        "views": [
+          "full_frame",
+          "person_context_10"
+        ]
+      },
+      "output_dir": "probes/dinov2_base_multilayer_logistic"
+    },
+    "dinov2_base_multilayer_logistic_3class": {
+      "configuration": {
+        "C": 0.001,
+        "class_weight": "none",
+        "classifier": "standardized_multinomial_logistic",
+        "max_iter": 2000,
+        "model_kind": "dinov2_base",
+        "representation": "last4_cls_mean_patch",
+        "seed": 42,
+        "solver": "lbfgs",
+        "task": "label_3",
+        "tol": 1e-05,
+        "views": [
+          "full_frame",
+          "person_context_10"
+        ]
+      },
+      "output_dir": "probes/dinov2_base_multilayer_logistic_3class"
+    },
+    "dinov2_base_multilayer_rbf": {
+      "configuration": {
+        "C": 10.0,
+        "cache_size_mb": 4096,
+        "calibration": "sigmoid",
+        "calibration_ensemble": true,
+        "calibration_folds": 5,
+        "class_weight": "none",
+        "classifier": "calibrated_rbf_svm",
+        "gamma_multiplier": 1.0,
+        "kernel": "rbf",
+        "model_kind": "dinov2_base",
+        "representation": "last4_cls_mean_patch",
+        "seed": 42,
+        "task": "label_4",
+        "views": [
+          "full_frame",
+          "person_context_10"
+        ]
+      },
+      "output_dir": "probes/dinov2_base_multilayer_rbf"
+    }
+  },
+  "implementation_files": [
+    "experiments/fit_polar_final_model.py",
+    "experiments/fit_polar_final_probe.py",
+    "experiments/evaluate_polar_final.py",
+    "experiments/evaluate_vcoco_external.py",
+    "experiments/screen_polar_embedding_classifiers.py",
+    "experiments/train_polar_candidate.py",
+    "src/hac/augmentations.py",
+    "src/hac/config.py",
+    "src/hac/data.py",
+    "src/hac/metrics.py",
+    "src/hac/models.py",
+    "src/hac/polar.py",
+    "src/hac/polar_analysis.py",
+    "src/hac/polar_features.py",
+    "src/hac/polar_models.py",
+    "src/hac/polar_training.py",
+    "src/hac/training.py"
+  ],
+  "protocol_version": "1.4.0",
+  "scale_evidence": {
+    "provenance_sha256": "5ad17b31fe60196edd16bffcb13fffce41b1ee88d5f61a1112dd477b923da4f2",
+    "summary_sha256": "e2919925cb3746d0abfaba740196f5a4c60b1e3cbd0d5f0355bf5ffa3a450a9f",
+    "test_rows_read": 0
+  },
+  "selection_basis": "development_train_validation_only",
+  "status": "DEVELOPMENT_SELECTION_SPEC",
+  "test_gate": {
+    "expected_rows": 3329,
+    "probe_batch_size": 32,
+    "test_manifest_sha256": "a8e01e1037e980edeb1886ef2bbbd22a07c316df044741c08e8e2afa8d32fce5",
+    "workers": 4
+  },
+  "test_rows_read": 0,
+  "test_used_for_selection": false
+}

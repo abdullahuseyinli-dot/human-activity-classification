@@ -4,14 +4,14 @@
     "dinov2_base_multilayer_logistic": 3327,
     "dinov2_base_multilayer_rbf": 3327,
     "dinov2_base_top4": 3327,
-    "dinov2_small_dropout02": 3327
+    "dinov2_small_moderate": 3327
   },
   "artifact_sha256": {
-    "convnext_small_full": "cf50b4d00f5cdd67e986b641a5dc2467a016df3a50e0bb5a842840f68727f7f8",
+    "convnext_small_full": "a1362f93f63635cf2b4b0246387bf7ec16aab6d117e087e5804547e5af1992f9",
     "dinov2_base_multilayer_logistic": "fc7568d584bcde11b86b0648143b9ab13a7411a3e2e9843f741c2a962ed45fc8",
     "dinov2_base_multilayer_rbf": "ab9c545ccf032c3de41248429c00de16ab2e85afeeaac403b1b316ae6c36efb2",
-    "dinov2_base_top4": "7931d6aabd1ba57bb358d1d041bbd50391a42ab274b259722e49b139c636d9fc",
-    "dinov2_small_dropout02": "ce755a5aa928a4dced6ecf7ae4092401b18361aad45341eb2003f9f8b12b560f"
+    "dinov2_base_top4": "fd0fbd03244c51dbff5319715b93bdf930c1ade394883317cb0a3ac0df9e5ed9",
+    "dinov2_small_moderate": "b96adf5a2a1d6ecb8e6436a9e1b0085d8f8a05f21fc975551fff70b2cac9e7d8"
   },
   "bootstrap_resamples": 10000,
   "bootstrap_seed": 20260822,

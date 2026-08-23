@@ -16,10 +16,10 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision import models
 from torchvision.models import ConvNeXt_Small_Weights
 from tqdm.auto import tqdm
-from transformers import AutoModel
 
 from hac.augmentations import build_eval_transform
 from hac.polar import image_view, sha256_file
+from hac.polar_features import PinnedDinoFeatureModel
 from hac.polar_models import DINO_MODEL_SPECS
 
 
@@ -38,37 +38,6 @@ class PolarFeatureDataset(Dataset):
             source = image.convert("RGB")
             pixels = self.transform(image_view(source, row, self.view))
         return {"pixel_values": pixels, "row": index}
-
-
-class DinoFeatureModel(nn.Module):
-    def __init__(self, model_id: str, revision: str, representation: str) -> None:
-        super().__init__()
-        self.backbone = AutoModel.from_pretrained(model_id, revision=revision)
-        self.representation = representation
-
-    def forward(self, pixel_values: torch.Tensor) -> torch.Tensor:
-        output = self.backbone(
-            pixel_values=pixel_values,
-            output_hidden_states=self.representation == "last4_cls_mean_patch",
-        )
-        if self.representation == "last4_cls_mean_patch":
-            return official_multilayer_features(output.hidden_states, self.backbone.layernorm)
-        if getattr(output, "pooler_output", None) is not None:
-            return output.pooler_output
-        return output.last_hidden_state[:, 0]
-
-
-def official_multilayer_features(
-    hidden_states: tuple[torch.Tensor, ...], layernorm: nn.Module
-) -> torch.Tensor:
-    """Match the official DINOv2 four-block linear-classifier representation."""
-
-    if len(hidden_states) < 4:
-        raise ValueError("DINOv2 multi-layer features require at least four hidden states")
-    normalized = [layernorm(state) for state in hidden_states[-4:]]
-    class_tokens = [state[:, 0] for state in normalized]
-    mean_patch_token = normalized[-1][:, 1:].mean(dim=1)
-    return torch.cat([*class_tokens, mean_patch_token], dim=1)
 
 
 class ConvNeXtFeatureModel(nn.Module):
@@ -142,9 +111,7 @@ def build_model(model_kind: str, representation: str) -> nn.Module:
         if representation != "final_cls":
             raise ValueError("Multi-layer representation is available only for DINOv2")
         return ConvNeXtFeatureModel()
-    model_id = DINO_MODEL_SPECS[model_kind]["model_id"]
-    revision = DINO_MODEL_SPECS[model_kind]["revision"]
-    return DinoFeatureModel(model_id, revision, representation)
+    return PinnedDinoFeatureModel(model_kind, representation)
 
 
 @torch.inference_mode()

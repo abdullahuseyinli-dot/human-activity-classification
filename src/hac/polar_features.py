@@ -7,6 +7,52 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import torch
+from torch import nn
+
+
+def official_multilayer_features(
+    hidden_states: tuple[torch.Tensor, ...], layernorm: nn.Module
+) -> torch.Tensor:
+    """Match the feature layout used by the official DINOv2 linear classifier."""
+
+    if len(hidden_states) < 4:
+        raise ValueError("DINOv2 multi-layer features require at least four hidden states")
+    normalized = [layernorm(state) for state in hidden_states[-4:]]
+    class_tokens = [state[:, 0] for state in normalized]
+    mean_patch_token = normalized[-1][:, 1:].mean(dim=1)
+    return torch.cat([*class_tokens, mean_patch_token], dim=1)
+
+
+class PinnedDinoFeatureModel(nn.Module):
+    """Extract a declared representation from a revision-pinned DINOv2 backbone."""
+
+    def __init__(self, model_kind: str, representation: str) -> None:
+        super().__init__()
+        from transformers import AutoModel
+
+        from .polar_models import DINO_MODEL_SPECS
+
+        if model_kind not in DINO_MODEL_SPECS:
+            raise ValueError(f"Frozen DINOv2 features are unavailable for {model_kind!r}")
+        if representation not in {"final_cls", "last4_cls_mean_patch"}:
+            raise ValueError(f"Unknown DINOv2 representation: {representation!r}")
+        specification = DINO_MODEL_SPECS[model_kind]
+        self.backbone = AutoModel.from_pretrained(
+            specification["model_id"], revision=specification["revision"]
+        )
+        self.representation = representation
+
+    def forward(self, pixel_values: torch.Tensor) -> torch.Tensor:
+        output = self.backbone(
+            pixel_values=pixel_values,
+            output_hidden_states=self.representation == "last4_cls_mean_patch",
+        )
+        if self.representation == "last4_cls_mean_patch":
+            return official_multilayer_features(output.hidden_states, self.backbone.layernorm)
+        if getattr(output, "pooler_output", None) is not None:
+            return output.pooler_output
+        return output.last_hidden_state[:, 0]
 
 
 def load_aligned_feature_view(

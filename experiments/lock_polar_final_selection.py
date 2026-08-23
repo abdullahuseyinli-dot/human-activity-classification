@@ -137,12 +137,8 @@ def main() -> None:
         },
         "development_selection": {
             "validation_provenance_sha256": sha256_file(validation_dir / "provenance.json"),
-            "validation_metrics_sha256": sha256_file(
-                validation_dir / "validation_metrics.csv"
-            ),
-            "validation_blend_sha256": sha256_file(
-                validation_dir / "validation_blend.json"
-            ),
+            "validation_metrics_sha256": sha256_file(validation_dir / "validation_metrics.csv"),
+            "validation_blend_sha256": sha256_file(validation_dir / "validation_blend.json"),
             "training_evidence": training_evidence,
             "scale_evidence": spec["scale_evidence"],
         },
@@ -152,6 +148,7 @@ def main() -> None:
         "calibration": spec["calibration"],
         "evaluation": spec["evaluation"],
         "faithfulness": spec["faithfulness"],
+        "fault_robustness": spec["fault_robustness"],
         "external_validation": spec["external_validation"],
         "test_gate": {
             **spec["test_gate"],

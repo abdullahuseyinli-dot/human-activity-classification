@@ -27,6 +27,7 @@ from hac.polar_analysis import (
     per_class_metrics,
     stratified_paired_bootstrap,
 )
+from hac.polar_features import PinnedDinoFeatureModel
 from hac.polar_models import build_polar_model
 from hac.polar_training import TASK_LABELS, evaluate_classifier, normalize_probability_rows
 
@@ -150,7 +151,9 @@ def validate_test_frame(frame: pd.DataFrame, expected_rows: int) -> pd.DataFrame
     output = frame.copy()
     output["image_id"] = output["image_id"].astype(str)
     if len(output) != expected_rows:
-        raise ValueError(f"Locked test row count changed: expected {expected_rows}, found {len(output)}")
+        raise ValueError(
+            f"Locked test row count changed: expected {expected_rows}, found {len(output)}"
+        )
     if set(output["split"].astype(str)) != {"test"}:
         raise ValueError("Locked test manifest must contain only the test split")
     if output["image_id"].duplicated().any():
@@ -261,9 +264,7 @@ def evaluate_neural_component(
         if evaluation["image_ids"] != frame["image_id"].astype(str).tolist():
             raise RuntimeError(f"Test prediction order drift for {model_id} seed {seed}")
         probabilities.append(evaluation["probabilities"])
-        seed_rows.append(
-            {"candidate": model_id, "seed": seed, **evaluation["metrics"]}
-        )
+        seed_rows.append({"candidate": model_id, "seed": seed, **evaluation["metrics"]})
         del model, payload, evaluation
         gc.collect()
         if device.type == "cuda":
@@ -298,7 +299,7 @@ def extract_probe_features(
     for batch in loader:
         values = batch["pixel_values"].to(device, non_blocking=True)
         with torch.autocast(device_type=device.type, enabled=device.type == "cuda"):
-            _, features = model(values, return_features=True)
+            features = model(values)
         output.append(features.float().cpu().numpy())
     return np.concatenate(output)
 
@@ -315,22 +316,20 @@ def evaluate_probe_components(
     views = primary_config["views"]
     for probe_id, specification in lock["final_probe_fits"].items():
         config = specification["configuration"]
-        if config["model_kind"] != primary_config["model_kind"] or config["views"] != views:
+        representation_key = (config["model_kind"], config["representation"], config["views"])
+        expected_key = (
+            primary_config["model_kind"],
+            primary_config["representation"],
+            views,
+        )
+        if representation_key != expected_key:
             raise RuntimeError(
                 f"Final probes do not share the locked representation and views: {probe_id}"
             )
 
-    model_config = ModelConfig(
-        model_kind=primary_config["model_kind"],
-        augmentation_strength="mild",
-        batch_size=lock["test_gate"]["probe_batch_size"],
-        head_lr=1e-3,
-        backbone_lr=1e-5,
-        weight_decay=0.0,
-        dropout=0.0,
-        unfreeze_strategy="probe_only",
-    )
-    model = build_polar_model(model_config, num_classes=len(TASK_LABELS["label_4"])).to(device)
+    model = PinnedDinoFeatureModel(
+        primary_config["model_kind"], primary_config["representation"]
+    ).to(device)
     feature_views = [
         extract_probe_features(
             model,
@@ -353,8 +352,14 @@ def evaluate_probe_components(
     direct_three_names: list[str] = []
     for probe_id, specification in lock["final_probe_fits"].items():
         pipeline = joblib.load(resolved_probes[probe_id]["pipeline"])
+        expected_dimensions = resolved_probes[probe_id]["summary"]["feature_dimensions"]
+        if features.shape[1] != expected_dimensions:
+            raise RuntimeError(
+                f"Frozen feature width differs for {probe_id}: "
+                f"expected {expected_dimensions}, observed {features.shape[1]}"
+            )
         predicted = normalize_probability_rows(pipeline.predict_proba(features))
-        classes = np.asarray(pipeline.named_steps["classifier"].classes_, dtype=int)
+        classes = np.asarray(pipeline.classes_, dtype=int)
         expected_classes = np.arange(predicted.shape[1])
         if not np.array_equal(classes, expected_classes):
             raise RuntimeError(f"Unexpected pipeline class order for {probe_id}: {classes}")
@@ -383,17 +388,16 @@ def main() -> None:
     summary_path = output_dir / "summary.json"
     if summary_path.is_file():
         existing = json.loads(summary_path.read_text(encoding="utf-8"))
-        if existing.get("status") == "LOCKED_FINAL_TEST_COMPLETE" and existing.get(
-            "selection_lock_sha256"
-        ) == lock_hash:
+        if (
+            existing.get("status") == "LOCKED_FINAL_TEST_COMPLETE"
+            and existing.get("selection_lock_sha256") == lock_hash
+        ):
             print(json.dumps(existing, indent=2, sort_keys=True), flush=True)
             return
 
     final_root = args.final_root.resolve()
     resolved = verify_final_fits(lock, final_root, lock_hash)
-    frame, gate = open_test_manifest_once(
-        args.test_manifest, output_dir, lock, lock_hash
-    )
+    frame, gate = open_test_manifest_once(args.test_manifest, output_dir, lock, lock_hash)
     started = time.perf_counter()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     components: dict[str, np.ndarray] = {}
@@ -479,9 +483,9 @@ def main() -> None:
         ignore_index=True,
     )
     metric_frame.to_csv(output_dir / "test_metrics.csv", index=False)
-    pd.DataFrame(per_class_rows).sort_values(
-        ["candidate", "class"], ignore_index=True
-    ).to_csv(output_dir / "test_per_class.csv", index=False)
+    pd.DataFrame(per_class_rows).sort_values(["candidate", "class"], ignore_index=True).to_csv(
+        output_dir / "test_per_class.csv", index=False
+    )
     pd.DataFrame(seed_rows).sort_values(["candidate", "seed"], ignore_index=True).to_csv(
         output_dir / "test_seed_metrics.csv", index=False
     )

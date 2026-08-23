@@ -13,6 +13,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import sklearn
+from screen_polar_embedding_classifiers import Candidate, calibrated_final_estimator
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -30,10 +31,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--feature-root", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--model-kind", required=True)
+    parser.add_argument(
+        "--representation",
+        choices=["final_cls", "last4_cls_mean_patch"],
+        required=True,
+    )
     parser.add_argument("--view", action="append", required=True, dest="views")
     parser.add_argument("--task", choices=sorted(TASK_LABELS), required=True)
+    parser.add_argument(
+        "--classifier",
+        choices=["standardized_multinomial_logistic", "calibrated_rbf_svm"],
+        required=True,
+    )
     parser.add_argument("--c-value", type=float, required=True)
     parser.add_argument("--class-weight", choices=["none", "balanced"], required=True)
+    parser.add_argument("--gamma-multiplier", type=float, default=1.0)
+    parser.add_argument("--calibration-folds", type=int, default=5)
     parser.add_argument("--seed", type=int, required=True)
     return parser.parse_args()
 
@@ -62,17 +75,83 @@ def write_json(path: Path, payload) -> None:
 
 
 def configuration(args: argparse.Namespace) -> dict:
-    return {
+    shared = {
         "model_kind": args.model_kind,
+        "representation": args.representation,
         "views": args.views,
         "task": args.task,
-        "classifier": "standardized_multinomial_logistic",
+        "classifier": args.classifier,
         "C": args.c_value,
         "class_weight": args.class_weight,
         "seed": args.seed,
-        "solver": "lbfgs",
-        "max_iter": 2_000,
-        "tol": 1e-5,
+    }
+    if args.classifier == "standardized_multinomial_logistic":
+        return {
+            **shared,
+            "solver": "lbfgs",
+            "max_iter": 2_000,
+            "tol": 1e-5,
+        }
+    return {
+        **shared,
+        "kernel": "rbf",
+        "gamma_multiplier": args.gamma_multiplier,
+        "calibration": "sigmoid",
+        "calibration_folds": args.calibration_folds,
+        "calibration_ensemble": True,
+        "cache_size_mb": 4_096,
+    }
+
+
+def build_estimator(args: argparse.Namespace, feature_count: int):
+    class_weight = None if args.class_weight == "none" else args.class_weight
+    if args.classifier == "standardized_multinomial_logistic":
+        return Pipeline(
+            [
+                ("scale", StandardScaler()),
+                (
+                    "classifier",
+                    LogisticRegression(
+                        C=args.c_value,
+                        class_weight=class_weight,
+                        max_iter=2_000,
+                        random_state=args.seed,
+                        solver="lbfgs",
+                        tol=1e-5,
+                    ),
+                ),
+            ]
+        )
+    candidate = Candidate(
+        "rbf_svm",
+        {
+            "C": args.c_value,
+            "gamma_multiplier": args.gamma_multiplier,
+            "class_weight": class_weight,
+        },
+    )
+    return calibrated_final_estimator(
+        candidate,
+        feature_count,
+        args.seed,
+        args.calibration_folds,
+    )
+
+
+def fitted_estimator_details(
+    estimator, classifier: str, feature_count: int, gamma_multiplier: float
+) -> dict:
+    if classifier == "standardized_multinomial_logistic":
+        iterations = int(np.max(estimator.named_steps["classifier"].n_iter_))
+        return {"iterations": iterations, "converged": iterations < 2_000}
+    support_vectors = [
+        int(np.asarray(calibrated.estimator.named_steps["classifier"].n_support_).sum())
+        for calibrated in estimator.calibrated_classifiers_
+    ]
+    return {
+        "resolved_gamma": float(gamma_multiplier / feature_count),
+        "support_vector_counts_by_calibration_fold": support_vectors,
+        "mean_support_vectors": float(np.mean(support_vectors)),
     }
 
 
@@ -99,6 +178,10 @@ def main() -> None:
     args = parse_args()
     if args.c_value <= 0.0:
         raise ValueError("c-value must be positive")
+    if args.gamma_multiplier <= 0.0:
+        raise ValueError("gamma-multiplier must be positive")
+    if args.calibration_folds < 2:
+        raise ValueError("calibration-folds must be at least two")
     if len(set(args.views)) != len(args.views):
         raise ValueError("Views must be unique")
     config = configuration(args)
@@ -120,6 +203,8 @@ def main() -> None:
         )
         feature_views.append(features)
         cache_provenance[view] = provenance
+        if provenance.get("representation", "final_cls") != args.representation:
+            raise RuntimeError(f"Feature representation differs for {view}: {provenance}")
     features = np.concatenate(feature_views, axis=1)
 
     request_core = {
@@ -166,28 +251,15 @@ def main() -> None:
             print(json.dumps(existing, indent=2, sort_keys=True), flush=True)
             return
 
-    pipeline = Pipeline(
-        [
-            ("scale", StandardScaler()),
-            (
-                "classifier",
-                LogisticRegression(
-                    C=args.c_value,
-                    class_weight=None if args.class_weight == "none" else args.class_weight,
-                    max_iter=2_000,
-                    random_state=args.seed,
-                    solver="lbfgs",
-                    tol=1e-5,
-                ),
-            ),
-        ]
-    )
+    pipeline = build_estimator(args, features.shape[1])
     started = time.perf_counter()
     pipeline.fit(features, labels)
     fit_seconds = time.perf_counter() - started
     pipeline_path = output_dir / "pipeline.joblib"
     joblib.dump(pipeline, pipeline_path, compress=3)
-    iterations = int(np.max(pipeline.named_steps["classifier"].n_iter_))
+    classes = np.asarray(pipeline.classes_, dtype=int)
+    if not np.array_equal(classes, np.arange(len(class_names))):
+        raise RuntimeError(f"Unexpected fitted class ordering: {classes.tolist()}")
     summary = {
         "status": "COMPLETE",
         "stage": "LOCKED_FINAL_TRAIN_PLUS_VALIDATION_PROBE_FIT",
@@ -201,8 +273,9 @@ def main() -> None:
         "class_counts": manifest["label"].value_counts().sort_index().to_dict(),
         "feature_dimensions": features.shape[1],
         "feature_cache_provenance": cache_provenance,
-        "iterations": iterations,
-        "converged": iterations < 2_000,
+        **fitted_estimator_details(
+            pipeline, args.classifier, features.shape[1], args.gamma_multiplier
+        ),
         "fit_seconds": fit_seconds,
         "pipeline_sha256": sha256_file(pipeline_path),
         "environment": {
