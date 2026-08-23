@@ -142,7 +142,9 @@ def perturbation_batch(
             scores,
             float(fraction),
             order="random",
-            random_seed=stable_seed("random-deletion", image_id, fraction),
+            # Reuse one permutation so larger fractions strictly extend the
+            # same random-deletion path instead of sampling unrelated masks.
+            random_seed=stable_seed("random-deletion", image_id),
             output_size=tuple(inputs.shape[-2:]),
         ).to(inputs.device)
         most_keep = most_keep[None, None]
