@@ -273,6 +273,12 @@ def main() -> None:
         image_ids=image_ids_reference,
         class_names=np.asarray(class_names),
     )
+    locked_person = person_frame.loc[
+        person_frame["candidate"].eq("locked_ensemble_collapsed")
+    ].iloc[0]
+    locked_image = image_frame.loc[
+        image_frame["candidate"].eq("locked_ensemble_collapsed")
+    ].iloc[0]
     summary = {
         "status": "LOCKED_EXTERNAL_EVALUATION_COMPLETE",
         "selection_role": "none",
@@ -283,8 +289,12 @@ def main() -> None:
         "person_rows": len(frame),
         "unique_images": frame["image_id"].nunique(),
         "image_level_rows": len(image_ids_reference),
-        "best_person_metrics": person_frame.iloc[0].to_dict(),
-        "best_image_metrics": image_frame.iloc[0].to_dict(),
+        "primary_candidate": "locked_ensemble_collapsed",
+        "primary_candidate_locked_pre_test": True,
+        "primary_person_metrics": locked_person.to_dict(),
+        "primary_image_metrics": locked_image.to_dict(),
+        "best_observed_person_metrics": person_frame.iloc[0].to_dict(),
+        "best_observed_image_metrics": image_frame.iloc[0].to_dict(),
         "ensemble_weights": weights,
         "predictions_sha256": sha256_file(output_dir / "external_predictions.npz"),
         "runtime_seconds": time.perf_counter() - started,

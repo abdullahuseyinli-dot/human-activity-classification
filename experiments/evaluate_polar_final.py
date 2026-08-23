@@ -505,6 +505,9 @@ def main() -> None:
         "class_names_3": np.asarray(secondary_names),
     }
     np.savez_compressed(output_dir / "test_predictions.npz", **prediction_payload)
+    locked_primary = metric_frame.loc[
+        metric_frame["candidate"].eq("locked_ensemble")
+    ].iloc[0]
     summary = {
         "status": "LOCKED_FINAL_TEST_COMPLETE",
         "selection_lock_sha256": lock_hash,
@@ -512,8 +515,11 @@ def main() -> None:
         "official_test_manifest_open_count": gate["official_test_manifest_open_count"],
         "test_rows_read": len(frame),
         "ensemble_weights": weights,
-        "primary_metrics": metric_frame.iloc[0].to_dict(),
-        "all_primary_metrics": metric_frame.to_dict("records"),
+        "primary_candidate": "locked_ensemble",
+        "primary_candidate_locked_pre_test": True,
+        "primary_metrics": locked_primary.to_dict(),
+        "best_observed_candidate_metrics": metric_frame.iloc[0].to_dict(),
+        "all_candidate_metrics": metric_frame.to_dict("records"),
         "secondary_metrics": secondary_rows,
         "bootstrap_resamples": evaluation["bootstrap_resamples"],
         "bootstrap_seed": evaluation["bootstrap_seed"],
