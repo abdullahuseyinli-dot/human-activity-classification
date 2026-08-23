@@ -20,7 +20,12 @@ import torch
 from huggingface_hub import snapshot_download
 from torch import nn
 
-from hac.augmentations import build_eval_transform, build_train_transform
+from hac.augmentations import (
+    build_aspect_preserving_eval_transform,
+    build_eval_transform,
+    build_person_train_transform,
+    build_train_transform,
+)
 from hac.config import ModelConfig
 from hac.data import make_loader
 from hac.models import parameter_counts
@@ -44,6 +49,8 @@ FAILURE_DIRECTORY: Path | None = None
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
+    parser.add_argument("--protocol-lock", type=Path)
+    parser.add_argument("--initial-checkpoint", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument(
         "--run-role",
@@ -64,7 +71,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--task", choices=sorted(TASK_LABELS), default="label_4")
     parser.add_argument(
         "--view",
-        choices=["full_frame", "person_context_10", "person_context_25"],
+        choices=[
+            "full_frame",
+            "person_tight",
+            "person_context_10",
+            "person_context_25",
+            "person_context_50",
+        ],
         required=True,
     )
     parser.add_argument(
@@ -75,8 +88,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--top-n-blocks", type=int)
     parser.add_argument(
         "--augmentation",
-        choices=["mild", "moderate", "mild_no_random_erasing"],
+        choices=[
+            "mild",
+            "moderate",
+            "mild_no_random_erasing",
+            "person_safe_mild",
+            "person_safe_augmix",
+        ],
         default="mild",
+    )
+    parser.add_argument(
+        "--evaluation-preprocess",
+        choices=["legacy_center_crop", "aspect_preserving_pad"],
+        default="legacy_center_crop",
     )
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--grad-accum-steps", type=int, default=2)
@@ -211,6 +235,7 @@ def configuration(args: argparse.Namespace) -> dict:
         "unfreeze_strategy": args.unfreeze_strategy,
         "top_n_blocks": args.top_n_blocks,
         "augmentation": args.augmentation,
+        "evaluation_preprocess": args.evaluation_preprocess,
         "batch_size": args.batch_size,
         "grad_accum_steps": args.grad_accum_steps,
         "effective_batch_size": args.batch_size * args.grad_accum_steps,
@@ -369,11 +394,42 @@ def main() -> None:
     manifest_path = args.manifest.resolve()
     repository_root = Path(__file__).resolve().parents[1]
 
+    protocol_evidence = None
+    if args.protocol_lock is not None:
+        protocol_path = args.protocol_lock.resolve()
+        protocol = json.loads(protocol_path.read_text(encoding="utf-8"))
+        if protocol.get("status") != "VCOCO_V2_PROTOCOL_LOCKED_BEFORE_NEW_MODEL_FITTING":
+            raise RuntimeError("The supplied V-COCO v2 protocol is not locked")
+        manifest_provenance_path = manifest_path.parent / "provenance.json"
+        manifest_provenance = json.loads(manifest_provenance_path.read_text(encoding="utf-8"))
+        if (
+            manifest_provenance.get("status")
+            != "VCOCO_V2_PERSON_TRAINING_MANIFEST_COMPLETE"
+            or manifest_provenance.get("manifest_sha256") != sha256_file(manifest_path)
+            or manifest_provenance.get("protocol_lock_sha256") != sha256_file(protocol_path)
+            or manifest_provenance.get("test_rows_read") != 0
+        ):
+            raise RuntimeError("Person training manifest does not satisfy the supplied protocol")
+        protocol_evidence = {
+            "path": str(protocol_path),
+            "sha256": sha256_file(protocol_path),
+            "training_manifest_provenance_sha256": sha256_file(manifest_provenance_path),
+        }
+    initial_checkpoint_evidence = None
+    if args.initial_checkpoint is not None:
+        initial_checkpoint_path = args.initial_checkpoint.resolve()
+        initial_checkpoint_evidence = {
+            "path": str(initial_checkpoint_path),
+            "sha256": sha256_file(initial_checkpoint_path),
+        }
+
     config_values = configuration(args)
     request_core = {
         "status": "DEVELOPMENT_TRAINING_REQUEST",
         "configuration": config_values,
         "manifest_sha256": sha256_file(manifest_path),
+        "protocol_lock": protocol_evidence,
+        "initial_checkpoint": initial_checkpoint_evidence,
         "runner_sha256": sha256_file(Path(__file__).resolve()),
         "implementation_sha256": implementation_hashes(repository_root),
         "test_rows_read": 0,
@@ -434,6 +490,14 @@ def main() -> None:
     seed_everything(args.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = build_polar_model(model_config, num_classes=len(class_names)).to(device)
+    if args.initial_checkpoint is not None:
+        initial_payload = torch.load(
+            args.initial_checkpoint.resolve(), map_location=device, weights_only=False
+        )
+        if "model_state_dict" not in initial_payload:
+            raise RuntimeError("Initial checkpoint does not contain a model state")
+        model.load_state_dict(initial_payload["model_state_dict"])
+        del initial_payload
     groups = optimizer_parameter_groups(
         model,
         head_lr=args.head_lr,
@@ -475,7 +539,9 @@ def main() -> None:
     validation_loader = make_loader(
         validation_frame,
         class_to_index,
-        build_eval_transform(),
+        build_eval_transform()
+        if args.evaluation_preprocess == "legacy_center_crop"
+        else build_aspect_preserving_eval_transform(),
         batch_size=args.batch_size,
         shuffle=False,
         seed=args.seed,
@@ -512,7 +578,9 @@ def main() -> None:
         train_loader = make_loader(
             train_frame,
             class_to_index,
-            build_train_transform(args.augmentation),
+            build_person_train_transform(args.augmentation)
+            if args.augmentation.startswith("person_safe_")
+            else build_train_transform(args.augmentation),
             batch_size=args.batch_size,
             shuffle=True,
             seed=args.seed * 10_000 + epoch,

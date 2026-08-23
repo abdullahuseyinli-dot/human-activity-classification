@@ -14,7 +14,7 @@ from pathlib import Path
 import imagehash
 import numpy as np
 import pandas as pd
-from PIL import Image
+from PIL import Image, ImageFilter
 from tqdm.auto import tqdm
 
 SOURCE_TO_LABEL = {
@@ -181,7 +181,14 @@ def image_view(image: Image.Image, row: pd.Series | dict, view: str) -> Image.Im
 
     if view == "full_frame":
         return image
-    context_by_view = {"person_context_10": 0.10, "person_context_25": 0.25}
+    context_by_view = {
+        "person_tight": 0.0,
+        "person_context_10": 0.10,
+        "person_context_25": 0.25,
+        "person_context_50": 0.50,
+        "person_context_25_background_blur": 0.25,
+        "person_context_25_background_mask": 0.25,
+    }
     if view not in context_by_view:
         raise ValueError(f"Unknown POLAR view: {view}")
     box = (
@@ -190,7 +197,28 @@ def image_view(image: Image.Image, row: pd.Series | dict, view: str) -> Image.Im
         float(row["bbox_xmax"]),
         float(row["bbox_ymax"]),
     )
-    return image.crop(context_box(box, image.size, context_by_view[view]))
+    crop_box = context_box(box, image.size, context_by_view[view])
+    crop = image.crop(crop_box)
+    if view not in {
+        "person_context_25_background_blur",
+        "person_context_25_background_mask",
+    }:
+        return crop
+    crop_left, crop_top, crop_right, crop_bottom = crop_box
+    person_box = (
+        max(0, int(np.floor(box[0])) - crop_left),
+        max(0, int(np.floor(box[1])) - crop_top),
+        min(crop_right - crop_left, int(np.ceil(box[2])) - crop_left),
+        min(crop_bottom - crop_top, int(np.ceil(box[3])) - crop_top),
+    )
+    person = crop.crop(person_box)
+    if view == "person_context_25_background_blur":
+        radius = max(2.0, 0.04 * min(crop.size))
+        output = crop.filter(ImageFilter.GaussianBlur(radius=radius))
+    else:
+        output = Image.new("RGB", crop.size, color=(124, 116, 104))
+    output.paste(person, person_box[:2])
+    return output
 
 
 def _inspect_image(path: Path) -> dict:
@@ -278,13 +306,13 @@ def build_manifest(
     rows = []
     non_target = 0
     ambiguous_target = 0
-    annotations = parse_annotations(
-        annotation_paths, workers=workers, show_progress=show_progress
-    )
+    annotations = parse_annotations(annotation_paths, workers=workers, show_progress=show_progress)
     for annotation_path, annotation in zip(annotation_paths, annotations, strict=True):
         split = split_by_id.get(annotation.image_id)
         if split is None:
-            raise ValueError(f"Annotation is absent from official split lists: {annotation.image_id}")
+            raise ValueError(
+                f"Annotation is absent from official split lists: {annotation.image_id}"
+            )
         if annotation.target is None:
             if annotation.target_record_count:
                 ambiguous_target += 1
@@ -317,9 +345,8 @@ def build_manifest(
         show_progress=show_progress,
     )
     frame = pd.concat([frame, pd.DataFrame(inspections)], axis=1)
-    frame["dimension_match"] = (
-        (frame["annotated_width"] == frame["actual_width"])
-        & (frame["annotated_height"] == frame["actual_height"])
+    frame["dimension_match"] = (frame["annotated_width"] == frame["actual_width"]) & (
+        frame["annotated_height"] == frame["actual_height"]
     )
     clipped_xmin = frame["bbox_xmin"].clip(lower=0, upper=frame["actual_width"])
     clipped_ymin = frame["bbox_ymin"].clip(lower=0, upper=frame["actual_height"])
@@ -335,9 +362,8 @@ def build_manifest(
     frame["bbox_ymin"] = clipped_ymin.astype(int)
     frame["bbox_xmax"] = clipped_xmax.astype(int)
     frame["bbox_ymax"] = clipped_ymax.astype(int)
-    frame["bbox_valid"] = (
-        (frame["bbox_xmax"] > frame["bbox_xmin"])
-        & (frame["bbox_ymax"] > frame["bbox_ymin"])
+    frame["bbox_valid"] = (frame["bbox_xmax"] > frame["bbox_xmin"]) & (
+        frame["bbox_ymax"] > frame["bbox_ymin"]
     )
     frame["bbox_area_fraction"] = (
         (frame["bbox_xmax"] - frame["bbox_xmin"])
@@ -347,13 +373,9 @@ def build_manifest(
     frame["eligible"] = frame["decode_ok"] & frame["bbox_valid"]
     frame["exclusion_reason"] = ""
     frame.loc[~frame["decode_ok"], "exclusion_reason"] = "decode_failure"
-    frame.loc[frame["decode_ok"] & ~frame["bbox_valid"], "exclusion_reason"] = (
-        "invalid_person_box"
-    )
+    frame.loc[frame["decode_ok"] & ~frame["bbox_valid"], "exclusion_reason"] = "invalid_person_box"
 
-    observed = (
-        frame.groupby(["split", "label_4"], observed=True).size().unstack(fill_value=0)
-    )
+    observed = frame.groupby(["split", "label_4"], observed=True).size().unstack(fill_value=0)
     for split, expected in EXPECTED_TARGET_COUNTS.items():
         actual = {label: int(observed.loc[split, label]) for label in LABEL_TO_INDEX}
         if actual != expected:
@@ -400,9 +422,7 @@ def exact_cross_split_duplicates(frame: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def near_phash_cross_split_pairs(
-    frame: pd.DataFrame, *, max_distance: int = 6
-) -> pd.DataFrame:
+def near_phash_cross_split_pairs(frame: pd.DataFrame, *, max_distance: int = 6) -> pd.DataFrame:
     """Find all cross-split 64-bit pHash pairs within a Hamming radius."""
 
     if not 0 <= max_distance < 8:
@@ -526,9 +546,7 @@ def cross_split_embedding_pairs(
         scores, indices = torch.topk(similarities, k=requested_k, dim=1)
         scores = scores.cpu().numpy()
         indices = indices.cpu().numpy()
-        for local_index, (row_scores, row_indices) in enumerate(
-            zip(scores, indices, strict=True)
-        ):
+        for local_index, (row_scores, row_indices) in enumerate(zip(scores, indices, strict=True)):
             left_index = start + local_index
             for score, right_index in zip(row_scores, row_indices, strict=True):
                 if float(score) < minimum_cosine:
@@ -573,7 +591,9 @@ def cross_split_embedding_pairs(
 
 def enrich_near_pairs(pairs: pd.DataFrame, *, workers: int = 8) -> pd.DataFrame:
     if pairs.empty:
-        return pairs.assign(normalized_mae=pd.Series(dtype=float), normalized_correlation=pd.Series(dtype=float))
+        return pairs.assign(
+            normalized_mae=pd.Series(dtype=float), normalized_correlation=pd.Series(dtype=float)
+        )
     path_pairs = list(zip(pairs["left_path"], pairs["right_path"], strict=True))
 
     def compare(values: tuple[str, str]) -> dict:
@@ -668,7 +688,9 @@ def quarantine_components(pairs: pd.DataFrame) -> pd.DataFrame:
     components: dict[str, list[str]] = defaultdict(list)
     for image_id in sorted(disjoint.parent):
         components[disjoint.find(image_id)].append(image_id)
-    ordered_components = sorted((sorted(values) for values in components.values()), key=lambda x: x[0])
+    ordered_components = sorted(
+        (sorted(values) for values in components.values()), key=lambda x: x[0]
+    )
     rows = []
     for index, image_ids in enumerate(ordered_components, start=1):
         group = f"source_leakage_{index:04d}"
