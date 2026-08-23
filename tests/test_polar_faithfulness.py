@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import pytest
 import torch
+from evaluate_polar_faithfulness import randomized_adapted_cascade
+from torch import nn
 
 from hac.polar_faithfulness import (
     area_matched_context_mask,
@@ -85,3 +87,32 @@ def test_quantized_parameter_fault_is_deterministic_and_finite():
     assert scale == repeated_scale
     assert torch.equal(corrupted, repeated)
     assert torch.isfinite(corrupted).all()
+
+
+class _ConvBackbone(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.features = nn.ModuleList(
+            [nn.Sequential(nn.Linear(3, 3)), nn.Sequential(nn.Linear(3, 3))]
+        )
+        self.classifier = nn.Sequential(nn.Identity(), nn.Identity(), nn.Linear(3, 2))
+
+
+class _ConvModel(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.backbone = _ConvBackbone()
+
+
+def test_cascade_randomization_changes_only_head_and_adapted_stage():
+    torch.manual_seed(3)
+    model = _ConvModel()
+    early = model.backbone.features[0][0].weight.detach().clone()
+    adapted = model.backbone.features[-1][0].weight.detach().clone()
+    head = model.backbone.classifier[2].weight.detach().clone()
+
+    randomized_adapted_cascade(model, "convnext_small_full", seed=17)
+
+    assert torch.equal(model.backbone.features[0][0].weight, early)
+    assert not torch.equal(model.backbone.features[-1][0].weight, adapted)
+    assert not torch.equal(model.backbone.classifier[2].weight, head)

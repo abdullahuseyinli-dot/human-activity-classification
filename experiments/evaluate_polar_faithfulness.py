@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import copy
 import gc
 import json
 import platform
@@ -190,14 +189,37 @@ def bootstrap_mean(values: pd.Series, *, resamples: int, seed: int) -> dict:
     }
 
 
-def randomized_head(model, family: str, seed: int):
+def classifier_head(model, family: str):
+    return model.backbone.classifier[2] if family == "convnext_small_full" else model.classifier
+
+
+def reset_leaf_modules(module: torch.nn.Module) -> None:
+    for child in module.modules():
+        if any(child.children()):
+            continue
+        reset = getattr(child, "reset_parameters", None)
+        if callable(reset):
+            reset()
+
+
+def randomized_head(model, family: str, seed: int) -> None:
     head = model.backbone.classifier[2] if family == "convnext_small_full" else model.classifier
-    original = copy.deepcopy(head.state_dict())
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
     head.reset_parameters()
-    return head, original
+
+
+def randomized_adapted_cascade(model, family: str, seed: int) -> None:
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+    reset_leaf_modules(classifier_head(model, family))
+    if family == "convnext_small_full":
+        adapted = model.backbone.features[-1]
+    else:
+        adapted = model.backbone.encoder.layer[-4:]
+    reset_leaf_modules(adapted)
 
 
 def evaluate_family(
@@ -232,6 +254,7 @@ def evaluate_family(
         [group.index.to_numpy()[:4] for _, group in cohort.groupby("label_4", sort=True)]
     )
     randomized_sum = np.zeros((len(sanity_indices), 224, 224), dtype=np.float32)
+    cascade_randomized_sum = np.zeros((len(sanity_indices), 224, 224), dtype=np.float32)
     targets = np.argmax(locked_probabilities, axis=1)
     alternatives = np.argsort(locked_probabilities, axis=1)[:, -2]
     class_names = list(TASK_LABELS["label_4"])
@@ -302,9 +325,7 @@ def evaluate_family(
                     flush=True,
                 )
 
-        head, original_head = randomized_head(
-            model, family, stable_seed("head-randomization", family, seed)
-        )
+        randomized_head(model, family, stable_seed("head-randomization", family, seed))
         model.eval()
         for sanity_position, cohort_position in enumerate(sanity_indices):
             row = cohort.iloc[int(cohort_position)]
@@ -316,7 +337,20 @@ def evaluate_family(
                 int(targets[int(cohort_position)]),
                 steps=steps,
             )
-        head.load_state_dict(original_head)
+        randomized_adapted_cascade(
+            model, family, stable_seed("adapted-cascade-randomization", family, seed)
+        )
+        model.eval()
+        for sanity_position, cohort_position in enumerate(sanity_indices):
+            row = cohort.iloc[int(cohort_position)]
+            selected = load_tensor(row, configuration["view"], transform)[None].to(device)
+            cascade_randomized_sum[sanity_position] += model_attribution(
+                model,
+                family,
+                selected,
+                int(targets[int(cohort_position)]),
+                steps=steps,
+            )
         del model, payload
         gc.collect()
         if device.type == "cuda":
@@ -335,6 +369,9 @@ def evaluate_family(
     )
     randomized_maps = np.stack(
         [normalize_attribution(values / seed_count) for values in randomized_sum]
+    )
+    cascade_randomized_maps = np.stack(
+        [normalize_attribution(values / seed_count) for values in cascade_randomized_sum]
     )
     original = original_sum / seed_count
     person_occluded = person_occluded_sum / seed_count
@@ -416,6 +453,10 @@ def evaluate_family(
                     patch_scores(attribution_maps[int(cohort_position)], grid_size),
                     patch_scores(randomized_maps[sanity_position], grid_size),
                 ),
+                "trained_vs_randomized_adapted_cascade_spearman": attribution_spearman(
+                    patch_scores(attribution_maps[int(cohort_position)], grid_size),
+                    patch_scores(cascade_randomized_maps[sanity_position], grid_size),
+                ),
             }
         )
 
@@ -425,6 +466,7 @@ def evaluate_family(
         attributions=attribution_maps,
         alternative_target_attributions=alternative_maps,
         randomized_head_attributions=randomized_maps,
+        randomized_adapted_cascade_attributions=cascade_randomized_maps,
         randomized_head_image_ids=cohort.iloc[sanity_indices]["image_id"].astype(str).to_numpy(),
     )
     return pd.DataFrame(per_image), pd.DataFrame(curve_rows), pd.DataFrame(sanity_rows)
@@ -562,6 +604,14 @@ def main() -> None:
             resamples=10_000,
             seed=stable_seed("faithfulness-bootstrap", family, "randomized-head"),
         )
+        aggregate[family]["randomized_adapted_cascade_spearman"] = bootstrap_mean(
+            sanity.loc[
+                sanity["family"].eq(family),
+                "trained_vs_randomized_adapted_cascade_spearman",
+            ],
+            resamples=10_000,
+            seed=stable_seed("faithfulness-bootstrap", family, "randomized-cascade"),
+        )
 
     stratum_summary = (
         per_image.groupby(["family", "true_label", "bbox_area_quartile"], as_index=False)[
@@ -586,6 +636,19 @@ def main() -> None:
         "cohort_rows": len(cohort),
         "cohort_sha256": sha256_file(cohort_path),
         "protocol": faithfulness,
+        "parameter_randomization_scopes": {
+            "convnext_small_full": [
+                "classifier_head",
+                "classifier_head_plus_last_convnext_stage",
+            ],
+            "dinov2_base_top4": [
+                "classifier_head",
+                "classifier_head_plus_top_four_transformer_blocks",
+            ],
+        },
+        "parameter_randomization_rows_per_family": int(
+            sanity.groupby("family", sort=True).size().min()
+        ),
         "aggregate": aggregate,
         "max_probability_parity_absolute_error": float(
             per_image["probability_parity_absolute_error"].max()
