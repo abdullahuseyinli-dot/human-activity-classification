@@ -1,0 +1,40 @@
+{
+  "clear_walking_or_running_rows": 50,
+  "complete_repeat_pairs": 4,
+  "evidence_scope": "fixed_prefix_single_rater_descriptive_mechanism_audit",
+  "human_harmonized_performance_claim_permitted": false,
+  "human_pilot_labels_used_for_candidate_selection": false,
+  "interrater_agreement_available": false,
+  "intrarater_repeat_agreement": {
+    "gait": {
+      "complete_pairs": 4,
+      "exact_agreement": 1.0,
+      "matches": 4
+    },
+    "posture": {
+      "complete_pairs": 4,
+      "exact_agreement": 1.0,
+      "matches": 4
+    },
+    "visibility": {
+      "complete_pairs": 4,
+      "exact_agreement": 1.0,
+      "matches": 4
+    },
+    "visible_translation": {
+      "complete_pairs": 4,
+      "exact_agreement": 1.0,
+      "matches": 4
+    }
+  },
+  "non_gait_locomotion_rows": 32,
+  "not_resolved_3class_rows": 35,
+  "primary_selection_rule": "first_130_by_blind_manifest_display_order",
+  "primary_task_presentations": 130,
+  "resolved_3class_rows": 91,
+  "source_summary_sha256": "f7f7e8eb5e8192cb6e275fb821847e0d252849de96ed51bca7d7aa0b0849c0f4",
+  "status": "VCOCO_V3_HUMAN_PILOT_AUDIT_COMPLETE",
+  "surplus_responses_preserved_and_excluded": 1,
+  "unique_content_rows": 126,
+  "unique_images": 121
+}

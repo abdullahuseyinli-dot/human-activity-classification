@@ -6,9 +6,21 @@ code, or pretrained model parameters.
 
 ## COCO source images
 
-`data/manifest.csv` records COCO image URLs, labels, fixed splits, and checksums;
-the image files are downloaded by the user and are not redistributed by this
-repository. Under the [COCO terms of use](https://cocodataset.org/#termsofuse),
+`data/manifest.csv` records COCO image URLs, labels, fixed splits, and checksums.
+Full source datasets are not included. Four historical qualitative figures contain
+reduced-resolution COCO photographs:
+
+- `assets/champion_error_gallery.png`;
+- `assets/convnext_small_faithfulness_gallery.jpg`;
+- `assets/dinov2_small_faithfulness_gallery.jpg`;
+- `assets/probability_blend_faithfulness_gallery.jpg`.
+
+These figures are retained as evidence for the original benchmark. They are not
+covered by this repository's MIT License and must not be treated as project-owned
+stock imagery. The corresponding image identifiers and source URLs are recorded in
+`data/manifest.csv`, `results/champion_error_analysis.csv`, and
+`results/faithfulness_test_per_image.csv`. Under the
+[COCO terms of use](https://cocodataset.org/#termsofuse),
 COCO annotations and the COCO website are licensed under CC BY 4.0. The COCO
 Consortium does not own the image copyrights, so every image remains subject to
 its original Flickr/source terms. Users are responsible for confirming that
@@ -49,6 +61,20 @@ Suggested citation:
 > Gupta, S., & Malik, J. (2015). Visual Semantic Role Labeling. arXiv:1505.04474.
 > https://arxiv.org/abs/1505.04474
 
+## Okutama-Action dataset
+
+The temporal extension uses locally obtained Okutama-Action frame archives and
+provider annotations. No archive, frame, person crop, or annotation row is committed
+or redistributed. Users must obtain the dataset from its provider and comply with the
+terms supplied with that release. The tracked repository contains only aggregate
+metrics and archive hashes.
+
+Suggested citation:
+
+> Barekatain, M. et al. (2017). Okutama-Action: An Aerial View Video Dataset for
+> Concurrent Human Action Detection. CVPR Workshops, 28-35.
+> https://openaccess.thecvf.com/content_cvpr_2017_workshops/w34/html/Barekatain_Okutama-Action_An_Aerial_CVPR_2017_paper.html
+
 ## DINOv2-Small and DINOv2-Base
 
 The DINOv2-Small and DINOv2-Base pretrained models are developed by Meta AI and
@@ -57,6 +83,23 @@ the [Apache License 2.0](https://github.com/facebookresearch/dinov2/blob/main/LI
 The upstream [model card](https://github.com/facebookresearch/dinov2/blob/main/MODEL_CARD.md)
 documents the model's intended uses, limitations, and training-data context.
 
+## DINOv3-Base
+
+The matched representation screen uses the gated
+[`facebook/dinov3-vitb16-pretrain-lvd1689m`](https://huggingface.co/facebook/dinov3-vitb16-pretrain-lvd1689m)
+checkpoint. DINOv3 code and weights are supplied under Meta's
+[`DINOv3 License`](https://github.com/facebookresearch/dinov3/blob/main/LICENSE.md),
+not this repository's MIT License. The checkpoint remains in the local Hugging Face
+cache and is not committed or redistributed.
+
+## SigLIP and SigLIP2 Base models
+
+The frozen representation controls use
+[`google/siglip2-base-patch16-224`](https://huggingface.co/google/siglip2-base-patch16-224),
+and the CPTR center-frame control uses
+[`google/siglip-base-patch16-224`](https://huggingface.co/google/siglip-base-patch16-224).
+Their model cards record the Apache License 2.0. No SigLIP checkpoint is committed.
+
 ## ConvNeXt-Small and torchvision
 
 ConvNeXt-Small is loaded with torchvision's `IMAGENET1K_V1` pretrained weights.
@@ -64,6 +107,12 @@ The torchvision source is distributed under the
 [BSD 3-Clause License](https://github.com/pytorch/vision/blob/main/LICENSE).
 Torchvision notes that pretrained models can also be subject to terms derived
 from their training data; those upstream rights are not relicensed here.
+
+## OpenCV
+
+Camera-motion estimation uses the headless Python distribution of
+[OpenCV](https://github.com/opencv/opencv-python). OpenCV 4.5.0 and later are
+distributed under the [Apache License 2.0](https://github.com/opencv/opencv/blob/4.x/LICENSE).
 
 ## PyTorch Grad-CAM
 

@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software or its evidence, cite the versioned technical report under preferred-citation."
-title: "Source-Overlap-Controlled Human Activity Classification"
+title: "Human Activity Classification Under Domain and Temporal Shift"
 type: software
-version: 2.0.0
+version: 3.0.0
 date-released: 2026-08-24
 authors:
   - family-names: Huseyinli
@@ -11,11 +11,11 @@ repository-code: "https://github.com/abdullahuseyinli-dot/human-activity-classif
 url: "https://github.com/abdullahuseyinli-dot/human-activity-classification"
 license: MIT
 abstract: >-
-  A leakage-audited human activity classification study spanning the four-class
-  POLAR benchmark and a locked person-level V-COCO follow-up. The release includes
-  source-overlap controls, DINOv2 and ConvNeXt experiments, scale-conditioned views,
-  factorized targets, calibrated classifiers, paired uncertainty, attribution
-  diagnostics, and bounded fault injection.
+  A leakage-audited human activity classification study spanning POLAR, V-COCO,
+  and Okutama-Action. The release includes source-overlap controls, person-level
+  transfer, short-clip temporal modeling, budgeted inference, paired uncertainty,
+  attribution diagnostics, bounded fault injection, and a recording-grouped
+  architecture study.
 keywords:
   - human activity recognition
   - transfer learning
@@ -25,10 +25,12 @@ keywords:
   - domain adaptation
   - calibration
   - evaluation methodology
+  - temporal modeling
+  - motion identifiability
 preferred-citation:
   type: report
-  title: "Improving Person-Level External Transfer on V-COCO"
-  version: 2.0.0
+  title: "When a Still Image Is Not Enough: Motion Identifiability and Budgeted Temporal Inference"
+  version: 3.0.0
   year: 2026
   url: "https://github.com/abdullahuseyinli-dot/human-activity-classification"
   authors:

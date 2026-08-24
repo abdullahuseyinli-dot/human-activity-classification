@@ -1,0 +1,176 @@
+{
+  "grid_version": "3.0.0-neural-2",
+  "status": "DECLARED_BEFORE_NEURAL_FITTING",
+  "execution_backend": {
+    "cuda_required": true,
+    "automatic_mixed_precision": true,
+    "numeric_precision": "float16_autocast_with_float32_master_weights"
+  },
+  "required_gates": {
+    "human_annotation": "VCOCO_V3_HUMAN_PILOT_AUDIT_COMPLETE",
+    "spatial": "VCOCO_V3_SPATIAL_DEVELOPMENT_COMPLETE",
+    "representations": "VCOCO_V3_MATCHED_REPRESENTATION_DEVELOPMENT_COMPLETE"
+  },
+  "eligibility": {
+    "spatial_promotion_required": true,
+    "backbone_pool": [
+      "dinov2_base",
+      "dinov3_base"
+    ],
+    "backbone_rule": "highest nested source-tag macro-F1 among the declared DINO families; break ties by locomotion F1, then log loss, then model name",
+    "siglip_role": "frozen representation comparator only"
+  },
+  "development_data": {
+    "splits": [
+      "train",
+      "val"
+    ],
+    "labels": "immutable source tags",
+    "human_pilot_labels_used_for_selection": false,
+    "official_v2_test_used": false
+  },
+  "cross_validation": {
+    "outer_folds": 5,
+    "inner_folds": 3,
+    "splitter": "StratifiedGroupKFold",
+    "group": "source_image",
+    "outer_seed": 20260830,
+    "inner_seed": 20260831,
+    "early_stopping_folds": 5,
+    "early_stopping_fold": 0,
+    "screening_seeds": [
+      42,
+      43,
+      44
+    ],
+    "outer_fit_seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ]
+  },
+  "views": {
+    "tight": "person_tight",
+    "context": "person_context_25",
+    "image_size": 224,
+    "preprocess": "aspect_preserving_pad"
+  },
+  "architecture": {
+    "adapter_dim": 256,
+    "geometry_features": 6,
+    "factorized_posture_motion_heads": true,
+    "reliability_gate": true,
+    "auxiliary_view_loss_weight": 0.2
+  },
+  "candidate_templates": [
+    {
+      "candidate_id": "adapter_only_d010_erase010",
+      "strategy": "adapter_only",
+      "top_blocks": 0,
+      "lora_rank": 0,
+      "lora_alpha": 0.0,
+      "lora_dropout": 0.0,
+      "dropout": 0.1,
+      "random_erasing_probability": 0.1
+    },
+    {
+      "candidate_id": "lora_top2_d010_erase010",
+      "strategy": "lora_top_blocks",
+      "top_blocks": 2,
+      "lora_rank": 8,
+      "lora_alpha": 16.0,
+      "lora_dropout": 0.05,
+      "dropout": 0.1,
+      "random_erasing_probability": 0.1
+    },
+    {
+      "candidate_id": "lora_top4_d010_erase010",
+      "strategy": "lora_top_blocks",
+      "top_blocks": 4,
+      "lora_rank": 8,
+      "lora_alpha": 16.0,
+      "lora_dropout": 0.05,
+      "dropout": 0.1,
+      "random_erasing_probability": 0.1
+    },
+    {
+      "candidate_id": "lora_top2_d020_erase010",
+      "strategy": "lora_top_blocks",
+      "top_blocks": 2,
+      "lora_rank": 8,
+      "lora_alpha": 16.0,
+      "lora_dropout": 0.05,
+      "dropout": 0.2,
+      "random_erasing_probability": 0.1
+    },
+    {
+      "candidate_id": "lora_top2_d030_erase010",
+      "strategy": "lora_top_blocks",
+      "top_blocks": 2,
+      "lora_rank": 8,
+      "lora_alpha": 16.0,
+      "lora_dropout": 0.05,
+      "dropout": 0.3,
+      "random_erasing_probability": 0.1
+    },
+    {
+      "candidate_id": "lora_top2_d010_erase000",
+      "strategy": "lora_top_blocks",
+      "top_blocks": 2,
+      "lora_rank": 8,
+      "lora_alpha": 16.0,
+      "lora_dropout": 0.05,
+      "dropout": 0.1,
+      "random_erasing_probability": 0.0
+    }
+  ],
+  "training": {
+    "schedule": "linear_probe_then_parameter_efficient_adaptation",
+    "probe_epochs": 3,
+    "maximum_epochs": 20,
+    "minimum_epochs": 6,
+    "early_stopping_patience": 4,
+    "batch_size": 4,
+    "gradient_accumulation_steps": 8,
+    "effective_batch_size": 32,
+    "head_learning_rate": 0.0005,
+    "adapter_learning_rate": 0.0002,
+    "lora_learning_rate": 0.00001,
+    "weight_decay": 0.01,
+    "label_smoothing": 0.02,
+    "class_balance": "fit_partition_inverse_frequency",
+    "optimizer": "AdamW",
+    "scheduler": "linear_warmup_cosine_decay",
+    "warmup_fraction": 0.1,
+    "gradient_clip_norm": 1.0,
+    "automatic_mixed_precision": true,
+    "gradient_checkpointing": true,
+    "augmentation": "paired_person_safe_mild",
+    "horizontal_flip_probability": 0.5,
+    "maximum_rotation_degrees": 5,
+    "maximum_translation_fraction": 0.02,
+    "scale_range": [
+      0.9,
+      1.0
+    ],
+    "colour_jitter": "mild_shared_between_views",
+    "aggressive_motion_destroying_augmentation": false
+  },
+  "selection": {
+    "inner_seed_aggregation": "mean probabilities before scoring",
+    "candidate_order": [
+      "macro_f1_descending",
+      "locomotion_f1_descending",
+      "log_loss_ascending",
+      "candidate_id_ascending"
+    ],
+    "outer_seed_aggregation": "mean probabilities",
+    "bootstrap_unit": "source_image",
+    "bootstrap_resamples": 10000,
+    "multiplicity": "Holm",
+    "primary_endpoint": "source_tag_macro_f1",
+    "human_harmonized_labels_used_for_selection": false
+  }
+}

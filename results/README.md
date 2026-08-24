@@ -4,6 +4,30 @@ This directory contains compact, path-sanitized evidence for the repository's
 versioned studies. Dataset images, checkpoints, embeddings, fitted estimators, dense
 probabilities, and full-resolution attribution arrays remain outside Git.
 
+## Okutama CPTR architecture study
+
+Begin with [`okutama_cptr/README.md`](okutama_cptr/README.md) and its
+[`evidence_manifest.json`](okutama_cptr/evidence_manifest.json). The five-seed
+center-conditioned short-window and body-region ensemble reaches 0.7887 macro-F1 on
+the fixed validation split, compared with 0.7806 for the frozen temporal baseline.
+The full 11-recording grouped OOF result is 0.7144 versus 0.7165, so the baseline
+remains the default model. The package contains every component screen, all 25
+fold/seed results, paired uncertainty, visibility and transition subgroups,
+faithfulness interventions, CUDA latency, and the locked development decision.
+
+## Motion-identifiability and temporal extension
+
+Begin with [`vcoco_v3/README.md`](vcoco_v3/README.md) and its
+[`evidence_manifest.json`](vcoco_v3/evidence_manifest.json). The sealed Okutama
+confirmation contains 1,771 tracked people from five scenarios. The eight-frame
+temporal model reaches 0.7854 macro-F1, compared with 0.7458 for the matched static
+model. A fixed 50% clip-routing policy reaches 0.7817.
+
+The package includes the human pilot aggregates, matched frozen-representation and
+spatial screens, source-only and few-shot transfer, recording-grouped temporal
+development, pre-confirmation calibration, paired scenario-cluster uncertainty, and
+confirmation subgroup results.
+
 ## V-COCO v2 person-level study
 
 Begin with [`vcoco_v2/README.md`](vcoco_v2/README.md) and the accompanying

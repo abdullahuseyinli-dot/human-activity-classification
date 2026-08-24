@@ -1,0 +1,5 @@
+axis,complete_pairs,matches,exact_agreement
+posture,4,4,1.0
+visible_translation,4,4,1.0
+gait,4,4,1.0
+visibility,4,4,1.0

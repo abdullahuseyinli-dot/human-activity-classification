@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import tomllib
 from pathlib import Path, PurePosixPath
 
@@ -97,13 +98,9 @@ def validate_versions(repository: Path) -> None:
     with (repository / "pyproject.toml").open("rb") as handle:
         package_version = tomllib.load(handle)["project"]["version"]
     if package_version != SOFTWARE_VERSION:
-        raise RuntimeError(
-            f"Expected software version {SOFTWARE_VERSION}, found {package_version}"
-        )
+        raise RuntimeError(f"Expected software version {SOFTWARE_VERSION}, found {package_version}")
 
-    report = (repository / "docs/VCOCO_V2_EXTERNAL_TRANSFER.md").read_text(
-        encoding="utf-8"
-    )
+    report = (repository / "docs/VCOCO_V2_EXTERNAL_TRANSFER.md").read_text(encoding="utf-8")
     match = re.search(r"(?m)^version: ([^\s]+)$", report)
     if match is None or match.group(1) != REPORT_VERSION:
         found = match.group(1) if match else "missing"
@@ -153,8 +150,7 @@ def checksum_text(repository: Path, manifest_path: Path) -> str:
     pdf_path = repository / "output/pdf/vcoco_v2_external_transfer_v2.0.0.pdf"
     targets = (pdf_path, manifest_path)
     return "".join(
-        f"{sha256_file(path)}  {path.relative_to(repository).as_posix()}\n"
-        for path in targets
+        f"{sha256_file(path)}  {path.relative_to(repository).as_posix()}\n" for path in targets
     )
 
 
@@ -167,22 +163,50 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def verify_frozen_release(repository: Path, manifest_path: Path, checksums_path: Path) -> None:
+    if not manifest_path.is_file():
+        raise RuntimeError(f"Release manifest is missing: {manifest_path}")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if (
+        manifest.get("release_id") != RELEASE_ID
+        or manifest.get("report_version") != REPORT_VERSION
+        or manifest.get("software_version") != SOFTWARE_VERSION
+    ):
+        raise RuntimeError("Release manifest identity changed")
+    artifacts = manifest.get("artifacts")
+    if not isinstance(artifacts, dict) or len(artifacts) != manifest.get("artifact_count"):
+        raise RuntimeError("Release manifest artifact inventory is invalid")
+    for relative, evidence in artifacts.items():
+        blob = subprocess.run(
+            ["git", "show", f"{RELEASE_ID}:{relative}"],
+            cwd=repository,
+            check=True,
+            capture_output=True,
+        ).stdout
+        if hashlib.sha256(blob).hexdigest() != evidence.get("sha256"):
+            raise RuntimeError(f"Tagged release artifact hash differs: {relative}")
+        if len(blob) != int(evidence.get("size_bytes", -1)):
+            raise RuntimeError(f"Tagged release artifact size differs: {relative}")
+    expected_checksums = checksum_text(repository, manifest_path)
+    if (
+        not checksums_path.is_file()
+        or checksums_path.read_text(encoding="utf-8") != expected_checksums
+    ):
+        raise RuntimeError(f"Release checksums are stale: {checksums_path}")
+
+
 def main() -> None:
     args = parse_args()
     repository = args.repository.resolve()
     output = repository / args.output
     checksums = repository / args.checksums
-    expected = encoded_manifest(build_manifest(repository))
 
     if args.check:
-        if not output.is_file() or output.read_bytes() != expected:
-            raise RuntimeError(f"Release manifest is stale: {output}")
-        expected_checksums = checksum_text(repository, output)
-        if not checksums.is_file() or checksums.read_text(encoding="utf-8") != expected_checksums:
-            raise RuntimeError(f"Release checksums are stale: {checksums}")
+        verify_frozen_release(repository, output, checksums)
         print(f"Release manifest verified: {output}")
         return
 
+    expected = encoded_manifest(build_manifest(repository))
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(expected)
     checksums.parent.mkdir(parents=True, exist_ok=True)

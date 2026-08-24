@@ -1,0 +1,232 @@
+{
+  "protocol_version": "1.0.0",
+  "status": "DECLARED_BEFORE_CPTR_DEVELOPMENT_FITTING",
+  "study_name": "camera_compensated_part_trajectory_residual",
+  "short_name": "CPTR",
+  "research_question": "Can explicit camera compensation, structured person kinematics, body-region articulation, centre-conditioned temporal evidence, and counterfactual utility routing improve the remaining standing-locomotion and transition errors without weakening the established static fallback?",
+  "claim_boundary": {
+    "architecture_scope": "task_specific_video_activity_model_using_frozen_or_parameter_efficient_pretrained_encoders",
+    "foundation_model_claim": false,
+    "state_of_the_art_claim": false,
+    "novelty_status": "candidate_mechanism_requiring_ablation_and_independent_confirmation",
+    "consumed_confirmation_use": "historical_baseline_context_only",
+    "new_confirmation_required": true
+  },
+  "dataset": {
+    "name": "Okutama-Action",
+    "development_partition": "provider_train",
+    "selection_splits": [
+      "train",
+      "validation"
+    ],
+    "calibration_split_policy": "unread_until_architecture_and_router_are_locked",
+    "confirmation_partition_policy": "must_not_be_loaded_or_scored",
+    "group": "scenario_id",
+    "synchronised_drone_views_stay_together": true,
+    "track_crossing_forbidden": true,
+    "provider_labels_immutable": true,
+    "primary_labels": [
+      "sitting",
+      "standing",
+      "walking_running"
+    ],
+    "auxiliary_labels": [
+      "walking_running_subtype",
+      "transition_window",
+      "window_occluded"
+    ]
+  },
+  "execution_order": [
+    "baseline_replay",
+    "temporal_faithfulness_diagnostics",
+    "compact_raw_kinematics",
+    "camera_compensated_kinematics",
+    "centre_conditioned_short_residual",
+    "dual_clock_residual",
+    "confidence_masked_part_articulation",
+    "motion_null_and_invariance_training",
+    "cross_fitted_continuous_utility_router",
+    "target_video_masked_adaptation",
+    "top_block_lora_and_centre_siglip_specialists",
+    "passing_component_integration",
+    "five_seed_and_grouped_crossfit_validation",
+    "development_lock"
+  ],
+  "input": {
+    "base_store": ".runs/vcoco_v3/okutama/features/dinov2_base/store.json",
+    "development_manifest": ".runs/vcoco_v3/temporal/development_manifest.csv",
+    "development_centres": ".runs/vcoco_v3/okutama/development_audit/development_centres.csv",
+    "raw_development_archive": "data/external/OkutamaAction/TrainSetFrames.zip",
+    "frame_resolution": [
+      1280,
+      720
+    ],
+    "cached_frames": 17,
+    "cached_frame_rate_hz": 16.0,
+    "centre_index": 8,
+    "short_clock": {
+      "samples": 8,
+      "seconds": 0.5
+    },
+    "long_clock": {
+      "samples": 8,
+      "seconds": 1.0
+    },
+    "body_regions": [
+      "head_shoulders",
+      "torso",
+      "pelvis",
+      "left_upper_side",
+      "right_upper_side",
+      "left_leg",
+      "right_leg"
+    ]
+  },
+  "architecture": {
+    "static_fallback": "matching_seed_frozen_v3_static_model",
+    "legacy_temporal_expert": "matching_seed_frozen_v3_temporal_8f_050s_model",
+    "model_dim": 192,
+    "trajectory_dim": 96,
+    "part_dim": 96,
+    "attention_heads": 4,
+    "temporal_layers": 2,
+    "feedforward_dim": 384,
+    "dropout": 0.15,
+    "stochastic_depth": 0.05,
+    "fusion": "separate_posture_and_motion_reliability_gated_residuals",
+    "outputs": [
+      "factorized_posture",
+      "factorized_translation",
+      "walking_running_subtype",
+      "transition_window",
+      "visibility_quality",
+      "evidence_reliability"
+    ],
+    "unsupported_supervised_outputs": [
+      "other_posture",
+      "non_gait_locomotion",
+      "unknown_state"
+    ]
+  },
+  "camera_compensation": {
+    "estimator": "background_dominant_sparse_lucas_kanade_with_ransac_partial_affine",
+    "fallback": "phase_correlation_translation",
+    "working_resolution": [
+      320,
+      180
+    ],
+    "maximum_corners": 400,
+    "minimum_inliers": 12,
+    "person_motion_policy": "robust_background_consensus_without_label_use",
+    "unreliable_estimate_policy": "preserve_raw_path_and_expose_quality_mask"
+  },
+  "augmentation": {
+    "temporally_coherent_feature_noise": 0.015,
+    "temporally_coherent_geometry_jitter": 0.01,
+    "modality_dropout": 0.15,
+    "quality_conditioned_part_dropout": true,
+    "independent_per_frame_spatial_augmentation": false
+  },
+  "counterfactual_training": {
+    "motion_null": "repeat_centre_frame_and_zero_relative_motion",
+    "motion_null_residual_weight": 0.15,
+    "non_transition_reversal_consistency_weight": 0.05,
+    "camera_jitter_invariance_weight": 0.05,
+    "transition_auxiliary_weight": 0.10,
+    "gait_auxiliary_weight": 0.05,
+    "quality_auxiliary_weight": 0.025
+  },
+  "masked_target_adaptation": {
+    "labels_used": false,
+    "mask_fraction": 0.4,
+    "objective": "masked_frozen_feature_reconstruction_with_temporal_order_regularisation",
+    "semantic_anchor": "frozen_dinov2_frame_features",
+    "epochs": 12
+  },
+  "parameter_efficient_adaptation": {
+    "screen_after_feature_level_heads": true,
+    "backbone": "facebook/dinov2-base",
+    "top_blocks": 2,
+    "lora_rank": 8,
+    "lora_alpha": 16.0,
+    "lora_dropout": 0.05,
+    "batch_size": 4,
+    "gradient_accumulation": 8,
+    "mixed_precision": true,
+    "full_backbone_finetuning": false
+  },
+  "training": {
+    "device": "cuda",
+    "cpu_fallback": false,
+    "automatic_mixed_precision": true,
+    "optimizer": "AdamW",
+    "learning_rate": 0.0003,
+    "weight_decay": 0.015,
+    "batch_size": 64,
+    "maximum_epochs": 30,
+    "minimum_epochs": 6,
+    "early_stopping_patience": 5,
+    "gradient_clip_norm": 1.0,
+    "label_smoothing": 0.02,
+    "class_balance": "fit_partition_inverse_frequency",
+    "screen_seed": 42,
+    "promotion_seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "crossfit_folds": 5,
+    "crossfit_seed": 20260911
+  },
+  "router": {
+    "targets": [
+      "continuous_true_class_log_likelihood_gain",
+      "rescue_probability",
+      "harm_probability"
+    ],
+    "training_predictions": "recording_grouped_out_of_fold_only",
+    "mandatory_baselines": [
+      "one_minus_static_max_probability",
+      "static_entropy",
+      "inverse_static_top_two_margin"
+    ],
+    "clip_budget_fractions": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "cost_penalty_selected_on": "development_validation",
+    "report_measured_latency_and_peak_cuda_memory": true
+  },
+  "diagnostics": [
+    "repeat_centre_frame",
+    "reverse_temporal_order",
+    "deterministic_temporal_shuffle",
+    "zero_geometry",
+    "zero_appearance_dynamics",
+    "raw_vs_camera_compensated_path",
+    "occluded_frame_masking",
+    "background_camera_jitter"
+  ],
+  "promotion": {
+    "screen_minimum_macro_f1_gain": 0.003,
+    "final_minimum_macro_f1_gain": 0.01,
+    "paired_scenario_cluster_interval_lower_bound_above_zero": true,
+    "maximum_allowed_per_class_f1_regression": 0.01,
+    "standing_f1_must_be_reported": true,
+    "transition_macro_f1_must_be_reported": true,
+    "worst_scenario_must_not_materially_regress": true,
+    "holm_correction_across_promoted_families": true,
+    "failed_components_remain_visible": true
+  },
+  "final_evaluation": {
+    "development_only": true,
+    "calibration_may_open_only_after_development_lock": true,
+    "existing_okutama_confirmation_must_not_open": true,
+    "new_untouched_scenario_or_compatible_dataset_required": true
+  }
+}

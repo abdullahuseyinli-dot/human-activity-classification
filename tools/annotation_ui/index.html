@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>V-COCO motion annotation</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div>
+          <p class="eyebrow">Motion identifiability study</p>
+          <h1>Person annotation</h1>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="button button-quiet" id="instructions-button" type="button">
+          Guide
+        </button>
+        <button class="button button-quiet" id="change-annotator-button" type="button">
+          Change annotator
+        </button>
+        <button class="button button-quiet" id="export-button" type="button">
+          Export CSV
+        </button>
+      </div>
+    </header>
+
+    <main class="shell" id="app" aria-busy="true">
+      <section class="progress-panel" aria-label="Annotation progress">
+        <div class="progress-copy">
+          <span id="annotator-label">Not signed in</span>
+          <strong id="progress-label">0 of 0 complete</strong>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <span id="progress-fill"></span>
+        </div>
+      </section>
+
+      <section class="workspace" hidden id="workspace">
+        <div class="task-heading">
+          <div>
+            <p class="eyebrow" id="task-position">Example —</p>
+            <h2>Describe only what is visible</h2>
+          </div>
+          <span class="save-state" id="save-state" role="status">Ready</span>
+        </div>
+
+        <section class="viewer" aria-label="Target person images">
+          <figure class="image-card image-card-context">
+            <figcaption>
+              <strong>Scene</strong>
+              <span>Target outlined in amber</span>
+            </figcaption>
+            <div class="image-stage">
+              <img id="context-image" alt="Scene containing the target person" />
+              <div class="image-loading" aria-hidden="true">Loading scene…</div>
+            </div>
+          </figure>
+          <figure class="image-card image-card-person">
+            <figcaption>
+              <strong>Person crop</strong>
+              <span>Use the scene when the crop is ambiguous</span>
+            </figcaption>
+            <div class="image-stage image-stage-person">
+              <img id="person-image" alt="Close crop of the target person" />
+              <div class="image-loading" aria-hidden="true">Loading person…</div>
+            </div>
+          </figure>
+        </section>
+
+        <form id="annotation-form" novalidate>
+          <div class="question-grid">
+            <fieldset class="question" data-field="posture">
+              <legend><span>1</span> Posture</legend>
+              <p class="question-hint">Body configuration, independent of motion</p>
+              <div class="choices">
+                <label><input type="radio" name="posture" value="seated" /><span><kbd>1</kbd>Seated</span></label>
+                <label><input type="radio" name="posture" value="upright" /><span><kbd>2</kbd>Upright</span></label>
+                <label><input type="radio" name="posture" value="other" /><span><kbd>3</kbd>Other</span></label>
+                <label><input type="radio" name="posture" value="indeterminate" /><span><kbd>4</kbd>Indeterminate</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question" data-field="visible_translation">
+              <legend><span>2</span> Visible translation</legend>
+              <p class="question-hint">Whether this frame supports movement through the scene</p>
+              <div class="choices">
+                <label><input type="radio" name="visible_translation" value="stationary" /><span><kbd>Q</kbd>Stationary</span></label>
+                <label><input type="radio" name="visible_translation" value="locomoting" /><span><kbd>W</kbd>Locomoting</span></label>
+                <label><input type="radio" name="visible_translation" value="transition" /><span><kbd>E</kbd>Transition</span></label>
+                <label><input type="radio" name="visible_translation" value="not_inferable" /><span><kbd>R</kbd>Not inferable</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question" data-field="gait">
+              <legend><span>3</span> Gait</legend>
+              <p class="question-hint">Interpret gait together with visible translation</p>
+              <div class="choices">
+                <label><input type="radio" name="gait" value="walking" /><span><kbd>A</kbd>Walking</span></label>
+                <label><input type="radio" name="gait" value="running" /><span><kbd>S</kbd>Running</span></label>
+                <label><input type="radio" name="gait" value="not_applicable" /><span><kbd>D</kbd>Not applicable</span></label>
+                <label><input type="radio" name="gait" value="indeterminate" /><span><kbd>F</kbd>Indeterminate</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question" data-field="visibility">
+              <legend><span>4</span> Visibility</legend>
+              <p class="question-hint">The main limitation on judging this person</p>
+              <div class="choices">
+                <label><input type="radio" name="visibility" value="clear" /><span><kbd>Z</kbd>Clear</span></label>
+                <label><input type="radio" name="visibility" value="occluded" /><span><kbd>X</kbd>Occluded</span></label>
+                <label><input type="radio" name="visibility" value="truncated" /><span><kbd>C</kbd>Truncated</span></label>
+                <label><input type="radio" name="visibility" value="too_small" /><span><kbd>V</kbd>Too small</span></label>
+              </div>
+            </fieldset>
+          </div>
+
+          <label class="notes-field">
+            <span>Optional note</span>
+            <textarea
+              id="notes"
+              maxlength="1000"
+              rows="2"
+              placeholder="Record a specific ambiguity or visual cue only when useful"
+            ></textarea>
+          </label>
+
+          <p class="form-error" id="form-error" role="alert" hidden></p>
+          <div class="form-actions">
+            <button class="button button-secondary" id="previous-button" type="button">
+              ← Previous
+            </button>
+            <button class="button button-secondary" id="skip-button" type="button">
+              Skip for now
+            </button>
+            <button class="button button-primary" id="save-button" type="submit">
+              Save &amp; next <kbd>Space</kbd>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="empty-state" id="loading-state">
+        <div class="spinner" aria-hidden="true"></div>
+        <h2>Preparing your annotation session</h2>
+        <p>The task list and saved progress stay on this computer.</p>
+      </section>
+
+      <section class="empty-state" id="complete-state" hidden>
+        <div class="complete-mark" aria-hidden="true">✓</div>
+        <h2>This annotation pass is complete</h2>
+        <p>Your responses are saved. Export a copy before closing the session.</p>
+        <div class="complete-actions">
+          <button class="button button-secondary" id="review-button" type="button">Review responses</button>
+          <button class="button button-primary" id="complete-export-button" type="button">Export CSV</button>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="annotator-dialog">
+      <form method="dialog" id="annotator-form" class="dialog-body">
+        <p class="eyebrow">Independent annotation pass</p>
+        <h2>Choose your annotator ID</h2>
+        <p>
+          Use a short identifier that is unique to you. Your progress will be saved
+          separately and can be resumed on this computer.
+        </p>
+        <label class="text-field">
+          <span>Annotator ID</span>
+          <input
+            id="annotator-input"
+            name="annotator_id"
+            type="text"
+            autocomplete="off"
+            maxlength="64"
+            pattern="[A-Za-z0-9][A-Za-z0-9_.-]{0,63}"
+            placeholder="for example, rater-01"
+            required
+          />
+        </label>
+        <p class="form-error" id="annotator-error" role="alert" hidden></p>
+        <button class="button button-primary button-wide" type="submit">Start or resume</button>
+      </form>
+    </dialog>
+
+    <dialog id="instructions-dialog">
+      <div class="dialog-body guide">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">Annotation guide</p>
+            <h2>Judge the pixels, not the likely label</h2>
+          </div>
+          <button class="icon-button" id="close-instructions-button" type="button" aria-label="Close guide">×</button>
+        </div>
+
+        <div class="guide-callout">
+          The amber rectangle identifies the person to label. Do not infer motion from
+          clothing, location, or what the person might do next.
+        </div>
+
+        <dl>
+          <div>
+            <dt>Seated / upright / other</dt>
+            <dd>Describe body posture. Use <em>indeterminate</em> when the body is not sufficiently visible.</dd>
+          </div>
+          <div>
+            <dt>Stationary</dt>
+            <dd>The image contains positive support for a stationary pose; it is not merely missing motion evidence.</dd>
+          </div>
+          <div>
+            <dt>Locomoting</dt>
+            <dd>The pose or scene provides visible evidence of translation through the environment.</dd>
+          </div>
+          <div>
+            <dt>Transition</dt>
+            <dd>The person appears to be starting, stopping, standing up, sitting down, or otherwise between states.</dd>
+          </div>
+          <div>
+            <dt>Not inferable</dt>
+            <dd>A single frame does not contain enough evidence to distinguish stationary from locomoting.</dd>
+          </div>
+          <div>
+            <dt>Gait</dt>
+            <dd>
+              Select walking or running only with visible locomotion.
+              <em>Stationary + not applicable</em> means the person is not changing
+              location; localized actions such as throwing or hitting may still be
+              occurring. <em>Locomoting + not applicable</em> means the person is changing
+              location by a mode other than walking or running, such as crawling,
+              cycling, skating, or swimming. Use <em>indeterminate</em> when translation is
+              visible and walking versus running cannot be distinguished.
+            </dd>
+          </div>
+          <div>
+            <dt>Visibility</dt>
+            <dd>Choose the strongest limitation: occluded by another object, cut by the frame boundary, too small to judge, or clear.</dd>
+          </div>
+        </dl>
+
+        <p class="keyboard-note">
+          Keyboard shortcuts appear beside each answer. Press <kbd>Space</kbd> to save,
+          or use <kbd>←</kbd> and <kbd>→</kbd> to navigate.
+        </p>
+        <button class="button button-primary button-wide" id="guide-done-button" type="button">Continue annotation</button>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

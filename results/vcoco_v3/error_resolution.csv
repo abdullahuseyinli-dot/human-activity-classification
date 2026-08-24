@@ -1,0 +1,7 @@
+error_type,pilot_resolution,count
+locomotion_to_standing,not_resolved,9
+locomotion_to_standing,prediction_supported,4
+locomotion_to_standing,source_supported,18
+standing_to_locomotion,not_resolved,3
+standing_to_locomotion,prediction_supported,4
+standing_to_locomotion,source_supported,4

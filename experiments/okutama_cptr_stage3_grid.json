@@ -1,0 +1,86 @@
+{
+  "grid_version": "1.3.0-adaptive-3",
+  "status": "DECLARED_AFTER_COUNTERFACTUAL_FAILURE_BEFORE_REFINED_FITTING",
+  "base_stage2_grid_lock": ".runs/cptr/stage2_grid_lock.json",
+  "selection_rationale": "The first counterfactual objective penalized the frozen legacy residual together with the new residual branches and materially regressed the passing model. The refined loss preserves the frozen legacy prediction and suppresses only newly learned residuals on motion-null clips. Masked initialization is isolated from counterfactual training before their combination is considered.",
+  "evidence": [
+    {
+      "artifact": "counterfactual_screen",
+      "path": ".runs/cptr/stage2/centre_short_parts_counterfactual/seed-42/summary.json",
+      "sha256": "cedd558f22a038ab52917f66f1bf469c7b2bbe3d7f1efbeb1efcc4191740a772"
+    },
+    {
+      "artifact": "utility_router",
+      "path": ".runs/cptr/router/summary.json",
+      "sha256": "6dde9bd882cf204bf469f230db0673db075571cffd6b07ffc5703ffe59a0e739"
+    },
+    {
+      "artifact": "masked_pretraining",
+      "path": ".runs/cptr/masked_pretraining/seed-42/summary.json",
+      "sha256": "99dbeb910538c9db7594c0aa669e2e7f728d07db63e0da6397fb70c9b76a44f1"
+    }
+  ],
+  "candidates": [
+    {
+      "candidate_id": "centre_short_parts_counterfactual_refined",
+      "stage": "legacy_preserving_motion_null_and_invariance_training",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": false,
+      "use_compensated_trajectory": false,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": false,
+      "use_counterfactuals": true,
+      "use_masked_initialisation": false,
+      "group_objective": "erm",
+      "expert_roles": {
+        "centre_short": "both",
+        "parts": "both"
+      }
+    },
+    {
+      "candidate_id": "centre_short_parts_masked_only",
+      "stage": "isolated_target_video_masked_initialisation",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": false,
+      "use_compensated_trajectory": false,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": false,
+      "use_counterfactuals": false,
+      "use_masked_initialisation": true,
+      "group_objective": "erm",
+      "expert_roles": {
+        "centre_short": "both",
+        "parts": "both"
+      }
+    },
+    {
+      "candidate_id": "centre_short_parts_masked_counterfactual_refined",
+      "stage": "passing_stage3_component_integration",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": false,
+      "use_compensated_trajectory": false,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": false,
+      "use_counterfactuals": true,
+      "use_masked_initialisation": true,
+      "group_objective": "erm",
+      "expert_roles": {
+        "centre_short": "both",
+        "parts": "both"
+      }
+    }
+  ],
+  "selection_policy": {
+    "screen_seed": 42,
+    "minimum_incremental_macro_f1_gain": 0.003,
+    "maximum_per_class_f1_regression": 0.01,
+    "combination_requires_both_isolated_components_to_pass": true,
+    "failed_results_remain_visible": true
+  }
+}

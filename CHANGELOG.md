@@ -3,6 +3,22 @@
 This file records versioned public study artifacts. The Python package has its own
 version in `pyproject.toml`.
 
+## Study Release 3.0.0 - 2026-08-24
+
+- Added the motion-identifiability study across V-COCO source tags and
+  Okutama-Action tracked video, including a sealed 1,771-example confirmation set.
+- Added matched static, temporal, distilled, and fixed-budget routed systems with
+  scenario-cluster uncertainty, calibration, prediction sets, and subgroup analysis.
+- Added the fixed 130-presentation human audit, matched DINOv2, DINOv3, and SigLIP2
+  representation screens, and explicit ontology and visibility diagnostics.
+- Added the CPTR development study covering camera-compensated trajectories,
+  body-region tokens, residual gating, counterfactuals, masked adaptation, LoRA,
+  GroupDRO, five seeds, and 25 recording-grouped cross-fit runs.
+- Retained the CPTR validation gain and the contrary grouped-OOF result in the same
+  evidence package; the established temporal ensemble remains the default model.
+- Updated the executed notebook, reports, release metadata, figures, path-safe launch
+  commands, automated evidence checks, and versioned SHA-256 inventory.
+
 ## Study Release 2.0.0 - 2026-08-24
 
 - Added a split-preserving, person-level V-COCO study with training-split candidate
@@ -38,5 +54,4 @@ version in `pyproject.toml`.
 - Removed a machine-local path from the portable failure ledger and made future exports
   sanitize repository-local failure messages.
 
-The report version is 1.0.0. The installable Python package is version 2.0.0; the
-historical report tag is `polar-study-v1.0.0`.
+The historical report tags are `polar-study-v1.0.0` and `polar-study-v2.0.0`.

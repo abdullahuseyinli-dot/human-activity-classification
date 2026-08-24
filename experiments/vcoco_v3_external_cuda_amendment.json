@@ -1,0 +1,37 @@
+{
+  "amendment_version": "3.0.0-external-cuda-1",
+  "status": "DECLARED_BEFORE_OKUTAMA_TARGET_FITTING_AND_CONFIRMATION_OPEN",
+  "base_protocol_lock_sha256": "c759576ba16e360a94317d416131fa8c4ac29836242976d8befa07b3fe95c9a9",
+  "scope": {
+    "source_vcoco_selection_endpoints_changed": false,
+    "consumed_vcoco_test_reopened": false,
+    "completed_source_development_evidence_retained": true,
+    "human_pilot": {
+      "primary_presentations": 130,
+      "role": "descriptive_ontology_and_error_mechanism_audit_only",
+      "labels_used_for_model_selection": false
+    },
+    "external_confirmation": {
+      "dataset": "Okutama-Action",
+      "development_partition": "provider_train",
+      "confirmation_partition": "provider_test",
+      "split_group": "scenario_id",
+      "confirmation_open_count": 1,
+      "confirmation_sealed_until_pipeline_lock": true,
+      "replacement_reason": "The authorized local Okutama archives provide the required actions, tracks, person boxes, continuous video, and a provider-held test partition within the available storage."
+    },
+    "execution": {
+      "remaining_model_fitting_backend": "cuda",
+      "feature_extraction_backend": "cuda",
+      "cpu_fallback_permitted": false,
+      "cpu_metrics_and_file_validation_permitted": true,
+      "optimizer_evidence_required": true
+    }
+  },
+  "required_artifacts": {
+    "okutama_protocol": "experiments/okutama_action_protocol.json",
+    "okutama_temporal_grid": "experiments/okutama_temporal_grid.json",
+    "human_pilot_audit": ".runs/vcoco_v3/annotation/final/summary.json",
+    "okutama_development_audit": ".runs/vcoco_v3/okutama/development_audit/summary.json"
+  }
+}

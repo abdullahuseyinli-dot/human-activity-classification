@@ -1,0 +1,78 @@
+{
+  "crossfit_oof_cluster_bootstrap": {
+    "clusters": 11,
+    "macro_f1": {
+      "ci_95_high": 0.0023696983634915294,
+      "ci_95_low": -0.006277810585752538,
+      "point_estimate": -0.002038062161019908,
+      "two_sided_p": 0.39576042395760425
+    },
+    "per_class_f1": {
+      "sitting": {
+        "ci_95_high": 0.003597247743568299,
+        "ci_95_low": -0.017464727825278182,
+        "point_estimate": -0.007287014061207686,
+        "two_sided_p": 0.2111788821117888
+      },
+      "standing": {
+        "ci_95_high": 0.0033006920146895213,
+        "ci_95_low": -0.0021557548068228934,
+        "point_estimate": 0.0006183509330293102,
+        "two_sided_p": 0.5645435456454354
+      },
+      "walking_running": {
+        "ci_95_high": 0.002573082469866095,
+        "ci_95_low": -0.0016257569027492895,
+        "point_estimate": 0.0005544766451186511,
+        "two_sided_p": 0.620937906209379
+      }
+    },
+    "resamples": 10000,
+    "seed": 20260919
+  },
+  "crossfit_oof_exact_group_swap": {
+    "method": "exact_paired_recording_prediction_swap",
+    "permutations": 2048,
+    "point_estimate": -0.0020380621610198713,
+    "recordings": 11,
+    "two_sided_p": 0.470703125
+  },
+  "validation_cluster_bootstrap": {
+    "clusters": 3,
+    "macro_f1": {
+      "ci_95_high": 0.019726781689029287,
+      "ci_95_low": 0.005515951293087573,
+      "point_estimate": 0.008050670493972123,
+      "two_sided_p": 0.00019998000199980003
+    },
+    "per_class_f1": {
+      "sitting": {
+        "ci_95_high": 0.0,
+        "ci_95_low": -0.004028671584785148,
+        "point_estimate": -0.0028562025435483474,
+        "two_sided_p": 0.5929407059294071
+      },
+      "standing": {
+        "ci_95_high": 0.05571552630376159,
+        "ci_95_low": 0.010204285002491265,
+        "point_estimate": 0.02200724688680311,
+        "two_sided_p": 0.00019998000199980003
+      },
+      "walking_running": {
+        "ci_95_high": 0.010592156325617497,
+        "ci_95_low": 0.0034648187633262717,
+        "point_estimate": 0.005000967138661605,
+        "two_sided_p": 0.00019998000199980003
+      }
+    },
+    "resamples": 10000,
+    "seed": 20260920
+  },
+  "validation_exact_group_swap": {
+    "method": "exact_paired_recording_prediction_swap",
+    "permutations": 8,
+    "point_estimate": 0.008050670493972123,
+    "recordings": 3,
+    "two_sided_p": 0.25
+  }
+}

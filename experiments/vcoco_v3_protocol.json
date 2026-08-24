@@ -1,0 +1,183 @@
+{
+  "protocol_version": "3.0.0-dev.2",
+  "status": "LOCKABLE_AFTER_REQUIRED_INPUTS_VALIDATE",
+  "study_title": "Motion Identifiability in Person-Level Activity Recognition",
+  "amendment": {
+    "revision": 2,
+    "date": "2026-08-24",
+    "reason": "Separate the completed descriptive human pilot from source-tag-only model development and retain independent agreement as a requirement for human-harmonized endpoints."
+  },
+  "frozen_reference": {
+    "git_tag": "polar-study-v2.0.0",
+    "git_commit": "11b7b9160785466841588b91ac815943dd94dad5",
+    "method": "scale_conditioned_stacking",
+    "official_test_status": "CONSUMED_EXPLORATORY_ONLY",
+    "official_test_people": 6077,
+    "official_test_images": 3708
+  },
+  "research_hypothesis": "The remaining standing-locomotion gap is an interaction between source-label semantics, person observability, and motion identifiability. Factorized targets and reliability-conditioned person/context evidence should improve visually identifiable cases; residual unidentifiable cases should benefit from temporal input or calibrated set-valued prediction.",
+  "supervision_regimes": {
+    "source_only": "No target-domain images or labels used for fitting, selection, or calibration.",
+    "unlabeled_target_adaptation": "Target development images may be used without target labels.",
+    "few_shot_target_adaptation": "Target labels are limited by a predeclared image-grouped per-class budget.",
+    "full_target_supervision": "All permitted target development labels may be used; results remain separate from source-only transfer."
+  },
+  "ontology": {
+    "source_tags_are_immutable": true,
+    "development_pilot": {
+      "status": "FIXED_PREFIX_READY_FOR_FINAL_AUDIT",
+      "purpose": "descriptive_error_mechanism_audit",
+      "primary_task_presentations": 130,
+      "selection_rule": "first_130_by_blind_manifest_display_order",
+      "annotators": 1,
+      "hidden_repeat_role": "descriptive_intrarater_consistency_only",
+      "predictions_and_source_tags_blinded": true,
+      "labels_used_for_candidate_selection": false,
+      "development_model_fitting_may_advance_after_integrity_audit": true,
+      "surplus_responses": "preserved_but_excluded_from_primary_audit"
+    },
+    "human_harmonized_axes": {
+      "posture": [
+        "seated",
+        "upright",
+        "other",
+        "indeterminate"
+      ],
+      "visible_translation": [
+        "stationary",
+        "locomoting",
+        "transition",
+        "not_inferable"
+      ],
+      "gait": [
+        "walking",
+        "running",
+        "not_applicable",
+        "indeterminate"
+      ],
+      "visibility": [
+        "clear",
+        "occluded",
+        "truncated",
+        "too_small"
+      ]
+    },
+    "annotation_gate": {
+      "minimum_independent_annotators": 2,
+      "adjudication_required": true,
+      "adjudication_mode": "third_blinded_pass_on_any_disagreement",
+      "pilot_tasks": 300,
+      "unique_pilot_people": 280,
+      "hidden_intrarater_repeats": 20,
+      "required_alpha_axes": [
+        "posture",
+        "visible_translation",
+        "gait",
+        "visibility"
+      ],
+      "minimum_alpha_each_required_axis": 0.8,
+      "minimum_intrarater_exact_agreement_each_axis": 0.9,
+      "required_completion_fraction": 1.0,
+      "predictions_and_source_tags_blinded": true,
+      "status": "REQUIRED_BEFORE_HUMAN_HARMONIZED_ENDPOINTS"
+    }
+  },
+  "development_policy": {
+    "data": "V-COCO train and validation only",
+    "outer_splitter": "StratifiedGroupKFold_by_source_image",
+    "inner_splitter": "StratifiedGroupKFold_by_source_image",
+    "model_selection_unit": "source_image",
+    "current_official_test_may_select_models": false,
+    "candidate_grid_must_be_declared_before_fit": true,
+    "model_fitting_prerequisite": "VCOCO_V3_HUMAN_PILOT_AUDIT_COMPLETE",
+    "human_pilot_labels_may_select_candidates": false
+  },
+  "candidate_stages": [
+    {
+      "stage": "cached_feature_fusion",
+      "families": [
+        "dino_flat_probability_stack",
+        "dino_factorized_probability_stack",
+        "dino_siglip_factorized_probability_stack"
+      ]
+    },
+    {
+      "stage": "spatial_mechanisms",
+      "families": [
+        "matched_geometry_ablation",
+        "boundary_aware_context",
+        "multiresolution_person_views",
+        "box_perturbation_robustness"
+      ]
+    },
+    {
+      "stage": "representation_and_adaptation",
+      "families": [
+        "dinov2_frozen",
+        "dinov3_frozen",
+        "siglip2_frozen",
+        "multiview_parameter_efficient_adaptation"
+      ]
+    },
+    {
+      "stage": "motion_identifiability",
+      "families": [
+        "static_factorized_model",
+        "temporal_teacher_distilled_student",
+        "identifiability_conditioned_student",
+        "true_clip_oracle"
+      ]
+    }
+  ],
+  "endpoints": {
+    "development_selection": "source_tag_macro_f1_named_explicitly",
+    "human_pilot": "descriptive_ontology_and_error_mechanism_audit_only",
+    "independent_confirmation": "human_harmonized_macro_f1",
+    "primary": [
+      "human_harmonized_macro_f1",
+      "locomotion_f1",
+      "worst_class_f1"
+    ],
+    "secondary": [
+      "source_tag_macro_f1",
+      "per_class_precision_recall_f1",
+      "balanced_accuracy",
+      "log_loss",
+      "brier_score",
+      "classwise_ece",
+      "risk_coverage_auc",
+      "prediction_set_coverage"
+    ]
+  },
+  "promotion_rules": {
+    "general_candidate": {
+      "minimum_macro_f1_gain": 0.01,
+      "paired_cluster_ci_lower_bound_above_zero": true,
+      "maximum_allowed_class_f1_regression": 0.01
+    },
+    "locomotion_specialist": {
+      "minimum_locomotion_f1_gain": 0.02,
+      "paired_cluster_ci_lower_bound_above_zero": true,
+      "macro_f1_noninferiority_margin": 0.005
+    },
+    "bootstrap_resamples": 10000,
+    "multiple_comparison_control": "Holm",
+    "minimum_final_seeds": 5
+  },
+  "confirmation": {
+    "required": true,
+    "current_vcoco_test_eligible": false,
+    "preferred_dataset": "POLIMI-ITW-S",
+    "secondary_dataset": "AVA_v2.2",
+    "split_unit": "recording_or_track",
+    "single_open_after_lock": true,
+    "status": "PENDING_EXTERNAL_DATA_ACCESS"
+  },
+  "resource_constraints": {
+    "polimi_full_release_gb": 392.1,
+    "polimi_access": "ACADEMIC_REQUEST_REQUIRED",
+    "local_free_space_gb_at_protocol_authoring": 43.4,
+    "gpu_status_at_protocol_authoring": "OCCUPIED_BY_UNRELATED_USER_TRAINING_JOB",
+    "unrelated_job_may_be_interrupted": false
+  }
+}

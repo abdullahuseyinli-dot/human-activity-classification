@@ -1,0 +1,43 @@
+{
+  "folds": 5,
+  "recordings": 11,
+  "samples": 4977,
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "source_summary_sha256": "5729c997ff3b8e6438b6e52db6a9c7490df79315724665fdb103fad26b5531bd",
+  "static_oof_metrics": {
+    "accuracy": 0.6632509543901949,
+    "adaptive_ece": 0.08416434502229471,
+    "balanced_accuracy": 0.6908410045494991,
+    "brier_score": 0.45157695043377294,
+    "classwise_ece": 0.08361021625609205,
+    "ece": 0.08622246315212151,
+    "locomotion_f1": 0.6861773975686628,
+    "log_loss": 0.7723779051939901,
+    "macro_f1": 0.6672136268852688,
+    "weighted_f1": 0.6606571066396922
+  },
+  "status": "VCOCO_V3_TEMPORAL_CROSSFIT_TARGETS_LOCKED",
+  "teacher_advantage_definition": {
+    "fraction": 0.20413903958207755,
+    "minimum_log_likelihood_gain": 0.2,
+    "positive_count": 1016
+  },
+  "teacher_oof_metrics": {
+    "accuracy": 0.7130801687763713,
+    "adaptive_ece": 0.0819658523283619,
+    "balanced_accuracy": 0.7271250825437662,
+    "brier_score": 0.4090997573045853,
+    "classwise_ece": 0.07532260324555139,
+    "ece": 0.08212579298395456,
+    "locomotion_f1": 0.7360070515645659,
+    "log_loss": 0.7538910731099561,
+    "macro_f1": 0.7164832120716224,
+    "weighted_f1": 0.7108681725925403
+  }
+}

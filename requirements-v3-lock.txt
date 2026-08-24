@@ -1,0 +1,20 @@
+# Top-level dependency snapshot recorded in the v3 CUDA workspace (Python 3.11.9,
+# PyTorch CUDA 12.8 build). This is not a complete transitive package lock. Report and
+# test tooling is installed through pyproject extras. Install the matching PyTorch
+# wheels first, as shown in the runbook.
+grad-cam==1.5.7
+huggingface-hub==1.28.0
+imagehash==4.3.2
+joblib==1.5.3
+matplotlib==3.11.1
+numpy==2.4.6
+opencv-python-headless==5.0.0.93
+pandas==3.0.5
+pillow==12.3.0
+scikit-learn==1.9.0
+scipy==1.17.1
+seaborn==0.13.2
+torch==2.11.0+cu128
+torchvision==0.26.0+cu128
+tqdm==4.70.0
+transformers==5.15.1

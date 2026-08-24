@@ -1,0 +1,192 @@
+{
+  "grid_version": "3.0.0-spatial-2",
+  "status": "DECLARED_BEFORE_SPATIAL_FITTING",
+  "gate": "VCOCO_V3_NESTED_CACHED_FUSION_DEVELOPMENT_COMPLETE",
+  "execution_backend": {
+    "solver": "pytorch_cuda_lbfgs_logistic",
+    "cuda_required": true,
+    "numeric_precision": "float32",
+    "maximum_iterations": 400,
+    "gradient_tolerance": 1e-5,
+    "standardization": "training_fold_only_on_cuda"
+  },
+  "cross_validation": {
+    "outer_folds": 5,
+    "inner_folds": 3,
+    "stack_folds": 3,
+    "splitter": "StratifiedGroupKFold",
+    "random_seed": 20260828
+  },
+  "feature_caches": {
+    "dino_tight_224": ".runs/polar_v2/features/dinov2_base/person_tight/aspect_pad_224",
+    "dino_context_224": ".runs/polar_v2/features/dinov2_base/person_context_25/aspect_pad_224",
+    "dino_context50_224": ".runs/polar_v2/features/dinov2_base/person_context_50/aspect_pad_224",
+    "dino_blur25_224": ".runs/polar_v2/features/dinov2_base/person_context_25_background_blur/aspect_pad_224",
+    "dino_mask25_224": ".runs/polar_v2/features/dinov2_base/person_context_25_background_mask/aspect_pad_224",
+    "dino_tight_336": ".runs/vcoco_v3/features/dinov2_base/person_tight/aspect_pad_336/none",
+    "dino_context_336": ".runs/vcoco_v3/features/dinov2_base/person_context_25/aspect_pad_336/none",
+    "dino_tight_448": ".runs/vcoco_v3/features/dinov2_base/person_tight/aspect_pad_448/none",
+    "dino_context_448": ".runs/vcoco_v3/features/dinov2_base/person_context_25/aspect_pad_448/none",
+    "context_shift_left_05": ".runs/vcoco_v3/features/dinov2_base/person_context_25/aspect_pad_224/shift_left_05",
+    "context_shift_right_05": ".runs/vcoco_v3/features/dinov2_base/person_context_25/aspect_pad_224/shift_right_05",
+    "context_shift_up_05": ".runs/vcoco_v3/features/dinov2_base/person_context_25/aspect_pad_224/shift_up_05",
+    "context_shift_down_05": ".runs/vcoco_v3/features/dinov2_base/person_context_25/aspect_pad_224/shift_down_05",
+    "context_scale_090": ".runs/vcoco_v3/features/dinov2_base/person_context_25/aspect_pad_224/scale_090",
+    "context_scale_110": ".runs/vcoco_v3/features/dinov2_base/person_context_25/aspect_pad_224/scale_110"
+  },
+  "families": {
+    "tight_no_geometry": {
+      "components": [
+        "dino_tight_224"
+      ],
+      "geometry": "none",
+      "factorized": true,
+      "reliability_features": false,
+      "mechanism": "matched_geometry_ablation"
+    },
+    "tight_basic_geometry": {
+      "components": [
+        "dino_tight_224"
+      ],
+      "geometry": "basic",
+      "factorized": true,
+      "reliability_features": false,
+      "mechanism": "matched_geometry_ablation"
+    },
+    "tight_context25_boundary_geometry": {
+      "components": [
+        "dino_tight_224",
+        "dino_context_224"
+      ],
+      "geometry": "boundary",
+      "factorized": true,
+      "reliability_features": false,
+      "mechanism": "matched_context_reference"
+    },
+    "tight_context50_boundary_geometry": {
+      "components": [
+        "dino_tight_224",
+        "dino_context50_224"
+      ],
+      "geometry": "boundary",
+      "factorized": true,
+      "reliability_features": false,
+      "mechanism": "context_extent"
+    },
+    "tight_blurred_context_boundary_geometry": {
+      "components": [
+        "dino_tight_224",
+        "dino_blur25_224"
+      ],
+      "geometry": "boundary",
+      "factorized": true,
+      "reliability_features": false,
+      "mechanism": "background_intervention"
+    },
+    "tight_masked_context_boundary_geometry": {
+      "components": [
+        "dino_tight_224",
+        "dino_mask25_224"
+      ],
+      "geometry": "boundary",
+      "factorized": true,
+      "reliability_features": false,
+      "mechanism": "background_intervention"
+    },
+    "adaptive_context25_50_reliability": {
+      "components": [
+        "dino_tight_224",
+        "dino_context_224",
+        "dino_context50_224"
+      ],
+      "geometry": "boundary",
+      "factorized": true,
+      "reliability_features": true,
+      "mechanism": "boundary_scale_conditioning"
+    },
+    "multiresolution_224_336_reliability": {
+      "components": [
+        "dino_tight_224",
+        "dino_context_224",
+        "dino_tight_336",
+        "dino_context_336"
+      ],
+      "geometry": "boundary",
+      "factorized": true,
+      "reliability_features": true,
+      "mechanism": "person_resolution"
+    },
+    "multiresolution_224_336_448_reliability": {
+      "components": [
+        "dino_tight_224",
+        "dino_context_224",
+        "dino_tight_336",
+        "dino_context_336",
+        "dino_tight_448",
+        "dino_context_448"
+      ],
+      "geometry": "boundary",
+      "factorized": true,
+      "reliability_features": true,
+      "mechanism": "person_resolution"
+    },
+    "box_augmentation_invariant_factorized": {
+      "training_mode": "augmentation_invariant_early_fusion",
+      "tight_component": "dino_tight_224",
+      "context_components": [
+        "dino_context_224",
+        "context_shift_left_05",
+        "context_shift_right_05",
+        "context_shift_up_05",
+        "context_shift_down_05",
+        "context_scale_090",
+        "context_scale_110"
+      ],
+      "geometry": "boundary",
+      "factorized": true,
+      "reliability_features": false,
+      "mechanism": "box_perturbation_robustness"
+    }
+  },
+  "hyperparameters": {
+    "probability_stacks": {
+      "component_C": [
+        0.1,
+        1.0
+      ],
+      "meta_C": [
+        0.1,
+        1.0
+      ],
+      "class_weight": [
+        "none",
+        "balanced"
+      ]
+    }
+  },
+  "robustness": {
+    "reference_family": "tight_context25_boundary_geometry",
+    "nominal_component": "dino_context_224",
+    "perturbation_components": [
+      "context_shift_left_05",
+      "context_shift_right_05",
+      "context_shift_up_05",
+      "context_shift_down_05",
+      "context_scale_090",
+      "context_scale_110"
+    ]
+  },
+  "reporting": {
+    "bootstrap_unit": "source_image",
+    "bootstrap_resamples": 10000,
+    "multiplicity": "Holm",
+    "promotion_reference": "tight_context25_boundary_geometry",
+    "subgroups": [
+      "bbox_area_quartile",
+      "person_height_quartile",
+      "bbox_aspect_quartile",
+      "boundary_contact",
+      "scene_occupancy"
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "plan_version": "1.0.0",
+  "status": "DECLARED_AFTER_FIVE_SEED_DEVELOPMENT_BEFORE_CPTR_CROSSFIT",
+  "candidate_id": "centre_short_parts",
+  "candidate_grid": "experiments/okutama_cptr_adaptive_grid.json",
+  "candidate_grid_lock": ".runs/cptr/adaptive_grid_lock.json",
+  "grouping_key": "recording_id",
+  "folds": 5,
+  "split_seed": 20260911,
+  "fixed_epoch_policy": "matching_seed_development_best_epoch_plus_one_with_zero_preserving_the_initial_residual_fallback",
+  "seeds": [
+    {
+      "seed": 42,
+      "fixed_epochs": 2,
+      "development_summary": ".runs/cptr/promotion/centre_short_parts/seed-42/summary.json",
+      "development_summary_sha256": "ab081ce5b84e223ba931cf3aae8994ad30bc6fba0d2fbf098711f735cbebcb70"
+    },
+    {
+      "seed": 43,
+      "fixed_epochs": 0,
+      "development_summary": ".runs/cptr/promotion/centre_short_parts/seed-43/summary.json",
+      "development_summary_sha256": "62d9c6fb7750a585b263ded2b6924ee327c816da9dba2a239c8e983b65d895bd"
+    },
+    {
+      "seed": 44,
+      "fixed_epochs": 1,
+      "development_summary": ".runs/cptr/promotion/centre_short_parts/seed-44/summary.json",
+      "development_summary_sha256": "43cf3ad113b48715f37faf93398e8915ab6ca2ccfeaaeee2f4bafbc5792730aa"
+    },
+    {
+      "seed": 45,
+      "fixed_epochs": 9,
+      "development_summary": ".runs/cptr/promotion/centre_short_parts/seed-45/summary.json",
+      "development_summary_sha256": "6c98d50b29b7d94b9dfd70d9dea08e03180a0118a9747d7c17795a6a0b4af09f"
+    },
+    {
+      "seed": 46,
+      "fixed_epochs": 1,
+      "development_summary": ".runs/cptr/promotion/centre_short_parts/seed-46/summary.json",
+      "development_summary_sha256": "99efcf3f549226361d7e4d92282e6f8028d18ba306063a76eef989f72085a2bd"
+    }
+  ],
+  "data_policy": {
+    "fit_partition": "development_train_fold_fit_rows_only",
+    "held_partition": "development_train_fold_held_rows_only",
+    "validation_samples_read": 0,
+    "calibration_samples_read": 0,
+    "confirmation_samples_read": 0
+  }
+}

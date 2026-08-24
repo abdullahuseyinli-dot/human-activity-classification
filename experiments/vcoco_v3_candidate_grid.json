@@ -1,0 +1,144 @@
+{
+  "grid_version": "3.0.0-dev-2",
+  "execution_amendment": {
+    "reason": "Replace an impractical single-core liblinear control with the equivalent CUDA primal one-versus-rest squared-hinge objective before accepting any SVM result.",
+    "solver": "pytorch_cuda_lbfgs_ovr_squared_hinge",
+    "date": "2026-08-24"
+  },
+  "status": "DECLARED_BEFORE_CANDIDATE_FITTING",
+  "development_data": {
+    "rows": "combined locked V-COCO train and validation people",
+    "labels": "immutable factorized V-COCO source tags",
+    "group": "source image_id",
+    "official_v2_test_used": false
+  },
+  "cross_validation": {
+    "outer_folds": 5,
+    "inner_folds": 3,
+    "stack_folds": 3,
+    "splitter": "StratifiedGroupKFold",
+    "shuffle": true,
+    "random_seed": 20260827
+  },
+  "selection": {
+    "primary": "source_tag_macro_f1",
+    "tie_breakers": [
+      "locomotion_f1_descending",
+      "log_loss_ascending",
+      "candidate_id_ascending"
+    ],
+    "human_harmonized_labels_used_for_selection": false
+  },
+  "feature_caches": {
+    "dino_tight": {
+      "path": ".runs/polar_v2/features/dinov2_base/person_tight/aspect_pad_224",
+      "model_kind": "dinov2_base",
+      "view": "person_tight",
+      "image_size": 224
+    },
+    "dino_context": {
+      "path": ".runs/polar_v2/features/dinov2_base/person_context_25/aspect_pad_224",
+      "model_kind": "dinov2_base",
+      "view": "person_context_25",
+      "image_size": 224
+    },
+    "siglip_tight": {
+      "path": ".runs/polar_v2/features/siglip2_base/person_tight/aspect_pad_224",
+      "model_kind": "siglip2_base",
+      "view": "person_tight",
+      "image_size": 224
+    },
+    "siglip_context": {
+      "path": ".runs/polar_v2/features/siglip2_base/person_context_25/aspect_pad_224",
+      "model_kind": "siglip2_base",
+      "view": "person_context_25",
+      "image_size": 224
+    }
+  },
+  "families": {
+    "dino_flat_probability_stack": {
+      "components": [
+        "dino_tight",
+        "dino_context"
+      ],
+      "component_head": "multinomial_logistic",
+      "meta_head": "multinomial_logistic",
+      "factorized": false,
+      "reliability_features": false
+    },
+    "dino_factorized_probability_stack": {
+      "components": [
+        "dino_tight",
+        "dino_context"
+      ],
+      "component_head": "posture_motion_logistic",
+      "meta_head": "posture_motion_logistic",
+      "factorized": true,
+      "reliability_features": false
+    },
+    "dino_siglip_factorized_reliability_stack": {
+      "components": [
+        "dino_tight",
+        "dino_context",
+        "siglip_tight",
+        "siglip_context"
+      ],
+      "component_head": "posture_motion_logistic",
+      "meta_head": "posture_motion_logistic",
+      "factorized": true,
+      "reliability_features": true
+    },
+    "dino_siglip_linear_svm_control": {
+      "components": [
+        "dino_tight",
+        "dino_context",
+        "siglip_tight",
+        "siglip_context"
+      ],
+      "component_head": "none",
+      "meta_head": "linear_svm_with_grouped_oof_calibration",
+      "solver": "pytorch_cuda_lbfgs_ovr_squared_hinge",
+      "maximum_iterations": 800,
+      "tolerance": 1e-4,
+      "cuda_required": true,
+      "factorized": false,
+      "reliability_features": false
+    }
+  },
+  "hyperparameters": {
+    "probability_stacks": {
+      "component_C": [
+        0.01,
+        0.1,
+        1.0
+      ],
+      "meta_C": [
+        0.1,
+        1.0
+      ],
+      "class_weight": [
+        "none",
+        "balanced"
+      ]
+    },
+    "linear_svm_control": {
+      "C": [
+        0.001,
+        0.01,
+        0.1,
+        1.0
+      ],
+      "class_weight": [
+        "none",
+        "balanced"
+      ],
+      "calibrator_C": 1.0
+    }
+  },
+  "reporting": {
+    "bootstrap_unit": "source_image",
+    "bootstrap_resamples": 10000,
+    "multiplicity": "Holm",
+    "promotion_reference": "dino_flat_probability_stack"
+  }
+}

@@ -43,8 +43,48 @@ The following were fixed before the official test cache opened:
 - bootstrap seed and resample count;
 - the external mapping, attribution cohort, and fault-injection levels.
 
-Test results did not break ties. The primary ensemble happened to be the strongest
-observed test candidate, but its identity and weights remained the pre-test lock.
+Test results did not affect model identity, weights, or tie-breaking.
+
+## Person-level V-COCO transfer chain - study v2
+
+| Gate | Tracked evidence | Outcome |
+| --- | --- | --- |
+| Protocol lock | `results/vcoco_v2/protocol_lock.json` | Model families, views, grouping, and evaluation policy fixed before new fitting |
+| Development screen | `results/vcoco_v2/development_candidates.csv` | Candidate comparisons restricted to development data |
+| Final selection | `results/vcoco_v2/final_selection_lock.json` | Scale-conditioned stack and all hyperparameters fixed before test access |
+| Test-access gate | `results/vcoco_v2/test_access_gate.json` | Official test opened after the selection lock passed |
+| Official evaluation | `results/vcoco_v2/official_test_summary.json` | One locked evaluation with paired uncertainty and per-class results |
+| Portable export | `results/vcoco_v2/evidence_manifest.json` | Every published v2 table and JSON artifact inventoried by hash |
+
+## Motion-identifiability chain - study v3
+
+| Gate | Tracked evidence | Outcome |
+| --- | --- | --- |
+| Protocol and amendment | `results/vcoco_v3/protocol_lineage.json` | Original protocol, CUDA amendment, and source hashes retained in one portable lineage record |
+| Human pilot audit | `results/vcoco_v3/annotation_summary.json` | 130 presentations audited; labels excluded from candidate selection |
+| Representation and spatial development | `results/vcoco_v3/source_tag_development_metrics.csv` | Frozen representation, crop, and stacking screens completed on source-tag development data |
+| Temporal development | `results/vcoco_v3/temporal_development_metrics.csv` | Clip span, temporal model, and routing candidates evaluated before confirmation |
+| Grouped temporal cross-fit | `results/vcoco_v3/temporal_crossfit_summary.json` | Student targets and fixed pipeline selected from recording-grouped development evidence |
+| Confirmation gate | `results/vcoco_v3/protocol_lineage.json` | Confirmation opened once; confirmation results were not used for selection |
+| Sealed confirmation | `results/vcoco_v3/confirmation_summary.json` | Static, temporal, and budgeted-routing results recorded with paired uncertainty |
+| Portable export | `results/vcoco_v3/evidence_manifest.json` | Confirmation tables, diagnostics, and protocol lineage inventoried by hash |
+
+## Okutama CPTR development chain
+
+| Gate | Tracked evidence | Outcome |
+| --- | --- | --- |
+| Protocol | `experiments/okutama_cptr_protocol.json` | Execution order, CUDA policy, counterfactuals, and promotion thresholds fixed |
+| Feature stores | `results/okutama_cptr/provenance.json` | DINOv2 body regions, camera-compensated trajectories, and SigLIP control revision-bound |
+| Component screens | `results/okutama_cptr/component_ablation.csv` | Fourteen retained and rejected development steps recorded with their source revisions |
+| Five-seed evaluation | `results/okutama_cptr/headline_metrics.csv` | +0.0081 validation macro-F1 for center and parts |
+| Grouped cross-fit | `results/okutama_cptr/fold_seed_metrics.csv` | 25 CUDA runs; -0.0020 OOF macro-F1 |
+| Faithfulness | `results/okutama_cptr/faithfulness_summary.json` | Temporal null, order, part, geometry, visibility, and latency checks |
+| Development lock | `results/okutama_cptr/development_decision.json` | Existing temporal ensemble retained; CPTR calibration left closed |
+| Portable export | `results/okutama_cptr/evidence_manifest.json` | Path-sanitized tables and JSON files with per-file hashes |
+
+The CPTR branch ends at its development gate. It does not reuse the previously opened
+Okutama confirmation labels, and it does not promote a validation-only gain after the
+recording-grouped OOF comparison moves in the opposite direction.
 
 ## Local versus tracked artifacts
 
@@ -53,7 +93,7 @@ paths, full probability arrays, full-resolution attribution maps, failures, and
 interrupted runs. These files are intentionally ignored rather than deleted.
 
 The tracked `results/` export excludes reconstructive or machine-specific artifacts.
-Its manifest records the hash of every promoted table and JSON document. The final-fit
+Its manifest records the hash of every exported table and JSON document. The final-fit
 manifest publishes checkpoint hashes, sizes, configurations, and runtimes without
 publishing the checkpoints themselves.
 

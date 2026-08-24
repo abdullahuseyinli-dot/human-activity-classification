@@ -1,0 +1,109 @@
+{
+  "protocol_version": "1.0.0",
+  "status": "DECLARED_BEFORE_OKUTAMA_AGGREGATE_LABEL_AUDIT_OR_MODEL_FITTING",
+  "role": "independent_video-domain_transfer_and_motion_identifiability_study",
+  "rationale": {
+    "preferred_dataset_unavailable": "The POLIMI-ITW-S full release requires an academic access workflow and 392.1 GB, exceeding local storage.",
+    "replacement_basis": "Okutama-Action is openly downloadable, fits local storage, has person boxes and tracks, contains the exact sitting, standing, walking, and running actions, and supplies continuous video around action transitions.",
+    "comparability_boundary": "Published spatio-temporal detection mAP is not treated as directly comparable to cropped-person classification macro-F1."
+  },
+  "provider": {
+    "dataset": "Okutama-Action",
+    "official_page": "http://okutama-action.org/",
+    "paper_doi": "10.1109/CVPRW.2017.134",
+    "license": "CC BY-NC-SA 3.0",
+    "frame_resolution": [
+      1280,
+      720
+    ],
+    "frames_per_second": 30,
+    "annotation_resolution": [
+      3840,
+      2160
+    ],
+    "annotation_types": [
+      "MultiActionLabels",
+      "SingleActionTrackingLabels"
+    ]
+  },
+  "archives": {
+    "development": {
+      "provider_partition": "train",
+      "file_name": "TrainSetFrames.zip",
+      "expected_bytes": 5770432522,
+      "sha256": "c021ce8a12c84e083f359023ffd41c145561aaedb48b118e7c5416d5ddcecb73"
+    },
+    "confirmation": {
+      "provider_partition": "test",
+      "file_name": "TestSetFrames.zip",
+      "expected_bytes": 1650462812,
+      "sha256": "9eb3995a4a96fc05f0502d6442873e5bbaaad28cc72217880e87a85daa733557",
+      "labels_must_remain_unopened_until_pipeline_lock": true,
+      "confirmation_open_count": 1
+    }
+  },
+  "ontology": {
+    "provider_base_actions": [
+      "Sitting",
+      "Standing",
+      "Walking",
+      "Running"
+    ],
+    "target_mapping": {
+      "Sitting": "sitting",
+      "Standing": "standing",
+      "Walking": "walking_running",
+      "Running": "walking_running"
+    },
+    "walking_running_subtype_retained": true,
+    "multi_action_policy": "Use the unique base action from MultiActionLabels and retain concurrent non-base actions as metadata.",
+    "ambiguous_base_action_policy": "quarantine"
+  },
+  "sampling": {
+    "development_center_rate_hz": 1,
+    "center_frames_must_be_manual_annotations": true,
+    "window_seconds": 1.0,
+    "cached_frames_per_window": 17,
+    "cached_frame_rate_hz": 16,
+    "full_window_track_visibility_required": true,
+    "lost_rows_excluded": true,
+    "occlusion_retained_as_subgroup": true,
+    "interpolated_box_rows_permitted_away_from_center": true
+  },
+  "identity_and_split_policy": {
+    "development_partition": "provider_train_only",
+    "confirmation_partition": "provider_test_only",
+    "development_group": "scenario_id",
+    "scenario_id_definition": "part_of_day_and_scenario_number; synchronized Drone1 and Drone2 recordings stay together",
+    "track_identity": "Join MultiActionLabels to SingleActionTrackingLabels by recording, frame, and box to recover stable provider track IDs.",
+    "no_scenario_crossing": true,
+    "no_track_crossing": true
+  },
+  "evaluation_regimes": [
+    "source_only_vcoco_transfer",
+    "target_supervised_static",
+    "target_supervised_short_clip",
+    "distilled_static_student",
+    "identifiability_conditioned_static_student",
+    "budgeted_static_to_clip_router"
+  ],
+  "primary_metrics": [
+    "provider_label_macro_f1",
+    "walking_running_f1",
+    "worst_class_f1"
+  ],
+  "required_subgroups": [
+    "walking_running_subtype",
+    "transition_window",
+    "occluded",
+    "person_scale",
+    "drone_view",
+    "part_of_day",
+    "scenario"
+  ],
+  "execution_backend": {
+    "feature_extraction": "cuda",
+    "model_training": "cuda",
+    "cpu_fallback_permitted": false
+  }
+}
