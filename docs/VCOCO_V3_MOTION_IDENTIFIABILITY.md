@@ -340,6 +340,12 @@ The current router ranks temporal benefit but does not optimize measured wall-cl
 latency, energy, or memory. The next system experiment should measure those quantities
 on uncached frames and compare fixed budgets under identical hardware.
 
+The [scientific validation plan](SCIENTIFIC_VALIDATION_PLAN.md) converts these open
+items into evidence gates for annotation reliability, independent replication,
+grouped inference, matched baselines, operational cost, and clean-environment replay.
+The gates govern claim scope and remain the same for positive, neutral, or negative
+outcomes.
+
 # 9. Reproducibility and artifact boundary
 
 The portable package in [`results/vcoco_v3`](../results/vcoco_v3/README.md) contains

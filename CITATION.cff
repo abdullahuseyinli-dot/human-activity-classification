@@ -1,9 +1,8 @@
 cff-version: 1.2.0
-message: "If you use this software or its evidence, cite the versioned technical report under preferred-citation."
+message: "If you use this software or its evidence, cite this versioned record."
 title: "Human Activity Classification Under Domain and Temporal Shift"
 type: software
-version: 3.0.0
-date-released: 2026-08-24
+version: "3.0.0"
 authors:
   - family-names: Huseyinli
     given-names: Abdulla
@@ -12,27 +11,21 @@ url: "https://github.com/abdullahuseyinli-dot/human-activity-classification"
 license: MIT
 abstract: >-
   A leakage-audited human activity classification study spanning POLAR, V-COCO,
-  and Okutama-Action. The release includes source-overlap controls, person-level
+  and Okutama-Action. This version includes source-overlap controls, person-level
   transfer, short-clip temporal modeling, budgeted inference, paired uncertainty,
   attribution diagnostics, bounded fault injection, and a recording-grouped
-  architecture study.
+  camera-compensated part-trajectory residual architecture study.
 keywords:
   - human activity recognition
   - transfer learning
   - DINOv2
+  - DINOv3
   - ConvNeXt
+  - POLAR
   - V-COCO
+  - Okutama-Action
   - domain adaptation
   - calibration
   - evaluation methodology
   - temporal modeling
   - motion identifiability
-preferred-citation:
-  type: report
-  title: "When a Still Image Is Not Enough: Motion Identifiability and Budgeted Temporal Inference"
-  version: 3.0.0
-  year: 2026
-  url: "https://github.com/abdullahuseyinli-dot/human-activity-classification"
-  authors:
-    - family-names: Huseyinli
-      given-names: Abdulla

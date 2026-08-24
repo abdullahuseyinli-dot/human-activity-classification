@@ -37,8 +37,6 @@ REQUIRED = {
     "src/hac/explainability.py",
     "assets/faithfulness_method_selection.png",
     "assets/faithfulness_perturbation_curves.png",
-    "assets/convnext_small_faithfulness_gallery.jpg",
-    "assets/dinov2_small_faithfulness_gallery.jpg",
     "results/locked_test_metrics.csv",
     "results/faithfulness_selection_lock.json",
     "results/faithfulness_test_summary.csv",
@@ -51,6 +49,25 @@ REQUIRED = {
     "results/faithfulness_provenance.json",
     "results/oof_replay_validation.csv",
     "results/run_provenance.json",
+}
+EXCLUDED_THIRD_PARTY_MEDIA = frozenset(
+    {
+        "assets/champion_error_gallery.png",
+        "assets/convnext_small_faithfulness_gallery.jpg",
+        "assets/dinov2_small_faithfulness_gallery.jpg",
+        "assets/probability_blend_faithfulness_gallery.jpg",
+    }
+)
+EXCLUDED_FAITHFULNESS_MEDIA_SHA256 = {
+    "convnext_small_faithfulness_gallery.jpg": (
+        "35865cc879b212a4f4690467c9100321b3d11ea16794280c31a47462e562ce32"
+    ),
+    "dinov2_small_faithfulness_gallery.jpg": (
+        "ebd41b2e289377ae470dc72fbe0fddc82d72d44109c631b06cdfa66e2ffacc91"
+    ),
+    "probability_blend_faithfulness_gallery.jpg": (
+        "cf787683493e90817ec1ac86ff44ec4d752480e0d2f8a03356f0fa9141175849"
+    ),
 }
 POLAR_REQUIRED = {
     ".zenodo.json",
@@ -166,6 +183,7 @@ VCOCO_V3_REQUIRED = {
     "tools/render_vcoco_v3_figures.py",
 }
 V3_RELEASE_REQUIRED = {
+    "docs/SCIENTIFIC_VALIDATION_PLAN.md",
     "docs/releases/HUMAN_ACTIVITY_STUDY_V3.0.0.md",
     "output/pdf/okutama_cptr_development_v3.0.0.pdf",
     "output/pdf/vcoco_v3_motion_identifiability_v3.0.0.pdf",
@@ -173,6 +191,7 @@ V3_RELEASE_REQUIRED = {
     "requirements-v3-lock.txt",
     "results/human_activity_study_v3.0.0_manifest.json",
     "tools/build_v3_release_manifest.py",
+    "tools/verify_v3_release_archive.py",
 }
 CPTR_REQUIRED = {
     "docs/OKUTAMA_CPTR_DEVELOPMENT.md",
@@ -249,6 +268,40 @@ def included_files(repository: Path):
             yield path, relative
 
 
+def validate_third_party_media_boundary(repository: Path) -> None:
+    for relative in sorted(EXCLUDED_THIRD_PARTY_MEDIA):
+        path = repository / PurePosixPath(relative)
+        if path.exists():
+            raise RuntimeError(f"Third-party qualitative media is publicly present: {relative}")
+
+        tracked = subprocess.run(
+            ["git", "ls-files", "--error-unmatch", "--", relative],
+            cwd=repository,
+            check=False,
+            capture_output=True,
+        )
+        if tracked.returncode == 0:
+            raise RuntimeError(f"Third-party qualitative media remains tracked: {relative}")
+
+        ignored = subprocess.run(
+            ["git", "check-ignore", "--no-index", "--quiet", "--", relative],
+            cwd=repository,
+            check=False,
+        )
+        if ignored.returncode != 0:
+            raise RuntimeError(f"Third-party qualitative media is not ignored: {relative}")
+
+        attribute = subprocess.run(
+            ["git", "check-attr", "export-ignore", "--", relative],
+            cwd=repository,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        if not attribute.endswith(": export-ignore: set"):
+            raise RuntimeError(f"Third-party media lacks export-ignore defense: {relative}")
+
+
 def validate_notebook(path: Path) -> None:
     notebook = json.loads(path.read_text(encoding="utf-8"))
     if int(notebook.get("nbformat", 0)) != 4:
@@ -256,7 +309,20 @@ def validate_notebook(path: Path) -> None:
     kernelspec = notebook.get("metadata", {}).get("kernelspec", {})
     if kernelspec.get("name") != "python3":
         raise RuntimeError(f"Non-portable notebook kernel: {path}")
-    for cell in notebook.get("cells", []):
+    notebook_text = path.read_text(encoding="utf-8")
+    if path.name == "human_activity_classification.ipynb":
+        if "scenario-cluster interval" not in notebook_text:
+            raise RuntimeError("Notebook is missing the scenario-level inference qualification")
+        if "recording-cluster interval" in notebook_text:
+            raise RuntimeError("Notebook contains obsolete recording-cluster terminology")
+    for index, cell in enumerate(notebook.get("cells", [])):
+        source = "".join(cell.get("source", []))
+        identity = f"{index}\0{cell.get('cell_type')}\0{source}".encode()
+        expected_id = hashlib.sha256(identity).hexdigest()[:8]
+        if path.name == "human_activity_classification.ipynb" and (
+            cell.get("id") != expected_id or "execution" in cell.get("metadata", {})
+        ):
+            raise RuntimeError("Notebook cell identity or execution metadata is not deterministic")
         for output in cell.get("outputs", []):
             if output.get("output_type") == "error":
                 raise RuntimeError(f"Notebook contains an error output: {path}")
@@ -336,10 +402,29 @@ def validate_faithfulness(repository: Path, expected_test_ids: set[str]) -> None
     release = provenance.get("release_export", {})
     if release.get("status") != "VALIDATED_PATH_SANITIZED_EVIDENCE_PROMOTED":
         raise RuntimeError("Faithfulness release evidence was not validated before export")
-    for relative, expected_hash in release.get("tracked_evidence", {}).items():
+    tracked_evidence = release.get("tracked_evidence", {})
+    if not isinstance(tracked_evidence, dict) or not tracked_evidence:
+        raise RuntimeError("Faithfulness release tracked-evidence inventory is missing")
+    forbidden_evidence = {
+        f"assets/{name}" for name in EXCLUDED_FAITHFULNESS_MEDIA_SHA256
+    }.intersection(tracked_evidence)
+    if forbidden_evidence:
+        raise RuntimeError(
+            f"Third-party galleries were promoted as release evidence: {sorted(forbidden_evidence)}"
+        )
+    for relative, expected_hash in tracked_evidence.items():
         path = repository / PurePosixPath(relative)
         if not path.is_file() or expected_hash not in legacy_release_hashes(path):
             raise RuntimeError(f"Faithfulness release fingerprint mismatch: {relative}")
+
+    excluded = release.get("excluded_third_party_media", {})
+    reason = excluded.get("reason", "")
+    if (
+        excluded.get("artifacts") != EXCLUDED_FAITHFULNESS_MEDIA_SHA256
+        or "COCO/Flickr" not in reason
+        or "not redistributed" not in reason
+    ):
+        raise RuntimeError("Faithfulness third-party media exclusion is incomplete")
     for relative, expected_hash in release.get("implementation_fingerprints", {}).items():
         path = repository / PurePosixPath(relative)
         if not path.is_file() or expected_hash not in legacy_release_hashes(path):
@@ -581,6 +666,7 @@ def validate_study_report_release(repository: Path) -> None:
         "docs/OKUTAMA_CPTR_DEVELOPMENT.md",
         "docs/PORTFOLIO_ARTICLE.md",
         "docs/RESULT_LINEAGE.md",
+        "docs/SCIENTIFIC_VALIDATION_PLAN.md",
         "docs/VCOCO_V2_EXTERNAL_TRANSFER.md",
         "docs/VCOCO_V3_MOTION_IDENTIFIABILITY.md",
         "docs/releases/POLAR_STUDY_V1.0.0.md",
@@ -627,25 +713,56 @@ def validate_study_report_release(repository: Path) -> None:
     )
 
     zenodo = read_json(repository / ".zenodo.json")
+    zenodo_keywords = set(zenodo.get("keywords", []))
     if (
         zenodo.get("title") != "Human Activity Classification Under Domain and Temporal Shift"
         or zenodo.get("version") != "3.0.0"
-        or zenodo.get("publication_date") != "2026-08-24"
-        or zenodo.get("license") != "MIT"
+        or "publication_date" in zenodo
+        or zenodo.get("access_right") != "open"
+        or zenodo.get("license") != "mit"
         or zenodo.get("upload_type") != "software"
         or zenodo.get("creators") != [{"name": "Huseyinli, Abdulla"}]
+        or not {"POLAR", "V-COCO", "Okutama-Action", "DINOv3"}.issubset(zenodo_keywords)
     ):
-        raise RuntimeError("Zenodo metadata does not match the v3.0.0 study release")
+        raise RuntimeError("Zenodo metadata does not match the v3.0.0 release candidate")
 
     citation = (repository / "CITATION.cff").read_text(encoding="utf-8")
     for marker in (
-        "date-released: 2026-08-24",
         'title: "Human Activity Classification Under Domain and Temporal Shift"',
-        '  title: "When a Still Image Is Not Enough: Motion Identifiability and Budgeted Temporal Inference"',
-        "version: 3.0.0",
+        'version: "3.0.0"',
+        'message: "If you use this software or its evidence, cite this versioned record."',
     ):
         if marker not in citation:
             raise RuntimeError(f"Citation metadata is missing: {marker}")
+    if "preferred-citation:" in citation or "date-released:" in citation:
+        raise RuntimeError("Candidate citation metadata contains premature release fields")
+
+    validation_plan = (repository / "docs/SCIENTIFIC_VALIDATION_PLAN.md").read_text(
+        encoding="utf-8"
+    )
+    for marker in (
+        "## Current claim boundary",
+        "## Limitation and evidence-gate matrix",
+        "## 1. Annotation reliability",
+        "## 3. Independent replication on POLIMI-ITW-S",
+        "## 4. Grouped inference and prospective precision",
+        "## 5. Matched model comparison",
+        "## 6. CPTR occlusion study",
+        "## 7. Runtime, energy, and memory",
+        "## 8. Reproducibility check",
+        "## 9. Multiplicity and analysis discipline",
+        "## Publication decision rule",
+        "The sealed temporal result has five confirmation scenarios",
+        "These are evidence-completeness gates, not success gates.",
+    ):
+        if marker not in validation_plan:
+            raise RuntimeError(f"Scientific validation plan is missing: {marker}")
+
+    v3_notes = (repository / "docs/releases/HUMAN_ACTIVITY_STUDY_V3.0.0.md").read_text(
+        encoding="utf-8"
+    )
+    if "Release tag:" in v3_notes:
+        raise RuntimeError("Release candidate notes claim a tag that does not exist")
 
     exploratory = read_json(repository / "results/polar_exploratory_summary.json")
     if (
@@ -1173,6 +1290,8 @@ def validate_okutama_cptr_evidence(repository: Path) -> None:
         "0.7144 for the new component and 0.7165",
         "2,048-permutation recording-swap test",
         "Calibration remains unopened",
+        "## 7. Limitations and validation requirements",
+        "SCIENTIFIC_VALIDATION_PLAN.md",
     ):
         if marker not in report:
             raise RuntimeError(f"CPTR development report is missing: {marker}")
@@ -1217,6 +1336,8 @@ def main() -> None:
     ):
         if marker not in notices:
             raise RuntimeError(f"Third-party notice is missing: {marker}")
+
+    validate_third_party_media_boundary(repository)
 
     windows_user_path = re.compile(r"[A-Za-z]:[\\/]+" + "Users" + r"[\\/]", flags=re.IGNORECASE)
     local_file_scheme = "file" + "://"

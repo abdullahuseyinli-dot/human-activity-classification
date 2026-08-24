@@ -1,5 +1,5 @@
 {
-  "artifact_count": 497,
+  "artifact_count": 495,
   "artifact_scope": "Complete nonignored repository release candidate, including the v3 motion-identifiability and CPTR reports, portable evidence, figures, protocols, implementation, tests, and reproducibility entry points",
   "artifacts": {
     ".env.example": {
@@ -7,44 +7,44 @@
       "size_bytes": 237
     },
     ".gitattributes": {
-      "sha256": "df74eb47eb0b7e721dbd6b2e73211c07a74637fc5a80c70d5bae0ec4d1efbd11",
-      "size_bytes": 340
+      "sha256": "1e49ee4eab8f04126570dbebd7a7dd1b272c5bcf32e47ecd22ae4f9317a9d5fb",
+      "size_bytes": 663
     },
     ".github/workflows/ci.yml": {
-      "sha256": "cbc2b2af1d81dfcf288601cc17c8db1ea83f7ce20926d4cce4014c1393b45e34",
-      "size_bytes": 1121
+      "sha256": "8c72f4d9570d78675d8686b2ae0bcfd2d39947144b8f0d0ce4d1002f1f8db308",
+      "size_bytes": 1219
     },
     ".gitignore": {
-      "sha256": "8a84226a609d25e43901dae4502944c80a274120e1bc3a3d8d0c756dbc41ecff",
-      "size_bytes": 576
+      "sha256": "1f3723ce5c93bfeac8b48e78f8e14f821998d084cc1769aac8b43352947320e4",
+      "size_bytes": 835
     },
     ".zenodo.json": {
-      "sha256": "27a5f2139e8a759e840917576333c40608c55dc22f8412fbc611676ea8f3afdd",
-      "size_bytes": 1345
+      "sha256": "2deb2cdb5a77c4fee4dd9781392e811f03fb131b44acebae2f7dbcb8f2f904c9",
+      "size_bytes": 1544
     },
     "CHANGELOG.md": {
-      "sha256": "c11ea0d3c1b195bf0d65cbe19fd838d203815055668afc6d22e698584178e662",
-      "size_bytes": 3406
+      "sha256": "f4bd629603970f6f5df01e8dc67a12cf532fe1bafecda9e3230b655a47b44619",
+      "size_bytes": 3754
     },
     "CITATION.cff": {
-      "sha256": "d1d872907ef9096da57a893c61cf7ef7ed96012ccd5e6d1f9dabc3cbeef3a6fb",
-      "size_bytes": 1380
+      "sha256": "e70598181ed7707e578213f0da5856cfe7014f858a55b80e7356938b1fc17677",
+      "size_bytes": 1095
     },
     "LICENSE": {
       "sha256": "251cb40b352d2c92fe0f9b28dbdc60560c0b9a9d971fbb0922a110acc8531f8d",
       "size_bytes": 1074
     },
     "README.md": {
-      "sha256": "2b9edc910f23bbd077e735cf4cba691f00fdb08f5aadbd397630611ae00be9ef",
-      "size_bytes": 16867
+      "sha256": "c1d54d782da439a11e09f9c1f7aaaacb9e3e435ee0574da9acf97ba28a31f32e",
+      "size_bytes": 17543
     },
     "THIRD_PARTY_NOTICES.md": {
-      "sha256": "10e2122b3a72c9b6bfd54b3879f91968bb4cad7ffb0e98e9e75e6f3fbd8863b0",
-      "size_bytes": 5927
+      "sha256": "01d82fd63448b05abde62fe42eca2334a650f379321d688bb501fd688024356b",
+      "size_bytes": 6246
     },
     "assets/README.md": {
-      "sha256": "ec4249e9cf44896706834a1ca3611f6b2c8147aa69ee5c254cc162d1aea02214",
-      "size_bytes": 1056
+      "sha256": "f0a0dbb548571e70a02371d9d84dfce7ad7a4191dc4d91104b05d2dd35971f84",
+      "size_bytes": 1210
     },
     "assets/champion_confusion_matrix.png": {
       "sha256": "c087008584b1c82b1b990272d18d02447efd00ff1dc3f22700a4bb6897d3473f",
@@ -54,10 +54,6 @@
       "sha256": "84c12c7b33ae3726bbc67f052e8e2c6ac3f1993d0ece25836e3b9eba800488c5",
       "size_bytes": 31712
     },
-    "assets/champion_error_gallery.png": {
-      "sha256": "b0ab0ccf114b50cf69a2e7fdcc99153b4fbfedf10ecfc79c5c75e1f344358865",
-      "size_bytes": 2785070
-    },
     "assets/convnext_architecture.png": {
       "sha256": "923e9f28d0c5c1ff783f35a8e0400444a5d6f1970d6b8640bce83890ef674042",
       "size_bytes": 103808
@@ -66,10 +62,6 @@
       "sha256": "66b5ff94789a19c1bbefe0a532f3331f7c7c8a0920faf7cc90ed3d59393d4acb",
       "size_bytes": 75447
     },
-    "assets/convnext_small_faithfulness_gallery.jpg": {
-      "sha256": "35865cc879b212a4f4690467c9100321b3d11ea16794280c31a47462e562ce32",
-      "size_bytes": 409019
-    },
     "assets/dinov2_architecture.png": {
       "sha256": "aca6724b6ee02422a55afa4cad00509a135881ac60f14ecdb1de84fdde0c3931",
       "size_bytes": 94806
@@ -77,10 +69,6 @@
     "assets/dinov2_architecture.svg": {
       "sha256": "05982043b1668ade4e2949ee65eaaec3aeaf6ca70dc071a77ea89b2d39b04b39",
       "size_bytes": 68007
-    },
-    "assets/dinov2_small_faithfulness_gallery.jpg": {
-      "sha256": "ebd41b2e289377ae470dc72fbe0fddc82d72d44109c631b06cdfa66e2ffacc91",
-      "size_bytes": 422446
     },
     "assets/faithfulness_method_selection.png": {
       "sha256": "625f02903388a91c7bf5fb59303f1ba64629efb1337891cd5a41afd6190c2abf",
@@ -218,10 +206,6 @@
       "sha256": "f954bfcc2092148e8761d3dc9698b91cb1f267ddc6886be6c9c79863bec608ac",
       "size_bytes": 44915
     },
-    "assets/probability_blend_faithfulness_gallery.jpg": {
-      "sha256": "cf787683493e90817ec1ac86ff44ec4d752480e0d2f8a03356f0fa9141175849",
-      "size_bytes": 427245
-    },
     "assets/vcoco_v2_development_comparison.png": {
       "sha256": "5acc68679425a6f261de3e440abcb8337200d8736472363139a829f4dd6c5152",
       "size_bytes": 132747
@@ -291,16 +275,16 @@
       "size_bytes": 2592
     },
     "docs/EXPERIMENT_PROTOCOL.md": {
-      "sha256": "2b3c58c7940a034db37ac5d75faca1c64f8807556daf9c9ea96405d03ef4b4fa",
-      "size_bytes": 7888
+      "sha256": "8b73b433e8e9ff7cf56a8468f446f7653d0253f3ff7927fc21c31ee1bf1e3c56",
+      "size_bytes": 7884
     },
     "docs/LEGACY_COCO_STUDY.md": {
-      "sha256": "76bc74097d127edca7fa3bab51508088c99b95133ff6299829fb7f9cff14d890",
-      "size_bytes": 1315
+      "sha256": "c391fe8c0657f4acd7840011a2e67d2dfd9f7939f2efcb1b08dde71fa436620d",
+      "size_bytes": 1317
     },
     "docs/OKUTAMA_CPTR_DEVELOPMENT.md": {
-      "sha256": "0dbb8cc0e1e3fec4fd7ce1a0024c3bdf397c75e8217ccefdf75884c7913720fa",
-      "size_bytes": 18233
+      "sha256": "f2dd2c1395db659e1673846e25cd639428f5ae131f445e553fbb0db799729a47",
+      "size_bytes": 20641
     },
     "docs/POLAR_PUBLIC_REPORT.md": {
       "sha256": "739452501cc4cbaec47d315f88e6f43e8ef68e0a5a0163f3984887549a9d38a5",
@@ -319,8 +303,12 @@
       "size_bytes": 8407
     },
     "docs/RESULT_LINEAGE.md": {
-      "sha256": "bb29253fc3a1ce2caf4877e3d3d90d5bf17ed39a35655ce6260849dab7f7d4d7",
-      "size_bytes": 7373
+      "sha256": "72a4cc239eed8bc87cc5e6a477bcf7d7a11dea3daebd616bd353f182d19746cd",
+      "size_bytes": 7810
+    },
+    "docs/SCIENTIFIC_VALIDATION_PLAN.md": {
+      "sha256": "497b8a3f35cd6f9b88e516fc17a34a8e0d735ac1990e346eb05053b98fc63454",
+      "size_bytes": 17329
     },
     "docs/VCOCO_V2_EXTERNAL_TRANSFER.md": {
       "sha256": "8a84e8955e33642971d2dde9181c186092b0cc64a08040290222bb5393ca7054",
@@ -335,16 +323,16 @@
       "size_bytes": 2208
     },
     "docs/VCOCO_V3_MOTION_IDENTIFIABILITY.md": {
-      "sha256": "80411fd7946f6310a021803b30f2f9c416b4c27cce998a02cd5027961bfee893",
-      "size_bytes": 19468
+      "sha256": "65646e1a564ea89bd6f6e4079ef98786dabeb52b0ef1ce60b7d91bb27ca303a6",
+      "size_bytes": 19812
     },
     "docs/VCOCO_V3_RESEARCH_PROTOCOL.md": {
       "sha256": "8f5bbab54dfdb9c9e329643219efa8171405ac7f9f1537f0d51b9d95a6e46ec1",
       "size_bytes": 9223
     },
     "docs/releases/HUMAN_ACTIVITY_STUDY_V3.0.0.md": {
-      "sha256": "ce50adae63acda2024c57f2dcbeb5d9c3d8ebf3c1b780857bb148c42412db77a",
-      "size_bytes": 2989
+      "sha256": "283c891dc9eacace53cb0b6be0b206e501f4e641f8e2d919e9bd0869a553f5d5",
+      "size_bytes": 3620
     },
     "docs/releases/POLAR_STUDY_V1.0.0.md": {
       "sha256": "ce14178f168f1907666e48182aa634dd25540ca62fb808abeb983dbaeb087bbc",
@@ -711,16 +699,16 @@
       "size_bytes": 6125
     },
     "human_activity_classification.ipynb": {
-      "sha256": "c5aae6ceed7283575e9321f618b863d710be693ca4a5d54051e32a2fe0b8971c",
-      "size_bytes": 65163
+      "sha256": "489321d11f567f22fb6fefc1349da2867e67cfa3461835e771b4cf6d782f0876",
+      "size_bytes": 62302
     },
     "output/pdf/README.md": {
-      "sha256": "fbb5d5b5e9181428eac8f13243cf69d449ad32a83bf27c4623a5bb350fca7522",
-      "size_bytes": 1704
+      "sha256": "f0d9fe1db936fd051c70c9f6878cd74db73c92cb5be0673cd871cbdd77b3a5f9",
+      "size_bytes": 1938
     },
     "output/pdf/okutama_cptr_development_v3.0.0.pdf": {
-      "sha256": "a5baa9cb0cca5ba75c35ab1ac606792696c1e8a385c55a0988374da0499cdf14",
-      "size_bytes": 25100
+      "sha256": "0cdd7e529404b052a62fccf137e3b625701d12406725b0aed97c1081766c05db",
+      "size_bytes": 27777
     },
     "output/pdf/polar_public_report_v1.0.0.pdf": {
       "sha256": "2320afe92e2d78d53e2805fc720f1d0385656205b23e4e38bba7929fa1026ada",
@@ -731,8 +719,8 @@
       "size_bytes": 602585
     },
     "output/pdf/vcoco_v3_motion_identifiability_v3.0.0.pdf": {
-      "sha256": "d0646e531b2bd1a837cb2ea2502ec7019ec439180151970026a79264fc9e620b",
-      "size_bytes": 27650
+      "sha256": "0b79938790a1222c8afe2135055091f45df64a9d81ed2f9a5af09c4c0224c27f",
+      "size_bytes": 28074
     },
     "pyproject.toml": {
       "sha256": "f871609d3c8db085054d707caca656f8bf3cd8f82481b0aac234271b6ad99a44",
@@ -815,8 +803,8 @@
       "size_bytes": 3226
     },
     "results/faithfulness_provenance.json": {
-      "sha256": "24933d5bcde6dee783462ebb191dd8382da9365a58c3d5ee8e96d35fd1e44bda",
-      "size_bytes": 5977
+      "sha256": "c46a23cad4686dc845512b7f1f570b16eb85179900fcfc942e3415bac601cc03",
+      "size_bytes": 6212
     },
     "results/faithfulness_replay_validation.csv": {
       "sha256": "aabf107144a4e4ad2ca06ea73814d70bb7050a4818232e804b4800cc8470bc7e",
@@ -1635,8 +1623,8 @@
       "size_bytes": 1836
     },
     "tests/test_v3_release_manifest.py": {
-      "sha256": "5bb1d683484ec5dcd6e9bb5bfe54fabd4fd0c1597052d271f88167fbf17a6dcf",
-      "size_bytes": 745
+      "sha256": "a6af150f5f5e7a1b5717437348008bd77003b3ca4af4366fca31ecadca8828fa",
+      "size_bytes": 3098
     },
     "tests/test_vcoco_factorized_fusion.py": {
       "sha256": "8051d4b5f5050146cb3dfb8121e7754a788abcd31c03f1fbfa39fb35b0fa9914",
@@ -1743,12 +1731,12 @@
       "size_bytes": 5244
     },
     "tools/build_portfolio_notebook.py": {
-      "sha256": "7db356c5036921ca54c1b6b63eb65dac6bd745392cb2295fba68be551d9fd342",
-      "size_bytes": 18837
+      "sha256": "afe9a2ec82fe7e43611005dd16c6388efb162f6049311d9c478316af5753304c",
+      "size_bytes": 19080
     },
     "tools/build_readme.py": {
-      "sha256": "df5fcda3025696f1e7e72d90244e36d3eb447ad15fa1667d1dd5265482bad9da",
-      "size_bytes": 32486
+      "sha256": "684c524440047c72c086b151317efa95865032a3179e3f6b0f75f925f2c2ded7",
+      "size_bytes": 33162
     },
     "tools/build_study_papers.py": {
       "sha256": "d9c6c422bb3928a56e152e26e07017cdeef611545ea0ed4b902ee8d19ebc8926",
@@ -1759,8 +1747,8 @@
       "size_bytes": 8297
     },
     "tools/build_v3_release_manifest.py": {
-      "sha256": "1d3db96d13c3ac00ce908ade5fe65184e433039316b19f7ec7b2af870848d2bf",
-      "size_bytes": 8206
+      "sha256": "322be17cf27b5da7506fac0ee1e51e6ff772fd454fc433b9234adfcbe3d93bbd",
+      "size_bytes": 9588
     },
     "tools/build_vcoco_external_manifest.py": {
       "sha256": "2842b0e36ec9165b73aa992be0816eedc275d94932552a765d88863d5affbf79",
@@ -1799,8 +1787,8 @@
       "size_bytes": 6315
     },
     "tools/create_error_gallery.py": {
-      "sha256": "1f912a17b53b0135e6621f391efa835e0625d300f4f51615ca9f846047bc3fb4",
-      "size_bytes": 3378
+      "sha256": "13549f674360025810fa5ffe53d818dd30a5bb3f20357d6a4786b0b7fd774747",
+      "size_bytes": 3881
     },
     "tools/download_dataset.py": {
       "sha256": "c4e86a289849583509d16d8058bb1fd1cddd030be1573a8bd87540119afe0a2f",
@@ -1811,8 +1799,8 @@
       "size_bytes": 10577
     },
     "tools/export_faithfulness_results.py": {
-      "sha256": "3f455c27cc6454015ce64097727de6f91dabf230c15fd3229f6680384e846032",
-      "size_bytes": 9891
+      "sha256": "3da4efe3298bfd849ebd8bb0965aaa5abd785348e51326f713259c2bf53295de",
+      "size_bytes": 10511
     },
     "tools/export_okutama_cptr_results.py": {
       "sha256": "841c401f8aeed16764d7c121ec69e475b5a7527b5f814adc7eb7797b10441489",
@@ -1987,11 +1975,33 @@
       "size_bytes": 2970
     },
     "tools/validate_repository.py": {
-      "sha256": "fbd8cf5794d8bf97c657333bb0357f05cccabbb5f1dd6d74916e74fdb62d79dd",
-      "size_bytes": 57209
+      "sha256": "adbd914e4a1807dde0b781b8a8c44c80ae799955cd8ce9eda78dde5d318b9307",
+      "size_bytes": 62604
+    },
+    "tools/verify_v3_release_archive.py": {
+      "sha256": "0fe0a60a357ce8e3a22c06ad94a26aefe31955bee5686ac246c5a4b9e1795ce4",
+      "size_bytes": 4685
     }
   },
-  "release_date": "2026-08-24",
+  "distribution_exclusions": {
+    "assets/champion_error_gallery.png": {
+      "reason": "Qualitative composite containing third-party COCO/Flickr imagery; retained only in ignored local evidence and historical Git history",
+      "sha256": "b0ab0ccf114b50cf69a2e7fdcc99153b4fbfedf10ecfc79c5c75e1f344358865"
+    },
+    "assets/convnext_small_faithfulness_gallery.jpg": {
+      "reason": "Qualitative composite containing third-party COCO/Flickr imagery; retained only in ignored local evidence and historical Git history",
+      "sha256": "35865cc879b212a4f4690467c9100321b3d11ea16794280c31a47462e562ce32"
+    },
+    "assets/dinov2_small_faithfulness_gallery.jpg": {
+      "reason": "Qualitative composite containing third-party COCO/Flickr imagery; retained only in ignored local evidence and historical Git history",
+      "sha256": "ebd41b2e289377ae470dc72fbe0fddc82d72d44109c631b06cdfa66e2ffacc91"
+    },
+    "assets/probability_blend_faithfulness_gallery.jpg": {
+      "reason": "Qualitative composite containing third-party COCO/Flickr imagery; retained only in ignored local evidence and historical Git history",
+      "sha256": "cf787683493e90817ec1ac86ff44ec4d752480e0d2f8a03356f0fa9141175849"
+    }
+  },
+  "prepared_date": "2026-08-24",
   "release_id": "human-activity-study-v3.0.0",
   "report_version": "3.0.0",
   "schema_version": 1,

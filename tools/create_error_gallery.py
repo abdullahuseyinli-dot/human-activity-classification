@@ -25,12 +25,25 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repository", type=Path, required=True)
     parser.add_argument("--maximum-images", type=int, default=12)
+    parser.add_argument(
+        "--output",
+        type=Path,
+        help=(
+            "Output path relative to the repository; defaults to ignored local run "
+            "evidence under .runs/legacy_coco/qualitative"
+        ),
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
     repository = args.repository.resolve()
+    output_path = args.output or Path(".runs/legacy_coco/qualitative/champion_error_gallery.png")
+    if not output_path.is_absolute():
+        output_path = repository / output_path
+    output_path = output_path.resolve()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     manifest = pd.read_csv(repository / "data" / "manifest.csv", dtype={"image_id": str})
     predictions = pd.read_csv(
         repository / "results" / "champion_test_predictions.csv", dtype={"image_id": str}
@@ -79,9 +92,9 @@ def main() -> None:
         axis.axis("off")
     fig.suptitle("Highest-confidence champion errors", fontsize=15, weight="bold")
     fig.tight_layout()
-    fig.savefig(repository / "assets" / "champion_error_gallery.png", dpi=180, bbox_inches="tight")
+    fig.savefig(output_path, dpi=180, bbox_inches="tight")
     plt.close(fig)
-    print(f"Wrote {len(errors)} champion errors; displayed {len(shown)}")
+    print(f"Wrote {len(errors)} champion errors; displayed {len(shown)}; gallery={output_path}")
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 RELEASE_ID = "human-activity-study-v3.0.0"
 REPORT_VERSION = "3.0.0"
 SOFTWARE_VERSION = "3.0.0"
-RELEASE_DATE = "2026-08-24"
+PREPARED_DATE = "2026-08-24"
 DEFAULT_OUTPUT = PurePosixPath("results/human_activity_study_v3.0.0_manifest.json")
 DEFAULT_CHECKSUMS = PurePosixPath("release/HUMAN_ACTIVITY_STUDY_V3.0.0_SHA256SUMS.txt")
 
@@ -24,6 +24,7 @@ REQUIRED_ARTIFACTS = frozenset(
         PurePosixPath("CITATION.cff"),
         PurePosixPath("README.md"),
         PurePosixPath("docs/OKUTAMA_CPTR_DEVELOPMENT.md"),
+        PurePosixPath("docs/SCIENTIFIC_VALIDATION_PLAN.md"),
         PurePosixPath("docs/VCOCO_V3_MOTION_IDENTIFIABILITY.md"),
         PurePosixPath("docs/releases/HUMAN_ACTIVITY_STUDY_V3.0.0.md"),
         PurePosixPath("human_activity_classification.ipynb"),
@@ -34,8 +35,24 @@ REQUIRED_ARTIFACTS = frozenset(
         PurePosixPath("results/okutama_cptr/evidence_manifest.json"),
         PurePosixPath("results/vcoco_v3/evidence_manifest.json"),
         PurePosixPath("tools/build_v3_release_manifest.py"),
+        PurePosixPath("tools/verify_v3_release_archive.py"),
     }
 )
+
+EXCLUDED_THIRD_PARTY_MEDIA = {
+    PurePosixPath("assets/champion_error_gallery.png"): (
+        "b0ab0ccf114b50cf69a2e7fdcc99153b4fbfedf10ecfc79c5c75e1f344358865"
+    ),
+    PurePosixPath("assets/convnext_small_faithfulness_gallery.jpg"): (
+        "35865cc879b212a4f4690467c9100321b3d11ea16794280c31a47462e562ce32"
+    ),
+    PurePosixPath("assets/dinov2_small_faithfulness_gallery.jpg"): (
+        "ebd41b2e289377ae470dc72fbe0fddc82d72d44109c631b06cdfa66e2ffacc91"
+    ),
+    PurePosixPath("assets/probability_blend_faithfulness_gallery.jpg"): (
+        "cf787683493e90817ec1ac86ff44ec4d752480e0d2f8a03356f0fa9141175849"
+    ),
+}
 
 TEXT_ARTIFACT_SUFFIXES = frozenset(
     {
@@ -124,16 +141,19 @@ def validate_versions(repository: Path) -> None:
             raise RuntimeError(f"Report version is missing or stale: {relative}")
 
     citation = (repository / "CITATION.cff").read_text(encoding="utf-8")
-    if (
-        f"version: {SOFTWARE_VERSION}" not in citation
-        or f"  version: {REPORT_VERSION}" not in citation
-        or f"date-released: {RELEASE_DATE}" not in citation
-    ):
+    if f'version: "{SOFTWARE_VERSION}"' not in citation:
         raise RuntimeError("Citation metadata does not match the v3 release")
 
     zenodo = json.loads((repository / ".zenodo.json").read_text(encoding="utf-8"))
-    if zenodo.get("version") != REPORT_VERSION or zenodo.get("publication_date") != RELEASE_DATE:
+    if zenodo.get("version") != REPORT_VERSION or "publication_date" in zenodo:
         raise RuntimeError("Zenodo metadata does not match the v3 release")
+
+    present_exclusions = [
+        path for path in EXCLUDED_THIRD_PARTY_MEDIA if (repository / path).exists()
+    ]
+    if present_exclusions:
+        formatted = ", ".join(path.as_posix() for path in sorted(present_exclusions))
+        raise RuntimeError(f"Non-distributable third-party media are present: {formatted}")
 
 
 def build_manifest(repository: Path) -> dict:
@@ -152,7 +172,7 @@ def build_manifest(repository: Path) -> dict:
         "release_id": RELEASE_ID,
         "report_version": REPORT_VERSION,
         "software_version": SOFTWARE_VERSION,
-        "release_date": RELEASE_DATE,
+        "prepared_date": PREPARED_DATE,
         "artifact_scope": (
             "Complete nonignored repository release candidate, including the v3 "
             "motion-identifiability and CPTR reports, portable evidence, figures, "
@@ -162,6 +182,18 @@ def build_manifest(repository: Path) -> dict:
             "CRLF is canonicalized to LF for source files and repository metadata "
             "declared as text by .gitattributes"
         ),
+        "distribution_exclusions": {
+            path.as_posix(): {
+                "sha256": digest,
+                "reason": (
+                    "Qualitative composite containing third-party COCO/Flickr imagery; "
+                    "retained only in ignored local evidence and historical Git history"
+                ),
+            }
+            for path, digest in sorted(
+                EXCLUDED_THIRD_PARTY_MEDIA.items(), key=lambda item: item[0].as_posix()
+            )
+        },
         "artifact_count": len(artifacts),
         "artifacts": artifacts,
     }
@@ -177,9 +209,7 @@ def checksum_text(repository: Path, manifest_path: Path) -> str:
         repository / "output/pdf/okutama_cptr_development_v3.0.0.pdf",
         manifest_path,
     )
-    return "".join(
-        f"{sha256_file(path)}  {path.relative_to(repository).as_posix()}\n" for path in targets
-    )
+    return "".join(f"{sha256_file(path)}  {path.name}\n" for path in targets)
 
 
 def parse_args() -> argparse.Namespace:

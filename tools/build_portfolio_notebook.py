@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 from pathlib import Path
 
@@ -312,7 +313,7 @@ The sealed confirmation compares the locked static model with an 8-frame, 0.5-se
 temporal teacher over {v3_summary["samples"]:,} person instances.
 The temporal model changes macro-F1 by
 **{v3_interval["teacher"]["macro_f1"]["point_estimate"]:+.4f}** with a 95% paired
-recording-cluster interval of
+scenario-cluster interval of
 [{v3_interval["teacher"]["macro_f1"]["ci_95_low"]:+.4f},
 {v3_interval["teacher"]["macro_f1"]["ci_95_high"]:+.4f}]. A fixed 50% routing budget
 reaches **{float(v3_metrics["hybrid_budget_0.5"]["macro_f1"]):.4f} macro-F1**.
@@ -477,6 +478,10 @@ def main() -> None:
         resources={"metadata": {"path": str(ROOT)}},
     )
     client.execute()
+    for index, cell in enumerate(notebook.cells):
+        cell.metadata.pop("execution", None)
+        identity = f"{index}\0{cell.cell_type}\0{cell.source}".encode()
+        cell["id"] = hashlib.sha256(identity).hexdigest()[:8]
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(nbformat.writes(notebook), encoding="utf-8", newline="\n")
     print(f"Wrote executed notebook: {args.output.resolve()}")

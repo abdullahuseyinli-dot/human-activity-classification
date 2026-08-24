@@ -1,11 +1,9 @@
 # Human Activity Classification Study v3.0.0
 
-Release tag: `human-activity-study-v3.0.0`
-
 Version 3.0.0 adds the motion-identifiability and tracked-video experiments to the
 source-overlap and person-level transfer studies released in v1 and v2. The release
-contains the complete technical reports, implementation, portable aggregate evidence,
-publication figures, and an executed evidence notebook.
+candidate contains the complete technical reports, implementation, portable aggregate
+evidence, publication figures, and an executed evidence notebook.
 
 ## Sealed temporal result
 
@@ -20,7 +18,7 @@ gain while invoking clip inference for half of the examples. Its paired interval
 thresholds, checkpoints, and evaluator were bound before the provider test archive
 was opened once.
 
-## CPTR development study
+## Camera-compensated part-trajectory residual development
 
 The follow-up architecture combined frozen temporal anchors with center-conditioned
 residuals, camera-compensated trajectories, confidence-masked body-region tokens,
@@ -33,6 +31,14 @@ the aggregate improvement: the component reached 0.7144 macro-F1 versus 0.7165 f
 matched temporal baseline. The component remains documented for further work, and the
 existing temporal ensemble remains the default model.
 
+## Scientific validation program
+
+The [scientific validation plan](../SCIENTIFIC_VALIDATION_PLAN.md) binds the remaining
+work to explicit evidence gates: independent annotation, external-domain replication,
+recording-grouped inference, matched baselines, operational measurements, and a fresh
+environment replay. These gates determine the permitted claim scope; they do not
+require a positive result.
+
 ## Release artifacts
 
 - `docs/VCOCO_V3_MOTION_IDENTIFIABILITY.md` and
@@ -43,12 +49,15 @@ existing temporal ensemble remains the default model.
   subgroup evidence, annotation aggregates, and protocol lineage;
 - `results/okutama_cptr/`: component screens, grouped cross-fit, faithfulness,
   uncertainty, provenance, and the development decision;
+- `docs/SCIENTIFIC_VALIDATION_PLAN.md`: limitation coverage and evidence gates;
 - `human_activity_classification.ipynb`: executed evidence narrative;
 - `results/human_activity_study_v3.0.0_manifest.json`: release-level SHA-256 inventory;
 - `release/HUMAN_ACTIVITY_STUDY_V3.0.0_SHA256SUMS.txt`: checksums for the reports and
   manifest.
 
-The v1.0.0 and v2.0.0 tags, reports, manifests, and checksum files remain unchanged.
+The v3 source tree excludes dataset media, pretrained checkpoints, and qualitative
+source-image composites. The v1.0.0 and v2.0.0 tags, reports, manifests, and checksum
+files remain unchanged.
 
 ## Validation
 
@@ -59,4 +68,5 @@ python -m pytest
 python tools/validate_repository.py
 python tools/build_study_release_manifest.py --check
 python tools/build_v3_release_manifest.py --check
+python tools/verify_v3_release_archive.py
 ```

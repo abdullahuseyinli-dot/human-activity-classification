@@ -3,7 +3,7 @@
 The first version of this repository studied a checksum-verified 285-image COCO subset
 with three labels: sitting, standing, and walking/running. It remains useful as a compact
 example of out-of-fold model selection and attribution-method locking, but it is no
-longer the primary portfolio result.
+longer the primary cross-domain study.
 
 ## Preserved result
 

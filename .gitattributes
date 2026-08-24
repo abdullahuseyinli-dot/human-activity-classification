@@ -1,5 +1,5 @@
 .gitattributes text eol=lf
-* text=auto
+* text=auto eol=lf
 *.py text eol=lf
 *.md text eol=lf
 *.csv text eol=lf
@@ -16,3 +16,9 @@
 *.pdf binary
 *.svg text eol=lf
 *.pt binary
+
+# Never include historical third-party photo composites in distributable archives.
+assets/champion_error_gallery.png export-ignore
+assets/convnext_small_faithfulness_gallery.jpg export-ignore
+assets/dinov2_small_faithfulness_gallery.jpg export-ignore
+assets/probability_blend_faithfulness_gallery.jpg export-ignore

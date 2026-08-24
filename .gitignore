@@ -9,6 +9,12 @@ checkpoints/
 *.pt
 *.pth
 *.ckpt
+
+# Locally retained qualitative composites with third-party source photographs
+/assets/champion_error_gallery.png
+/assets/convnext_small_faithfulness_gallery.jpg
+/assets/dinov2_small_faithfulness_gallery.jpg
+/assets/probability_blend_faithfulness_gallery.jpg
 paper/build/
 paper/*.aux
 paper/*.bbl

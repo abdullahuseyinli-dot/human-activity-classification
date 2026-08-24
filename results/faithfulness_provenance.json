@@ -82,17 +82,14 @@
       "experiments/evaluate_faithfulness.py": "b1d31bd91576527d04cfcfebb867c22d2a6c2759affe2d0c14853f787e799211",
       "src/hac/explainability.py": "da51b8b29baf413c66ef5461bd06c89e7351c28c28b1fc202c1e899ed07c8545",
       "src/hac/models.py": "b7834038ca58c0ddac7d9f997dfd69b2b0b9b1830e5c6f26225fd5387080b436",
-      "tools/export_faithfulness_results.py": "3f455c27cc6454015ce64097727de6f91dabf230c15fd3229f6680384e846032",
+      "tools/export_faithfulness_results.py": "3da4efe3298bfd849ebd8bb0965aaa5abd785348e51326f713259c2bf53295de",
       "tools/render_faithfulness_figures.py": "0502f75905522179a0a182debb7e03b0cb963ee8ae3fbb4c68f972e10c16fff0"
     },
     "tracked_evidence": {
-      "assets/convnext_small_faithfulness_gallery.jpg": "35865cc879b212a4f4690467c9100321b3d11ea16794280c31a47462e562ce32",
-      "assets/dinov2_small_faithfulness_gallery.jpg": "ebd41b2e289377ae470dc72fbe0fddc82d72d44109c631b06cdfa66e2ffacc91",
       "assets/faithfulness_method_selection.png": "625f02903388a91c7bf5fb59303f1ba64629efb1337891cd5a41afd6190c2abf",
-      "assets/faithfulness_method_selection.svg": "5f00b881ec8f46b5d0f795ef231f8ffcb23bde38d47857ab0f0b065ba5a2d548",
+      "assets/faithfulness_method_selection.svg": "1d2e371bf48464711d53b1f74b2744744ff0d5c60b6cfc655ecf9f1018b1500c",
       "assets/faithfulness_perturbation_curves.png": "7dba8ba7a040cb5f4a1e6de1ca473786a71f1f48b4a21590589a3df709964467",
-      "assets/faithfulness_perturbation_curves.svg": "41e18244584d82c5568b7c6929a0e7caaf0e4261b9d871b80d17c682aca62f6f",
-      "assets/probability_blend_faithfulness_gallery.jpg": "cf787683493e90817ec1ac86ff44ec4d752480e0d2f8a03356f0fa9141175849",
+      "assets/faithfulness_perturbation_curves.svg": "69d13d517b606dba1dac9cd336f0d47fe9ddb1d9fbac60356ed375ec96eafa23",
       "results/faithfulness_checkpoint_manifest.csv": "e3c5f9f4805d85e6b46882eb1506f0fd084045bb61d0d2fb4a5be456a8d6c7e0",
       "results/faithfulness_method_selection.csv": "e1b9fc65823d4ac32b1107b9f94a515c4aa3362054c45b5e5fea9447b856f9a3",
       "results/faithfulness_oof_selection_cohort.csv": "2aceee47a785d1dfc63c1a3d76740b975ec6ac66793d05d037c7070a14986a79",
@@ -107,6 +104,14 @@
       "results/faithfulness_test_summary.csv": "50c07dd77793f7a470dd94378fb18b9f2849c545dc76cc12c51b68ade22d3101",
       "results/oof_method_selection_per_image.csv": "c605368211f1d0ac5e817e1d33037a405b34b11bd5183b07d6941d354fc79304",
       "results/oof_replay_validation.csv": "8f65853032d02d07e0a044faad406efc5d2874ed07c50d7be0e63aad4ffbe03f"
+    },
+    "excluded_third_party_media": {
+      "reason": "Qualitative composites contain COCO/Flickr source photographs and remain part of validated local run evidence, but are not redistributed in the public release.",
+      "artifacts": {
+        "convnext_small_faithfulness_gallery.jpg": "35865cc879b212a4f4690467c9100321b3d11ea16794280c31a47462e562ce32",
+        "dinov2_small_faithfulness_gallery.jpg": "ebd41b2e289377ae470dc72fbe0fddc82d72d44109c631b06cdfa66e2ffacc91",
+        "probability_blend_faithfulness_gallery.jpg": "cf787683493e90817ec1ac86ff44ec4d752480e0d2f8a03356f0fa9141175849"
+      }
     }
   }
 }

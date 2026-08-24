@@ -3,7 +3,7 @@
 This file records versioned public study artifacts. The Python package has its own
 version in `pyproject.toml`.
 
-## Study Release 3.0.0 - 2026-08-24
+## Study 3.0.0 release candidate - 2026-08-24
 
 - Added the motion-identifiability study across V-COCO source tags and
   Okutama-Action tracked video, including a sealed 1,771-example confirmation set.
@@ -18,6 +18,11 @@ version in `pyproject.toml`.
   evidence package; the established temporal ensemble remains the default model.
 - Updated the executed notebook, reports, release metadata, figures, path-safe launch
   commands, automated evidence checks, and versioned SHA-256 inventory.
+- Added explicit scientific limitation coverage and evidence gates for annotation,
+  external validity, grouped inference, matched baselines, operational measurements,
+  and fresh-environment reproduction.
+- Removed qualitative COCO/Flickr composites from the distributable tree while
+  retaining their hashes and local evidence lineage.
 
 ## Study Release 2.0.0 - 2026-08-24
 

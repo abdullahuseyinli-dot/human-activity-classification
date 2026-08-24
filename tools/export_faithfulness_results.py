@@ -26,14 +26,20 @@ RESULT_FILES = (
     "faithfulness_stability_summary.csv",
     "faithfulness_checkpoint_manifest.csv",
 )
-ASSET_FILES = (
+PORTABLE_ASSET_FILES = (
     "faithfulness_method_selection.png",
     "faithfulness_method_selection.svg",
     "faithfulness_perturbation_curves.png",
     "faithfulness_perturbation_curves.svg",
+)
+LOCAL_QUALITATIVE_ASSET_FILES = (
     "convnext_small_faithfulness_gallery.jpg",
     "dinov2_small_faithfulness_gallery.jpg",
     "probability_blend_faithfulness_gallery.jpg",
+)
+EXCLUDED_MEDIA_REASON = (
+    "Qualitative composites contain COCO/Flickr source photographs and remain part "
+    "of validated local run evidence, but are not redistributed in the public release."
 )
 EXPECTED_MODELS = {"convnext_small", "dinov2_small", "probability_blend"}
 EXPECTED_FAMILIES = {"convnext_small", "dinov2_small"}
@@ -76,13 +82,15 @@ def sha256_file(path: Path) -> str:
 
 def normalize_svg(path: Path) -> None:
     lines = path.read_text(encoding="utf-8").splitlines()
-    path.write_text("\n".join(line.rstrip() for line in lines) + "\n", encoding="utf-8")
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write("\n".join(line.rstrip() for line in lines) + "\n")
 
 
 def require_files(source_dir: Path) -> None:
     required = (
         *RESULT_FILES,
-        *ASSET_FILES,
+        *PORTABLE_ASSET_FILES,
+        *LOCAL_QUALITATIVE_ASSET_FILES,
         "faithfulness_provenance.json",
         "oof_selection_cohort.csv",
     )
@@ -107,19 +115,20 @@ def validate_evidence(source_dir: Path, repository: Path) -> None:
     runner_path = repository / "experiments" / "evaluate_faithfulness.py"
     if provenance.get("runtime", {}).get("runner_sha256") != sha256_file(runner_path):
         raise RuntimeError("Faithfulness runner changed after the recorded execution")
-    recorded_lock_hash = provenance.get("inputs", {}).get(
-        "faithfulness_selection_lock_sha256"
-    )
+    recorded_lock_hash = provenance.get("inputs", {}).get("faithfulness_selection_lock_sha256")
     if recorded_lock_hash != sha256_file(lock_path):
         raise RuntimeError("Faithfulness lock fingerprint does not match provenance")
     recorded_evidence = provenance.get("evidence", {})
-    for name in (*RESULT_FILES, *ASSET_FILES, "oof_selection_cohort.csv"):
+    for name in (
+        *RESULT_FILES,
+        *PORTABLE_ASSET_FILES,
+        *LOCAL_QUALITATIVE_ASSET_FILES,
+        "oof_selection_cohort.csv",
+    ):
         if recorded_evidence.get(name) != sha256_file(source_dir / name):
             raise RuntimeError(f"Evidence fingerprint mismatch: {name}")
 
-    cohort = pd.read_csv(
-        source_dir / "oof_selection_cohort.csv", dtype={"image_id": str}
-    )
+    cohort = pd.read_csv(source_dir / "oof_selection_cohort.csv", dtype={"image_id": str})
     if (
         len(cohort) != 36
         or cohort["image_id"].duplicated().any()
@@ -138,9 +147,7 @@ def validate_evidence(source_dir: Path, repository: Path) -> None:
 
     manifest = pd.read_csv(repository / "data" / "manifest.csv", dtype={"image_id": str})
     expected_ids = set(manifest.loc[manifest["split"].eq("test"), "image_id"])
-    per_image = pd.read_csv(
-        source_dir / "faithfulness_test_per_image.csv", dtype={"image_id": str}
-    )
+    per_image = pd.read_csv(source_dir / "faithfulness_test_per_image.csv", dtype={"image_id": str})
     if set(per_image["model"]) != EXPECTED_MODELS:
         raise RuntimeError("Faithfulness test evidence has an unexpected model set")
     for model, rows in per_image.groupby("model"):
@@ -168,9 +175,7 @@ def validate_evidence(source_dir: Path, repository: Path) -> None:
 
 
 def export_selection_cohort(source_dir: Path, results_dir: Path) -> None:
-    cohort = pd.read_csv(
-        source_dir / "oof_selection_cohort.csv", dtype={"image_id": str}
-    )
+    cohort = pd.read_csv(source_dir / "oof_selection_cohort.csv", dtype={"image_id": str})
     columns = ["image_id", "label", "cv_row_id", "fold_id", "selection_key"]
     missing = [column for column in columns if column not in cohort]
     if missing:
@@ -197,7 +202,7 @@ def main() -> None:
 
     for name in RESULT_FILES:
         shutil.copy2(source_dir / name, results_dir / name)
-    for name in ASSET_FILES:
+    for name in PORTABLE_ASSET_FILES:
         destination = assets_dir / name
         shutil.copy2(source_dir / name, destination)
         if destination.suffix == ".svg":
@@ -208,7 +213,7 @@ def main() -> None:
     promoted_paths = [
         *(results_dir / name for name in RESULT_FILES),
         results_dir / "faithfulness_oof_selection_cohort.csv",
-        *(assets_dir / name for name in ASSET_FILES),
+        *(assets_dir / name for name in PORTABLE_ASSET_FILES),
     ]
     provenance["release_export"] = {
         "status": "VALIDATED_PATH_SANITIZED_EVIDENCE_PROMOTED",
@@ -226,6 +231,12 @@ def main() -> None:
         "tracked_evidence": {
             path.relative_to(repository).as_posix(): sha256_file(path)
             for path in sorted(promoted_paths)
+        },
+        "excluded_third_party_media": {
+            "reason": EXCLUDED_MEDIA_REASON,
+            "artifacts": {
+                name: sha256_file(source_dir / name) for name in LOCAL_QUALITATIVE_ASSET_FILES
+            },
         },
     }
     provenance.pop("evidence", None)

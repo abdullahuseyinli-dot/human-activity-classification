@@ -364,12 +364,13 @@ temporal context improves every class F1 and four of five confirmation scenarios
 
 ![Fixed-budget temporal routing](assets/vcoco_v3_routing_curve.png)
 
-## Okutama CPTR architecture study
+## Okutama camera-compensated part-trajectory residual architecture study
 
 The [development report](output/pdf/okutama_cptr_development_v3.0.0.pdf),
 [Markdown source](docs/OKUTAMA_CPTR_DEVELOPMENT.md), and
-[portable evidence](results/okutama_cptr/README.md) document the follow-up architecture
-study. Frozen static and temporal anchors were extended with center-conditioned
+[portable evidence](results/okutama_cptr/README.md) document the follow-up
+camera-compensated part-trajectory residual (CPTR) architecture study. Frozen static
+and temporal anchors were extended with center-conditioned
 residuals, camera-compensated kinematics, confidence-masked body-region tokens,
 quality-aware gates, counterfactual objectives, masked target-video adaptation,
 GroupDRO, frozen SigLIP, and top-block LoRA controls.
@@ -554,7 +555,7 @@ the same cohort.
   locked before the single confirmation open.
 - Pipeline lock: {vcoco_v3_evidence["pipeline_lock_sha256"]}.
 
-### CPTR architecture development
+### Camera-compensated part-trajectory residual architecture development
 
 - Camera, trajectory, part, counterfactual, masked-adaptation, specialist, and robust
   training components were evaluated in a fixed sequence.
@@ -568,14 +569,20 @@ the same cohort.
 Checkpoints, image paths, dense probabilities, and large feature tensors remain
 outside Git. The tracked evidence is path-sanitized and hash-indexed.
 
+The [scientific validation plan](docs/SCIENTIFIC_VALIDATION_PLAN.md) maps each known
+limitation to a measurement, acceptance gate, and permitted claim. It covers
+independent annotation, external-domain replication, grouped inference, matched
+baselines, operational measurements, and a clean-environment replay.
+
 ## Reports and release files
 
 | Artifact | Purpose |
 | --- | --- |
 | [Motion-identifiability report](output/pdf/vcoco_v3_motion_identifiability_v3.0.0.pdf) | Sealed static, temporal, distillation, and routing study |
 | [CPTR development report](output/pdf/okutama_cptr_development_v3.0.0.pdf) | Camera compensation, part tokens, residual fusion, cross-fit, and failure analysis |
-| [Study v3.0.0 release notes](docs/releases/HUMAN_ACTIVITY_STUDY_V3.0.0.md) | Current release scope, headline results, and validation commands |
-| [Study v3.0.0 manifest](results/human_activity_study_v3.0.0_manifest.json) | SHA-256 inventory of the current release |
+| [Scientific validation plan](docs/SCIENTIFIC_VALIDATION_PLAN.md) | Remaining limitations, required measurements, and claim gates |
+| [Study v3.0.0 version notes](docs/releases/HUMAN_ACTIVITY_STUDY_V3.0.0.md) | Candidate scope, headline results, and validation commands |
+| [Study v3.0.0 manifest](results/human_activity_study_v3.0.0_manifest.json) | SHA-256 inventory of the release candidate |
 | [CPTR development evidence](results/okutama_cptr/README.md) | Component screens, grouped OOF results, uncertainty, and faithfulness |
 | [Motion-identifiability evidence](results/vcoco_v3/README.md) | CUDA lineage, metrics, uncertainty, and subgroup tables |
 | [V-COCO v2 report](output/pdf/vcoco_v2_external_transfer_v2.0.0.pdf) | Person-level transfer study |
@@ -623,6 +630,7 @@ python -m pytest
 python tools/validate_repository.py
 python tools/build_study_release_manifest.py --check
 python tools/build_v3_release_manifest.py --check
+python tools/verify_v3_release_archive.py
 ~~~
 
 The historical v1/v2 environment remains frozen in `requirements-lock.txt`. The tested
@@ -634,8 +642,8 @@ installation order.
 
 Citation metadata is provided in [CITATION.cff](CITATION.cff).
 
-> Huseyinli, A. (2026). *When a Still Image Is Not Enough: Motion Identifiability and
-> Budgeted Temporal Inference* (Version 3.0.0) [Technical report].
+> Huseyinli, A. (2026). *Human Activity Classification Under Domain and Temporal
+> Shift* (Version 3.0.0) [Computer software].
 > https://github.com/abdullahuseyinli-dot/human-activity-classification
 
 - [POLAR dataset](https://doi.org/10.17632/hvnsh7rwz7.1)
@@ -649,8 +657,9 @@ Citation metadata is provided in [CITATION.cff](CITATION.cff).
 - [AugMix](https://arxiv.org/abs/1912.02781)
 - [Sanity Checks for Saliency Maps](https://arxiv.org/abs/1810.03292)
 
-Original code and documentation are MIT licensed. Dataset images, annotations, and
-pretrained weights retain their upstream terms; see
+Original code and documentation are MIT licensed. Dataset media, qualitative
+source-image composites, and pretrained checkpoints are excluded from the current
+distributable tree; upstream data and model terms are recorded in
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 """
 

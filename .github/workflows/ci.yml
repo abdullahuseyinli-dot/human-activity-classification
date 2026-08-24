@@ -37,3 +37,5 @@ jobs:
         run: python tools/build_study_release_manifest.py --check
       - name: Verify current release manifest
         run: python tools/build_v3_release_manifest.py --check
+      - name: Verify distributable archive
+        run: python tools/verify_v3_release_archive.py

@@ -86,6 +86,15 @@ The CPTR branch ends at its development gate. It does not reuse the previously o
 Okutama confirmation labels, and it does not promote a validation-only gain after the
 recording-grouped OOF comparison moves in the opposite direction.
 
+## Scientific validation boundary
+
+The remaining evidence requirements are bound in
+[`SCIENTIFIC_VALIDATION_PLAN.md`](SCIENTIFIC_VALIDATION_PLAN.md). The plan separates
+measurement completeness from outcome direction: annotation reliability,
+external-domain replication, grouped inference, matched controls, operational cost,
+and fresh-environment reproduction must be reported whether their results are
+positive, neutral, or negative.
+
 ## Local versus tracked artifacts
 
 Local `.runs/` evidence retains checkpoints, fitted classifier binaries, local image

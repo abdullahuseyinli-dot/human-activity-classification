@@ -1,7 +1,7 @@
 # Experiment protocol
 
 > Historical scope: this protocol governs the retained 285-image COCO baseline.
-> The current portfolio study is governed by the
+> The current POLAR study is governed by the
 > [POLAR scale-study protocol](POLAR_SCALE_STUDY_PROTOCOL.md).
 
 ## Objective

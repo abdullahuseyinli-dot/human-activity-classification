@@ -290,7 +290,47 @@ all 25 requests share the same recorded source hashes and that their grid hash m
 the retained adaptive-grid lock. Current lock and runner schemas include the omitted
 bindings for future runs; no historical artifact or reported metric was rewritten.
 
-## 7. Reproduction
+## 7. Limitations and validation requirements
+
+CPTR is a development result. The calibration partition remained unopened, the
+previously consumed Okutama confirmation archive was not rescored, and no independent
+CPTR confirmation has been run. The fixed-validation improvement therefore does not
+override the slightly negative recording-grouped OOF result.
+
+The development evidence also has a limited number of independent groups. The fixed
+validation split contains three recordings, and the cross-fit contains 11. Exact
+recording-level tests are reported, but the resulting intervals remain too wide to
+support a small positive effect. Frame-level sample counts do not increase that
+independent evidence.
+
+The component screen is a sequential engineering trace, not a fully matched causal
+ablation. Several rows were produced under different implementation snapshots; only
+the five-seed promotion comparison and the 25 cross-fit runs share one bound code,
+feature, grid, and data-store lineage. Future component claims require matched reruns
+under a single lock.
+
+The body-region stream uses confidence-masked pooled image regions rather than a
+complete measured keypoint or pose sequence. Its strongest observed weakness is
+occlusion: the candidate is +0.0015 macro-F1 above baseline on clear OOF windows and
+-0.0308 on occluded windows. The next repair cycle must use provider-train development
+data only, keep calibration closed, and test reliability-aware fallback and coherent
+occlusion interventions with recording-grouped OOF predictions.
+
+External validity is also open. Okutama is one aerial, low-resolution domain, and the
+task is tracked-person classification rather than the dataset's original action-
+detection task. An authorized POLIMI-ITW-S study remains the preferred independent
+shopping-mall replication. Resource evidence is incomplete as well: cached-batch
+timing does not measure end-to-end decoding, feature extraction, latency, energy, or
+memory on uncached clips.
+
+The required annotation, external-replication, grouped-inference, matched-baseline,
+occlusion, resource, and clean-replay evidence is specified in
+[`SCIENTIFIC_VALIDATION_PLAN.md`](SCIENTIFIC_VALIDATION_PLAN.md). Its publication rule
+does not require CPTR to improve: a neutral or negative result remains reportable when
+the protocol is complete, while model promotion still requires the locked performance
+gates.
+
+## 8. Reproduction
 
 Create the environment described in the repository README and use a CUDA-enabled
 PyTorch build. The following commands verify the retained final evidence after the

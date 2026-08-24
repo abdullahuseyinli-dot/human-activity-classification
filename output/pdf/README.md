@@ -1,6 +1,6 @@
 # Versioned technical reports
 
-`vcoco_v3_motion_identifiability_v3.0.0.pdf` is the current release report. It presents
+`vcoco_v3_motion_identifiability_v3.0.0.pdf` is the current versioned report. It presents
 the V-COCO mechanism study and the locked Okutama-Action static, temporal,
 distillation, and fixed-budget routing experiments.
 
@@ -35,7 +35,13 @@ python tools/build_study_papers.py docs/POLAR_PUBLIC_REPORT.md \
   -o output/pdf/polar_public_report_v1.0.0.pdf
 ```
 
-The current release inventory is `results/human_activity_study_v3.0.0_manifest.json`;
+The release-candidate inventory is `results/human_activity_study_v3.0.0_manifest.json`;
 checksums for both reports and the manifest are recorded in
 `release/HUMAN_ACTIVITY_STUDY_V3.0.0_SHA256SUMS.txt`. The v1 and v2 inventories remain
-available with their tagged releases.
+available with their tagged releases. The v3 checksum file uses release-asset
+basenames, so it can be verified after downloading the two PDFs, the manifest, and the
+checksum file into one directory:
+
+```bash
+sha256sum -c HUMAN_ACTIVITY_STUDY_V3.0.0_SHA256SUMS.txt
+```

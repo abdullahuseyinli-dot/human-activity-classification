@@ -1,14 +1,14 @@
 {
   "title": "Human Activity Classification Under Domain and Temporal Shift",
-  "description": "Versioned code, technical reports, and portable evidence for linked POLAR, V-COCO, and Okutama-Action studies. The release adds a sealed tracked-video evaluation in which an eight-frame temporal model reaches 0.7854 macro-F1, compared with 0.7458 for the matched static model, together with fixed-budget routing, paired scenario-cluster uncertainty, and a complete execution lineage. It also includes the CPTR architecture study, whose positive fixed-validation result did not persist under recording-grouped cross-fitting, and retains the earlier source-overlap and person-level transfer releases.",
+  "description": "Versioned code, technical reports, and portable evidence for linked POLAR, V-COCO, and Okutama-Action studies. This version adds a sealed tracked-video evaluation in which an eight-frame temporal model reaches 0.7854 macro-F1, compared with 0.7458 for the matched static model, together with fixed-budget routing, paired scenario-cluster uncertainty, and a documented execution lineage. It also includes the camera-compensated part-trajectory residual (CPTR) architecture study, whose positive fixed-validation result did not persist under recording-grouped cross-fitting, and retains the earlier source-overlap and person-level transfer releases. Dataset media, pretrained checkpoints, and qualitative source-image composites are not included.",
   "creators": [
     {
       "name": "Huseyinli, Abdulla"
     }
   ],
-  "license": "MIT",
+  "access_right": "open",
+  "license": "mit",
   "upload_type": "software",
-  "publication_date": "2026-08-24",
   "version": "3.0.0",
   "language": "eng",
   "keywords": [
@@ -17,6 +17,7 @@
     "transfer learning",
     "domain adaptation",
     "DINOv2",
+    "DINOv3",
     "ConvNeXt",
     "SigLIP2",
     "multiview learning",
@@ -28,6 +29,9 @@
     "motion identifiability",
     "budgeted inference",
     "camera compensation",
-    "reproducible research"
+    "reproducible research",
+    "POLAR",
+    "V-COCO",
+    "Okutama-Action"
   ]
 }

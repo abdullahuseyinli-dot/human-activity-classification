@@ -7,24 +7,28 @@ code, or pretrained model parameters.
 ## COCO source images
 
 `data/manifest.csv` records COCO image URLs, labels, fixed splits, and checksums.
-Full source datasets are not included. Four historical qualitative figures contain
-reduced-resolution COCO photographs:
+Full source datasets and source photographs are not included in the current tree.
+The earlier v1 and v2 tags contained four qualitative composites made from COCO
+photographs:
 
 - `assets/champion_error_gallery.png`;
 - `assets/convnext_small_faithfulness_gallery.jpg`;
 - `assets/dinov2_small_faithfulness_gallery.jpg`;
 - `assets/probability_blend_faithfulness_gallery.jpg`.
 
-These figures are retained as evidence for the original benchmark. They are not
-covered by this repository's MIT License and must not be treated as project-owned
-stock imagery. The corresponding image identifiers and source URLs are recorded in
+These files remain part of the historical Git record and byte-identical copies are
+retained with nonpublic run evidence, but they are excluded from the current
+distributable tree and any archive built from it. They are not covered by this
+repository's MIT License. The corresponding image identifiers and source URLs remain in
 `data/manifest.csv`, `results/champion_error_analysis.csv`, and
-`results/faithfulness_test_per_image.csv`. Under the
+`results/faithfulness_test_per_image.csv`, so the numerical and error-analysis record
+does not depend on redistributing the photographs. Under the
 [COCO terms of use](https://cocodataset.org/#termsofuse),
 COCO annotations and the COCO website are licensed under CC BY 4.0. The COCO
 Consortium does not own the image copyrights, so every image remains subject to
-its original Flickr/source terms. Users are responsible for confirming that
-their intended use is permitted.
+its original Flickr/source terms. Those per-image terms include noncommercial and
+no-derivatives conditions, which is why the qualitative composites are not part of
+the current distributable tree.
 
 Suggested dataset citation:
 
