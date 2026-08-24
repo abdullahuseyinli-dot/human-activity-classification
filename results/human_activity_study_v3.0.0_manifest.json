@@ -1,10 +1,10 @@
 {
-  "artifact_count": 496,
+  "artifact_count": 497,
   "artifact_scope": "Complete nonignored repository release candidate, including the v3 motion-identifiability and CPTR reports, portable evidence, figures, protocols, implementation, tests, and reproducibility entry points",
   "artifacts": {
     ".env.example": {
-      "sha256": "5d68bc052829866aadf1149875fd8a33f5148d69c61c56bb2d1b0cc05ef46273",
-      "size_bytes": 242
+      "sha256": "1d87f574cbf57a853f13281a79d5728eef03648eb1fbcedeb6a1e26f69a5af5a",
+      "size_bytes": 237
     },
     ".gitattributes": {
       "sha256": "df74eb47eb0b7e721dbd6b2e73211c07a74637fc5a80c70d5bae0ec4d1efbd11",
@@ -15,8 +15,8 @@
       "size_bytes": 1121
     },
     ".gitignore": {
-      "sha256": "685ad80b921f7b84c5e2f521afa71b0ce6768ca79d8b02ec8e8dee9ee9cf7f74",
-      "size_bytes": 607
+      "sha256": "8a84226a609d25e43901dae4502944c80a274120e1bc3a3d8d0c756dbc41ecff",
+      "size_bytes": 576
     },
     ".zenodo.json": {
       "sha256": "27a5f2139e8a759e840917576333c40608c55dc22f8412fbc611676ea8f3afdd",
@@ -1634,6 +1634,10 @@
       "sha256": "2d901ae1ef64b30276488b363dbc84564cec863006a36b1bb38385db6b59b76e",
       "size_bytes": 1836
     },
+    "tests/test_v3_release_manifest.py": {
+      "sha256": "5bb1d683484ec5dcd6e9bb5bfe54fabd4fd0c1597052d271f88167fbf17a6dcf",
+      "size_bytes": 745
+    },
     "tests/test_vcoco_factorized_fusion.py": {
       "sha256": "8051d4b5f5050146cb3dfb8121e7754a788abcd31c03f1fbfa39fb35b0fa9914",
       "size_bytes": 431
@@ -1755,8 +1759,8 @@
       "size_bytes": 8297
     },
     "tools/build_v3_release_manifest.py": {
-      "sha256": "684de36bd5f60b2051f94d382aa04da529ee885744e66c351f3b72433942c7c9",
-      "size_bytes": 7933
+      "sha256": "1d3db96d13c3ac00ce908ade5fe65184e433039316b19f7ec7b2af870848d2bf",
+      "size_bytes": 8206
     },
     "tools/build_vcoco_external_manifest.py": {
       "sha256": "2842b0e36ec9165b73aa992be0816eedc275d94932552a765d88863d5affbf79",
@@ -1992,5 +1996,5 @@
   "report_version": "3.0.0",
   "schema_version": 1,
   "software_version": "3.0.0",
-  "text_digest_policy": "CRLF is canonicalized to LF to match .gitattributes"
+  "text_digest_policy": "CRLF is canonicalized to LF for source files and repository metadata declared as text by .gitattributes"
 }

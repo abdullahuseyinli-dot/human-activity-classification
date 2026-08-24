@@ -55,6 +55,14 @@ TEXT_ARTIFACT_SUFFIXES = frozenset(
         ".yml",
     }
 )
+TEXT_ARTIFACT_FILENAMES = frozenset(
+    {
+        ".env.example",
+        ".gitattributes",
+        ".gitignore",
+        "LICENSE",
+    }
+)
 
 
 def sha256_file(path: Path) -> str:
@@ -69,7 +77,7 @@ def artifact_bytes(path: Path) -> bytes:
     """Return bytes as Git will store them under the repository attributes."""
 
     payload = path.read_bytes()
-    if path.suffix.lower() in TEXT_ARTIFACT_SUFFIXES:
+    if path.suffix.lower() in TEXT_ARTIFACT_SUFFIXES or path.name in TEXT_ARTIFACT_FILENAMES:
         payload = payload.replace(b"\r\n", b"\n")
         if b"\r" in payload:
             raise RuntimeError(f"Text artifact contains a lone carriage return: {path}")
@@ -150,7 +158,10 @@ def build_manifest(repository: Path) -> dict:
             "motion-identifiability and CPTR reports, portable evidence, figures, "
             "protocols, implementation, tests, and reproducibility entry points"
         ),
-        "text_digest_policy": "CRLF is canonicalized to LF to match .gitattributes",
+        "text_digest_policy": (
+            "CRLF is canonicalized to LF for source files and repository metadata "
+            "declared as text by .gitattributes"
+        ),
         "artifact_count": len(artifacts),
         "artifacts": artifacts,
     }
