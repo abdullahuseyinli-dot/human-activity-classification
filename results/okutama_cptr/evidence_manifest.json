@@ -1,0 +1,51 @@
+{
+  "artifact_count": 11,
+  "artifacts": {
+    "README.md": {
+      "sha256": "323c9083e785eaf905bc0cd4b97b2e1c80f1879820e8bd32a5447c6458a36468",
+      "size_bytes": 3199
+    },
+    "component_ablation.csv": {
+      "sha256": "999d22f001e5e6bdcd6537ba39894cd255abc69a8e5e355c393df355ff1ba217",
+      "size_bytes": 11675
+    },
+    "development_decision.json": {
+      "sha256": "c432f0a3c04db219afe75221626911ea600563200b383848253122d142b68061",
+      "size_bytes": 4337
+    },
+    "faithfulness_metrics.csv": {
+      "sha256": "a72ef76ec5d526d0c1d0993abdc3a9637601ec602921a9a948c1fe2b4a784e77",
+      "size_bytes": 3013
+    },
+    "faithfulness_summary.json": {
+      "sha256": "add6d1b6a7b91b96a32ce4b10d149f9c46833694485d41ac93c8f41dc9698f19",
+      "size_bytes": 20201
+    },
+    "fold_seed_metrics.csv": {
+      "sha256": "af29e248986a0717ad66f54c30a21b007b67ad498a091ba552397b8af9a0545c",
+      "size_bytes": 2755
+    },
+    "headline_metrics.csv": {
+      "sha256": "3dcfbc3db74d9904d4c125725b26d187cc72acd1feb199300af60cb706efdf72",
+      "size_bytes": 1384
+    },
+    "provenance.json": {
+      "sha256": "caddb5cc187d52ad29d9ecc628697d6c068db25fb8b1b66ae739b6d8c4d262a9",
+      "size_bytes": 3163
+    },
+    "recording_metrics.csv": {
+      "sha256": "6272e729e272d1953a551ae21d241e6595c6fe031c54add9bea32531a8365d36",
+      "size_bytes": 1201
+    },
+    "subgroup_metrics.csv": {
+      "sha256": "37885c3870bbd7ac103e8ef4f7d2459d1779f039a26bbf809d344f2affbf2426",
+      "size_bytes": 2776
+    },
+    "uncertainty.json": {
+      "sha256": "775fb0f09b496e466747b7182b5bebe33c0f5a4b507e270e72542225600bec09",
+      "size_bytes": 2426
+    }
+  },
+  "schema_version": 1,
+  "study": "okutama_cptr_development"
+}

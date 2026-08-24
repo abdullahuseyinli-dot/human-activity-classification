@@ -1,0 +1,94 @@
+{
+  "grid_version": "1.4.0-adaptive-4",
+  "status": "DECLARED_AFTER_STAGE3_AND_SPECIALIST_SCREENS_BEFORE_STAGE4_FITTING",
+  "base_stage3_grid_lock": ".runs/cptr/stage3_grid_lock.json",
+  "selection_rationale": "Neither masked initialization nor either counterfactual formulation passed the incremental performance gate, and the supervised DINOv2 LoRA centre specialist did not beat the frozen static branch. Group robustness and frozen SigLIP complementarity are therefore isolated on the passing centre-short-plus-parts branch.",
+  "evidence": [
+    {
+      "artifact": "refined_counterfactual_screen",
+      "path": ".runs/cptr/stage3/centre_short_parts_counterfactual_refined/seed-42/summary.json",
+      "sha256": "96fc756119f9cdf3904c51b74e9db754a3300760f867688ffe9d9989bd01f33f"
+    },
+    {
+      "artifact": "masked_initialisation_screen",
+      "path": ".runs/cptr/stage3/centre_short_parts_masked_only/seed-42/summary.json",
+      "sha256": "dd612df5f1be44b32c5e1fe21c840180483bb0dcfc382295cbd50167b7a0abbd"
+    },
+    {
+      "artifact": "lora_specialist_screen",
+      "path": ".runs/cptr/lora_specialist-v4/summary.json",
+      "sha256": "0d8980c4c3bd4ec5882adf9d722c06b50e45423bd6d3a17d6c15ee70e4448e14"
+    },
+    {
+      "artifact": "siglip_feature_store",
+      "path": ".runs/cptr/siglip_features/store.json",
+      "sha256": "754e2a6f2e4f496d2bea6f901f0683e1a47f708362ebd9051499f8cf35234fc1"
+    }
+  ],
+  "candidates": [
+    {
+      "candidate_id": "centre_short_parts_group_dro",
+      "stage": "scenario_group_robust_objective",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": false,
+      "use_compensated_trajectory": false,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": false,
+      "use_counterfactuals": false,
+      "use_masked_initialisation": false,
+      "group_objective": "group_dro",
+      "expert_roles": {
+        "centre_short": "both",
+        "parts": "both"
+      }
+    },
+    {
+      "candidate_id": "centre_short_parts_siglip",
+      "stage": "frozen_centre_siglip_complementarity",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": false,
+      "use_compensated_trajectory": false,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": true,
+      "use_counterfactuals": false,
+      "use_masked_initialisation": false,
+      "group_objective": "erm",
+      "expert_roles": {
+        "centre_short": "both",
+        "parts": "both",
+        "siglip": "posture"
+      }
+    },
+    {
+      "candidate_id": "centre_short_parts_group_dro_siglip",
+      "stage": "passing_stage4_component_integration",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": false,
+      "use_compensated_trajectory": false,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": true,
+      "use_counterfactuals": false,
+      "use_masked_initialisation": false,
+      "group_objective": "group_dro",
+      "expert_roles": {
+        "centre_short": "both",
+        "parts": "both",
+        "siglip": "posture"
+      }
+    }
+  ],
+  "selection_policy": {
+    "screen_seed": 42,
+    "minimum_incremental_macro_f1_gain": 0.003,
+    "maximum_per_class_f1_regression": 0.01,
+    "combined_candidate_requires_both_isolated_components_to_pass": true,
+    "grouping_key": "scenario_id",
+    "failed_results_remain_visible": true
+  }
+}

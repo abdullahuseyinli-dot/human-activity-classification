@@ -1,0 +1,200 @@
+{
+  "classification_student": {
+    "clusters": 5,
+    "holm_adjusted_locomotion_p": 0.3621637836216378,
+    "holm_adjusted_macro_p": 0.9923007699230078,
+    "macro_f1": {
+      "ci_95_high": 0.012714948610087817,
+      "ci_95_low": -0.018712414643647368,
+      "point_estimate": -0.00015206058886330087,
+      "two_sided_p": 0.9923007699230078
+    },
+    "per_class_f1": {
+      "sitting": {
+        "ci_95_high": 0.019902971011587334,
+        "ci_95_low": -0.013622688853098142,
+        "point_estimate": 0.002028904079657945,
+        "two_sided_p": 0.7817218278172183
+      },
+      "standing": {
+        "ci_95_high": 0.008187461857969591,
+        "ci_95_low": -0.030980967535285453,
+        "point_estimate": -0.011392054447609934,
+        "two_sided_p": 0.2633736626337366
+      },
+      "walking_running": {
+        "ci_95_high": 0.019558467048772954,
+        "ci_95_low": -0.018367957944997237,
+        "point_estimate": 0.008906968601362086,
+        "two_sided_p": 0.3621637836216378
+      }
+    },
+    "resamples": 10000,
+    "seed": 20360907
+  },
+  "hybrid_budget_0.1": {
+    "clusters": 5,
+    "holm_adjusted_locomotion_p": 0.2343765623437656,
+    "holm_adjusted_macro_p": 0.3167683231676832,
+    "macro_f1": {
+      "ci_95_high": 0.028916366953274486,
+      "ci_95_low": -0.00749778122651501,
+      "point_estimate": 0.012166748102619751,
+      "two_sided_p": 0.1321867813218678
+    },
+    "per_class_f1": {
+      "sitting": {
+        "ci_95_high": 0.02453162659753305,
+        "ci_95_low": -0.00969802181787005,
+        "point_estimate": 0.0051712078464041245,
+        "two_sided_p": 0.5783421657834217
+      },
+      "standing": {
+        "ci_95_high": 0.03631500981844449,
+        "ci_95_low": -0.007604666392080017,
+        "point_estimate": 0.012564728973523787,
+        "two_sided_p": 0.3297670232976702
+      },
+      "walking_running": {
+        "ci_95_high": 0.03242825933408888,
+        "ci_95_low": -0.008110024610140765,
+        "point_estimate": 0.018764307487931342,
+        "two_sided_p": 0.1171882811718828
+      }
+    },
+    "resamples": 10000,
+    "seed": 20360909
+  },
+  "hybrid_budget_0.25": {
+    "clusters": 5,
+    "holm_adjusted_locomotion_p": 0.1877812218778122,
+    "holm_adjusted_macro_p": 0.3167683231676832,
+    "macro_f1": {
+      "ci_95_high": 0.03874923766526254,
+      "ci_95_low": -0.0021999818051677833,
+      "point_estimate": 0.018759857619009297,
+      "two_sided_p": 0.1055894410558944
+    },
+    "per_class_f1": {
+      "sitting": {
+        "ci_95_high": 0.02919403063023074,
+        "ci_95_low": -0.0073468647867650505,
+        "point_estimate": 0.006811903566047217,
+        "two_sided_p": 0.37236276372362764
+      },
+      "standing": {
+        "ci_95_high": 0.04864827982042619,
+        "ci_95_low": -0.005190946800446294,
+        "point_estimate": 0.020328919714165616,
+        "two_sided_p": 0.16578342165783422
+      },
+      "walking_running": {
+        "ci_95_high": 0.04933862754117946,
+        "ci_95_low": -0.004285522967724664,
+        "point_estimate": 0.02913874957681506,
+        "two_sided_p": 0.06259374062593741
+      }
+    },
+    "resamples": 10000,
+    "seed": 20360910
+  },
+  "hybrid_budget_0.5": {
+    "clusters": 5,
+    "holm_adjusted_locomotion_p": 0.09399060093990601,
+    "holm_adjusted_macro_p": 0.0011998800119988001,
+    "macro_f1": {
+      "ci_95_high": 0.06044551780179671,
+      "ci_95_low": 0.014365850363466678,
+      "point_estimate": 0.03595377981829336,
+      "two_sided_p": 0.00019998000199980003
+    },
+    "per_class_f1": {
+      "sitting": {
+        "ci_95_high": 0.05693889083612902,
+        "ci_95_low": 0.0028190369226449574,
+        "point_estimate": 0.0243828441861208,
+        "two_sided_p": 0.000999900009999
+      },
+      "standing": {
+        "ci_95_high": 0.07028722317210123,
+        "ci_95_low": 0.014401598633052903,
+        "point_estimate": 0.04036237571951862,
+        "two_sided_p": 0.00019998000199980003
+      },
+      "walking_running": {
+        "ci_95_high": 0.0623453264801066,
+        "ci_95_low": 0.013526523070938823,
+        "point_estimate": 0.04311611954924066,
+        "two_sided_p": 0.019998000199980003
+      }
+    },
+    "resamples": 10000,
+    "seed": 20360911
+  },
+  "source_only_static": {
+    "clusters": 5,
+    "holm_adjusted_locomotion_p": 0.0011998800119988001,
+    "holm_adjusted_macro_p": 0.0011998800119988001,
+    "macro_f1": {
+      "ci_95_high": -0.10875192192456623,
+      "ci_95_low": -0.22753538325654535,
+      "point_estimate": -0.17230689321881423,
+      "two_sided_p": 0.00019998000199980003
+    },
+    "per_class_f1": {
+      "sitting": {
+        "ci_95_high": -0.12435221137632846,
+        "ci_95_low": -0.3349104859335038,
+        "point_estimate": -0.22191300056208274,
+        "two_sided_p": 0.00019998000199980003
+      },
+      "standing": {
+        "ci_95_high": 0.0027542119920358488,
+        "ci_95_low": -0.16297873251232176,
+        "point_estimate": -0.07246445798425993,
+        "two_sided_p": 0.0795920407959204
+      },
+      "walking_running": {
+        "ci_95_high": -0.13438866361707963,
+        "ci_95_low": -0.26724840849374454,
+        "point_estimate": -0.22254322111010005,
+        "two_sided_p": 0.00019998000199980003
+      }
+    },
+    "resamples": 10000,
+    "seed": 20360908
+  },
+  "teacher": {
+    "clusters": 5,
+    "holm_adjusted_locomotion_p": 0.09399060093990601,
+    "holm_adjusted_macro_p": 0.0015998400159984002,
+    "macro_f1": {
+      "ci_95_high": 0.05684081543610586,
+      "ci_95_low": 0.02020935725070216,
+      "point_estimate": 0.039649874578962886,
+      "two_sided_p": 0.00039996000399960006
+    },
+    "per_class_f1": {
+      "sitting": {
+        "ci_95_high": 0.0491842487400701,
+        "ci_95_low": 0.014537987679671405,
+        "point_estimate": 0.028907863162006886,
+        "two_sided_p": 0.00039996000399960006
+      },
+      "standing": {
+        "ci_95_high": 0.06904262870045524,
+        "ci_95_low": 0.026401932015569396,
+        "point_estimate": 0.04692564102564112,
+        "two_sided_p": 0.00019998000199980003
+      },
+      "walking_running": {
+        "ci_95_high": 0.059505769541293496,
+        "ci_95_low": 0.011600649155496745,
+        "point_estimate": 0.04311611954924066,
+        "two_sided_p": 0.0187981201879812
+      }
+    },
+    "resamples": 10000,
+    "seed": 20360906
+  }
+}

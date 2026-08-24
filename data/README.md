@@ -1,6 +1,6 @@
 # Dataset setup
 
-No POLAR, V-COCO, or COCO image is redistributed in this repository.
+No POLAR, V-COCO, Okutama-Action, or COCO image is redistributed in this repository.
 
 ## POLAR
 
@@ -28,6 +28,27 @@ standing, and walking/running. `tools/build_vcoco_external_manifest.py` creates 
 person-level manifest, and `tools/audit_polar_vcoco_overlap.py` must pass before model
 predictions are allowed. Mixed-label images are retained for person-level evaluation
 and excluded from the image-level comparison.
+
+## Okutama-Action temporal extension
+
+Keep the provider train and test frame archives outside the repository. The train
+archive supplies the scenario-grouped development, validation, and calibration
+partitions; the test archive is opened only against a completed temporal pipeline
+lock. Archive hashes, class counts, exclusions, and aggregate metrics are exported,
+while frames, person crops, annotations, tracks, features, and checkpoints stay under
+ignored local storage. The complete command sequence is in
+`docs/VCOCO_V3_EXECUTION_RUNBOOK.md`.
+
+Commands that read an Okutama archive require an explicit `--archive` argument. The
+portable CPTR protocol uses `data/external/OkutamaAction/TrainSetFrames.zip` as a
+repository-relative example; callers may keep the archive elsewhere and pass its path
+without editing a tracked file.
+
+The CPTR architecture study reuses only the locked provider-train development
+manifest. Its camera transforms, part-region tokens, specialist features, and 25
+grouped cross-fit runs remain under `.runs/cptr/`. The candidate did not pass its
+development gate, so the 1,979-row calibration partition was not opened for CPTR.
+Portable aggregate evidence is in `results/okutama_cptr/`.
 
 ## Historical COCO manifest
 

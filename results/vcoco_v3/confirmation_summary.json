@@ -1,0 +1,30 @@
+{
+  "confirmation_open_number": 1,
+  "endpoint": "provider_labels_mapped_to_locked_three_class_ontology",
+  "frame_backbone": "dinov2_base",
+  "inference_device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "pipeline_lock_sha256": "9c2ff4715b87b9ee8854caa31f4f15ebf77306201911d839533aa3aab3be4068",
+  "pose_control_status": "VCOCO_V3_POSE_CONTROL_UNAVAILABLE",
+  "routing_enabled_by_validation_gate": true,
+  "samples": 1771,
+  "scenario_clusters": 5,
+  "selected_teacher": {
+    "candidate_id": "temporal_8f_050s",
+    "frame_backbone": "dinov2_base",
+    "uniform_samples": 8,
+    "window_seconds": 0.5
+  },
+  "source_artifact_sha256": {
+    "confirmation_metrics.csv": "051c80cb2218c2edfc55e91ed78480d85ab4b750aa7ee67a698bdb699447c58b",
+    "confirmation_per_class.csv": "f6eb36bd316f23439a4e07f970e227f19e1d2c5ee3e79c3655d5560a3e8d051a",
+    "confirmation_prediction_sets.csv": "0a27263d165fa8cd67d778cd52871161f08f7e3738419a978335ecff8cb6b936",
+    "confirmation_predictions.npz": "c592ac9b6292e3fea103e4ce8d4db975d64e5c3904f331964bbe9821e07d8c29",
+    "confirmation_routing_curve.csv": "a2d71a604e1406fef1c717333df3501ef28d31ac66d9bb20da07b7675e4f16ce",
+    "confirmation_subgroups.csv": "98bbd6cc61588becf45a31df136fe60cb84a3f2e3034460c54011cff341c2b9b",
+    "confirmation_uncertainty.json": "e8ad3fad157e23fdfe291eb63070448a6043c4369d44cbc7879818b90ba3a0ce"
+  },
+  "source_summary_sha256": "ee8926e38e1cac92c3a973fe144d9a05b17e9c59f1b63ffd7454d902875155c9",
+  "status": "VCOCO_V3_TEMPORAL_CONFIRMATION_COMPLETE",
+  "torch_version": "2.11.0+cu128",
+  "videos": 10
+}

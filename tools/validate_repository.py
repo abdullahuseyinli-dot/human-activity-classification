@@ -6,14 +6,23 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path, PurePosixPath
 
 import pandas as pd
+from pypdf import PdfReader
 
 TEXT_SUFFIXES = {".csv", ".ipynb", ".json", ".md", ".py", ".toml", ".yaml", ".yml"}
 LEGACY_FINGERPRINT_TEXT_SUFFIXES = {".csv", ".json", ".py", ".svg"}
-EXCLUDED_PARTS = {".git", ".runs", "__pycache__", ".pytest_cache", ".ruff_cache"}
+EXCLUDED_PARTS = {
+    ".git",
+    ".runs",
+    ".venv",
+    "__pycache__",
+    ".pytest_cache",
+    ".ruff_cache",
+}
 REQUIRED = {
     ".github/workflows/ci.yml",
     ".gitignore",
@@ -124,6 +133,94 @@ VCOCO_V2_REQUIRED = {
     "results/vcoco_v2/protocol_lock.json",
     "results/vcoco_v2/test_access_gate.json",
 }
+VCOCO_V3_REQUIRED = {
+    "docs/DINOV3_ACCESS.md",
+    "docs/POLIMI_ITW_S_ACCESS_AND_STORAGE.md",
+    "docs/VCOCO_V3_EXECUTION_RUNBOOK.md",
+    "docs/VCOCO_V3_EXTERNAL_CUDA_AMENDMENT.md",
+    "docs/VCOCO_V3_MOTION_IDENTIFIABILITY.md",
+    "docs/VCOCO_V3_RESEARCH_PROTOCOL.md",
+    "experiments/okutama_action_protocol.json",
+    "experiments/okutama_temporal_grid.json",
+    "experiments/vcoco_v3_protocol.json",
+    "assets/vcoco_v3_confirmation_comparison.png",
+    "assets/vcoco_v3_confirmation_comparison.svg",
+    "assets/vcoco_v3_routing_curve.png",
+    "assets/vcoco_v3_routing_curve.svg",
+    "results/vcoco_v3/README.md",
+    "results/vcoco_v3/annotation_summary.json",
+    "results/vcoco_v3/confirmation_metrics.csv",
+    "results/vcoco_v3/confirmation_per_class.csv",
+    "results/vcoco_v3/confirmation_routing_curve.csv",
+    "results/vcoco_v3/confirmation_subgroup_deltas.csv",
+    "results/vcoco_v3/confirmation_subgroups.csv",
+    "results/vcoco_v3/confirmation_summary.json",
+    "results/vcoco_v3/confirmation_uncertainty.json",
+    "results/vcoco_v3/evidence_manifest.json",
+    "results/vcoco_v3/okutama_dataset_summary.json",
+    "results/vcoco_v3/protocol_lineage.json",
+    "results/vcoco_v3/source_tag_development_metrics.csv",
+    "results/vcoco_v3/temporal_crossfit_summary.json",
+    "results/vcoco_v3/temporal_development_metrics.csv",
+    "tools/export_vcoco_v3_results.py",
+    "tools/render_vcoco_v3_figures.py",
+}
+V3_RELEASE_REQUIRED = {
+    "docs/releases/HUMAN_ACTIVITY_STUDY_V3.0.0.md",
+    "output/pdf/okutama_cptr_development_v3.0.0.pdf",
+    "output/pdf/vcoco_v3_motion_identifiability_v3.0.0.pdf",
+    "release/HUMAN_ACTIVITY_STUDY_V3.0.0_SHA256SUMS.txt",
+    "requirements-v3-lock.txt",
+    "results/human_activity_study_v3.0.0_manifest.json",
+    "tools/build_v3_release_manifest.py",
+}
+CPTR_REQUIRED = {
+    "docs/OKUTAMA_CPTR_DEVELOPMENT.md",
+    "experiments/audit_okutama_cptr_baseline.py",
+    "experiments/cache_okutama_cptr_motion.py",
+    "experiments/cache_okutama_cptr_parts.py",
+    "experiments/cache_okutama_cptr_siglip.py",
+    "experiments/crossfit_okutama_cptr.py",
+    "experiments/evaluate_okutama_cptr_faithfulness.py",
+    "experiments/fit_okutama_cptr_router.py",
+    "experiments/okutama_cptr_adaptive_grid.json",
+    "experiments/okutama_cptr_crossfit_plan.json",
+    "experiments/okutama_cptr_grid.json",
+    "experiments/okutama_cptr_protocol.json",
+    "experiments/okutama_cptr_stage2_grid.json",
+    "experiments/okutama_cptr_stage3_grid.json",
+    "experiments/okutama_cptr_stage4_grid.json",
+    "experiments/pretrain_okutama_cptr_masked.py",
+    "experiments/train_okutama_cptr_candidate.py",
+    "experiments/train_okutama_cptr_lora_specialist.py",
+    "results/okutama_cptr/README.md",
+    "results/okutama_cptr/component_ablation.csv",
+    "results/okutama_cptr/development_decision.json",
+    "results/okutama_cptr/evidence_manifest.json",
+    "results/okutama_cptr/faithfulness_metrics.csv",
+    "results/okutama_cptr/faithfulness_summary.json",
+    "results/okutama_cptr/fold_seed_metrics.csv",
+    "results/okutama_cptr/headline_metrics.csv",
+    "results/okutama_cptr/provenance.json",
+    "results/okutama_cptr/recording_metrics.csv",
+    "results/okutama_cptr/subgroup_metrics.csv",
+    "results/okutama_cptr/uncertainty.json",
+    "src/hac/cptr.py",
+    "src/hac/cptr_features.py",
+    "src/hac/cptr_training.py",
+    "tests/test_cptr.py",
+    "tests/test_okutama_cptr_portable_evidence.py",
+    "tools/export_okutama_cptr_results.py",
+    "tools/finalize_okutama_cptr_development.py",
+    "tools/lock_okutama_cptr_adaptive_grid.py",
+    "tools/lock_okutama_cptr_crossfit_plan.py",
+    "tools/lock_okutama_cptr_development.py",
+    "tools/lock_okutama_cptr_grid.py",
+    "tools/lock_okutama_cptr_protocol.py",
+    "tools/lock_okutama_cptr_stage2_grid.py",
+    "tools/lock_okutama_cptr_stage3_grid.py",
+    "tools/lock_okutama_cptr_stage4_grid.py",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -133,15 +230,23 @@ def parse_args() -> argparse.Namespace:
 
 
 def included_files(repository: Path):
-    for path in repository.rglob("*"):
-        if not path.is_file():
-            continue
-        relative = path.relative_to(repository)
+    completed = subprocess.run(
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+        cwd=repository,
+        check=True,
+        capture_output=True,
+    )
+    relative_paths = sorted(
+        Path(value.decode("utf-8")) for value in completed.stdout.split(b"\0") if value
+    )
+    for relative in relative_paths:
         if any(part in EXCLUDED_PARTS for part in relative.parts):
             continue
         if relative.parts[:2] == ("data", "images"):
             continue
-        yield path, relative
+        path = repository / relative
+        if path.is_file():
+            yield path, relative
 
 
 def validate_notebook(path: Path) -> None:
@@ -189,9 +294,7 @@ def validate_faithfulness(repository: Path, expected_test_ids: set[str]) -> None
     if set(selected) != {"convnext_small", "dinov2_small"}:
         raise RuntimeError("Attribution selection does not cover both model families")
 
-    cohort = pd.read_csv(
-        results / "faithfulness_oof_selection_cohort.csv", dtype={"image_id": str}
-    )
+    cohort = pd.read_csv(results / "faithfulness_oof_selection_cohort.csv", dtype={"image_id": str})
     if (
         len(cohort) != 36
         or cohort["image_id"].duplicated().any()
@@ -199,9 +302,7 @@ def validate_faithfulness(repository: Path, expected_test_ids: set[str]) -> None
     ):
         raise RuntimeError("Invalid OOF attribution-selection cohort")
 
-    per_image = pd.read_csv(
-        results / "faithfulness_test_per_image.csv", dtype={"image_id": str}
-    )
+    per_image = pd.read_csv(results / "faithfulness_test_per_image.csv", dtype={"image_id": str})
     expected_models = {"convnext_small", "dinov2_small", "probability_blend"}
     if set(per_image["model"]) != expected_models:
         raise RuntimeError("Unexpected model set in faithfulness test evidence")
@@ -321,8 +422,7 @@ def validate_polar_release(repository: Path) -> None:
         "dinov2_base_multilayer_rbf",
     }
     if set(fits.get("neural", {})) != expected_neural or any(
-        set(item.get("seeds", {})) != {"42", "52", "62"}
-        for item in fits.get("neural", {}).values()
+        set(item.get("seeds", {})) != {"42", "52", "62"} for item in fits.get("neural", {}).values()
     ):
         raise RuntimeError("POLAR final neural fits are incomplete")
     if set(fits.get("probes", {})) != expected_probes:
@@ -403,9 +503,7 @@ def validate_polar_release(repository: Path) -> None:
         or float(faithfulness.get("max_probability_parity_absolute_error", 1.0)) > 0.002
     ):
         raise RuntimeError("Invalid locked POLAR faithfulness summary")
-    faith_rows = pd.read_csv(
-        results / "polar_faithfulness_per_image.csv", dtype={"image_id": str}
-    )
+    faith_rows = pd.read_csv(results / "polar_faithfulness_per_image.csv", dtype={"image_id": str})
     faith_families = {"convnext_small_full", "dinov2_base_top4"}
     if set(faith_rows["family"]) != faith_families:
         raise RuntimeError("Unexpected POLAR faithfulness model family")
@@ -429,10 +527,12 @@ def validate_polar_release(repository: Path) -> None:
         raise RuntimeError("Invalid locked POLAR fault audit")
     fault_metrics = pd.read_csv(results / "polar_fault_robustness_metrics.csv")
     aggregate_faults = fault_metrics[fault_metrics["fault_seed"].astype(str).eq("aggregate")]
-    if set(aggregate_faults["family"]) != faith_families or set(
-        aggregate_faults["condition"]
-    ) != {"uint8_input_bit_flip_rate", "symmetric_int8_head_weight_bit_flips"}:
+    if set(aggregate_faults["family"]) != faith_families or set(aggregate_faults["condition"]) != {
+        "uint8_input_bit_flip_rate",
+        "symmetric_int8_head_weight_bit_flips",
+    }:
         raise RuntimeError("POLAR aggregate fault evidence is incomplete")
+
 
 def validate_pdf(path: Path, label: str) -> None:
     with path.open("rb") as handle:
@@ -443,13 +543,23 @@ def validate_pdf(path: Path, label: str) -> None:
             raise RuntimeError(f"{label} PDF is incomplete")
 
 
+def validate_current_pdf(path: Path, *, title: str, text_marker: str) -> None:
+    validate_pdf(path, title)
+    reader = PdfReader(path)
+    if len(reader.pages) < 4:
+        raise RuntimeError(f"{title} has too few pages")
+    extracted = "\n".join(page.extract_text() or "" for page in reader.pages)
+    if text_marker not in extracted:
+        raise RuntimeError(f"{title} is missing expected report text")
+    metadata_title = str((reader.metadata or {}).get("/Title", ""))
+    if metadata_title != title:
+        raise RuntimeError(f"{title} PDF metadata is stale: {metadata_title!r}")
+
+
 def validate_study_report_release(repository: Path) -> None:
     v1_report = repository / "docs/POLAR_PUBLIC_REPORT.md"
     v1_text = v1_report.read_text(encoding="utf-8")
-    if (
-        "version: 1.0.0" not in v1_text
-        or "status: Independent technical report" not in v1_text
-    ):
+    if "version: 1.0.0" not in v1_text or "status: Independent technical report" not in v1_text:
         raise RuntimeError("POLAR Study Report metadata is not final v1.0.0")
 
     v2_report = repository / "docs/VCOCO_V2_EXTERNAL_TRANSFER.md"
@@ -468,13 +578,20 @@ def validate_study_report_release(repository: Path) -> None:
         "README.md",
         "CHANGELOG.md",
         "docs/POLAR_PUBLIC_REPORT.md",
+        "docs/OKUTAMA_CPTR_DEVELOPMENT.md",
+        "docs/PORTFOLIO_ARTICLE.md",
+        "docs/RESULT_LINEAGE.md",
         "docs/VCOCO_V2_EXTERNAL_TRANSFER.md",
+        "docs/VCOCO_V3_MOTION_IDENTIFIABILITY.md",
         "docs/releases/POLAR_STUDY_V1.0.0.md",
         "docs/releases/POLAR_STUDY_V2.0.0.md",
+        "docs/releases/HUMAN_ACTIVITY_STUDY_V3.0.0.md",
         "experiments/README.md",
         "output/pdf/README.md",
         "results/README.md",
         "results/vcoco_v2/README.md",
+        "results/vcoco_v3/README.md",
+        "results/okutama_cptr/README.md",
     )
     stale_markers = (
         "0.9.0-review",
@@ -498,23 +615,34 @@ def validate_study_report_release(repository: Path) -> None:
         repository / "output/pdf/vcoco_v2_external_transfer_v2.0.0.pdf",
         "V-COCO Study Report v2.0.0",
     )
+    validate_current_pdf(
+        repository / "output/pdf/vcoco_v3_motion_identifiability_v3.0.0.pdf",
+        title="When a Still Image Is Not Enough",
+        text_marker="0.7854 macro-F1",
+    )
+    validate_current_pdf(
+        repository / "output/pdf/okutama_cptr_development_v3.0.0.pdf",
+        title="Camera-Compensated Part-Trajectory Residual Development",
+        text_marker="0.7144 for the new component",
+    )
 
     zenodo = read_json(repository / ".zenodo.json")
     if (
-        zenodo.get("title") != "Improving Person-Level External Transfer on V-COCO"
-        or zenodo.get("version") != "2.0.0"
+        zenodo.get("title") != "Human Activity Classification Under Domain and Temporal Shift"
+        or zenodo.get("version") != "3.0.0"
         or zenodo.get("publication_date") != "2026-08-24"
         or zenodo.get("license") != "MIT"
         or zenodo.get("upload_type") != "software"
         or zenodo.get("creators") != [{"name": "Huseyinli, Abdulla"}]
     ):
-        raise RuntimeError("Zenodo metadata does not match the v2.0.0 study release")
+        raise RuntimeError("Zenodo metadata does not match the v3.0.0 study release")
 
     citation = (repository / "CITATION.cff").read_text(encoding="utf-8")
     for marker in (
         "date-released: 2026-08-24",
-        'title: "Improving Person-Level External Transfer on V-COCO"',
-        "  version: 2.0.0",
+        'title: "Human Activity Classification Under Domain and Temporal Shift"',
+        '  title: "When a Still Image Is Not Enough: Motion Identifiability and Budgeted Temporal Inference"',
+        "version: 3.0.0",
     ):
         if marker not in citation:
             raise RuntimeError(f"Citation metadata is missing: {marker}")
@@ -546,22 +674,63 @@ def validate_study_report_release(repository: Path) -> None:
 
     sys.path.insert(0, str(repository / "tools"))
     from build_readme import build_readme
-    from build_study_release_manifest import build_manifest, checksum_text, encoded_manifest
+    from build_study_release_manifest import checksum_text as historical_checksum_text
+    from build_v3_release_manifest import (
+        build_manifest as build_v3_manifest,
+    )
+    from build_v3_release_manifest import (
+        checksum_text as v3_checksum_text,
+    )
+    from build_v3_release_manifest import (
+        encoded_manifest as encode_v3_manifest,
+    )
 
     if (repository / "README.md").read_text(encoding="utf-8") != build_readme(repository):
         raise RuntimeError("README is stale relative to locked evidence")
 
     manifest_path = repository / "results/polar_study_v2.0.0_manifest.json"
-    if manifest_path.read_bytes() != encoded_manifest(build_manifest(repository)):
-        raise RuntimeError("Study v2.0.0 release manifest is stale")
+    release_manifest = read_json(manifest_path)
+    if (
+        release_manifest.get("release_id") != "polar-study-v2.0.0"
+        or release_manifest.get("report_version") != "2.0.0"
+    ):
+        raise RuntimeError("Study v2.0.0 release manifest identity changed")
+    for relative, evidence in release_manifest.get("artifacts", {}).items():
+        blob = subprocess.run(
+            ["git", "show", f"polar-study-v2.0.0:{relative}"],
+            cwd=repository,
+            check=True,
+            capture_output=True,
+        ).stdout
+        if hashlib.sha256(blob).hexdigest() != evidence.get("sha256"):
+            raise RuntimeError(f"Tagged v2.0.0 artifact hash differs: {relative}")
+        if len(blob) != int(evidence.get("size_bytes", -1)):
+            raise RuntimeError(f"Tagged v2.0.0 artifact size differs: {relative}")
     checksums_path = repository / "release/POLAR_STUDY_V2.0.0_SHA256SUMS.txt"
-    if checksums_path.read_text(encoding="utf-8") != checksum_text(repository, manifest_path):
+    if checksums_path.read_text(encoding="utf-8") != historical_checksum_text(
+        repository, manifest_path
+    ):
         raise RuntimeError("Study v2.0.0 release checksums are stale")
 
-    notebook_text = (repository / "human_activity_classification.ipynb").read_text(
-        encoding="utf-8"
-    )
-    for marker in ("0.8663 official-test macro-F1", "## 5. Person-level V-COCO study"):
+    v3_manifest_path = repository / "results/human_activity_study_v3.0.0_manifest.json"
+    expected_v3_manifest = encode_v3_manifest(build_v3_manifest(repository))
+    if v3_manifest_path.read_bytes() != expected_v3_manifest:
+        raise RuntimeError("Study v3.0.0 release manifest is stale")
+    v3_checksums_path = repository / "release/HUMAN_ACTIVITY_STUDY_V3.0.0_SHA256SUMS.txt"
+    if v3_checksums_path.read_text(encoding="utf-8") != v3_checksum_text(
+        repository, v3_manifest_path
+    ):
+        raise RuntimeError("Study v3.0.0 release checksums are stale")
+
+    notebook_text = (repository / "human_activity_classification.ipynb").read_text(encoding="utf-8")
+    for marker in (
+        "0.8663 official-test macro-F1",
+        "## 5. Person-level V-COCO study",
+        "## 6. Motion identifiability on Okutama-Action",
+        "## 7. CPTR architecture development",
+        "0.7854",
+        "0.7144",
+    ):
         if marker not in notebook_text:
             raise RuntimeError(f"Executed notebook is missing: {marker}")
 
@@ -650,9 +819,7 @@ def validate_vcoco_v2_release(repository: Path) -> None:
     }:
         raise RuntimeError("V-COCO v2 per-class evidence is incomplete")
 
-    report = (repository / "docs" / "VCOCO_V2_EXTERNAL_TRANSFER.md").read_text(
-        encoding="utf-8"
-    )
+    report = (repository / "docs" / "VCOCO_V2_EXTERNAL_TRANSFER.md").read_text(encoding="utf-8")
     for marker in (
         "version: 2.0.0",
         "status: Independent technical report",
@@ -663,12 +830,365 @@ def validate_vcoco_v2_release(repository: Path) -> None:
             raise RuntimeError(f"V-COCO v2 report is missing: {marker}")
 
 
+def validate_vcoco_v3_evidence(repository: Path) -> None:
+    results = repository / "results" / "vcoco_v3"
+    manifest = read_json(results / "evidence_manifest.json")
+    summary = read_json(results / "confirmation_summary.json")
+    lineage = read_json(results / "protocol_lineage.json")
+    annotation = read_json(results / "annotation_summary.json")
+    dataset = read_json(results / "okutama_dataset_summary.json")
+
+    if manifest.get("status") != "VCOCO_V3_PORTABLE_EVIDENCE_COMPLETE":
+        raise RuntimeError("V-COCO v3 evidence export is incomplete")
+    if manifest.get("exporter_sha256") != sha256_file(
+        repository / "tools" / "export_vcoco_v3_results.py"
+    ):
+        raise RuntimeError("V-COCO v3 exporter changed after evidence generation")
+    if summary.get("status") != "VCOCO_V3_TEMPORAL_CONFIRMATION_COMPLETE":
+        raise RuntimeError("V-COCO v3 confirmation is incomplete")
+    if lineage.get("status") != "VCOCO_V3_PORTABLE_PROTOCOL_LINEAGE_COMPLETE":
+        raise RuntimeError("V-COCO v3 protocol lineage is incomplete")
+    if (
+        manifest.get("confirmation_open_number") != 1
+        or summary.get("confirmation_open_number") != 1
+        or lineage.get("confirmation_open_number") != 1
+        or manifest.get("confirmation_used_for_selection") is not False
+        or lineage.get("confirmation_used_for_selection") is not False
+    ):
+        raise RuntimeError("V-COCO v3 confirmation access contract changed")
+    if {
+        manifest.get("pipeline_lock_sha256"),
+        summary.get("pipeline_lock_sha256"),
+        lineage.get("pipeline_lock_sha256"),
+    } != {"9c2ff4715b87b9ee8854caa31f4f15ebf77306201911d839533aa3aab3be4068"}:
+        raise RuntimeError("V-COCO v3 pipeline lineage does not align")
+
+    artifact_names = {
+        path.name
+        for path in results.iterdir()
+        if path.is_file() and path.name != "evidence_manifest.json"
+    }
+    if set(manifest.get("artifacts", {})) != artifact_names:
+        raise RuntimeError("V-COCO v3 evidence inventory is incomplete")
+    for name, record in manifest["artifacts"].items():
+        path = results / name
+        if sha256_file(path) != record.get("sha256") or path.stat().st_size != record.get(
+            "size_bytes"
+        ):
+            raise RuntimeError(f"V-COCO v3 evidence artifact drift: {name}")
+
+    cuda = lineage.get("cuda", {})
+    if (
+        cuda.get("available") is not True
+        or cuda.get("cpu_fallback_permitted") is not False
+        or cuda.get("device") != "NVIDIA GeForce RTX 4060 Laptop GPU"
+        or cuda.get("torch_version") != "2.11.0+cu128"
+        or lineage.get("verified_cuda_temporal_runs") != 100
+        or lineage.get("spatial_cuda_logistic_fits") != 25380
+        or lineage.get("representation_cuda_logistic_fits") != 6750
+    ):
+        raise RuntimeError("V-COCO v3 CUDA provenance changed")
+
+    expected_families = {
+        "static",
+        "teacher",
+        "classification_student",
+        "routing_student",
+        "source_only_static",
+        "hybrid_budget_0",
+        "hybrid_budget_0.1",
+        "hybrid_budget_0.25",
+        "hybrid_budget_0.5",
+        "hybrid_budget_1",
+    }
+    metrics = pd.read_csv(results / "confirmation_metrics.csv").set_index("family")
+    if set(metrics.index) != expected_families or metrics.index.duplicated().any():
+        raise RuntimeError("Unexpected V-COCO v3 confirmation families")
+    expected_macro = {
+        "source_only_static": 0.5734824448414355,
+        "static": 0.7457893380602498,
+        "classification_student": 0.7456372774713865,
+        "hybrid_budget_0.5": 0.7817431178785431,
+        "teacher": 0.7854392126392127,
+    }
+    for family, expected in expected_macro.items():
+        if abs(float(metrics.loc[family, "macro_f1"]) - expected) > 1e-12:
+            raise RuntimeError(f"V-COCO v3 macro-F1 changed for {family}")
+    if (
+        abs(float(metrics.loc["hybrid_budget_1", "macro_f1"]) - expected_macro["teacher"]) > 1e-12
+        or abs(
+            float(metrics.loc["hybrid_budget_0", "macro_f1"])
+            - expected_macro["classification_student"]
+        )
+        > 1e-12
+    ):
+        raise RuntimeError("V-COCO v3 routing endpoints do not match their models")
+
+    uncertainty = read_json(results / "confirmation_uncertainty.json")
+    if set(uncertainty) != {
+        "classification_student",
+        "hybrid_budget_0.1",
+        "hybrid_budget_0.25",
+        "hybrid_budget_0.5",
+        "source_only_static",
+        "teacher",
+    }:
+        raise RuntimeError("V-COCO v3 paired uncertainty is incomplete")
+    teacher = uncertainty["teacher"]
+    half = uncertainty["hybrid_budget_0.5"]
+    student = uncertainty["classification_student"]
+    if (
+        teacher.get("resamples") != 10000
+        or teacher.get("clusters") != 5
+        or float(teacher["macro_f1"]["ci_95_low"]) <= 0.0
+        or float(half["macro_f1"]["ci_95_low"]) <= 0.0
+        or float(teacher["holm_adjusted_macro_p"]) >= 0.01
+        or float(half["holm_adjusted_macro_p"]) >= 0.01
+        or not (
+            float(student["macro_f1"]["ci_95_low"])
+            <= 0.0
+            <= float(student["macro_f1"]["ci_95_high"])
+        )
+    ):
+        raise RuntimeError("V-COCO v3 confirmation uncertainty changed")
+
+    routing = pd.read_csv(results / "confirmation_routing_curve.csv")
+    if (
+        list(routing["requested_clip_fraction"]) != [0.0, 0.1, 0.25, 0.5, 1.0]
+        or not routing["macro_f1"].is_monotonic_increasing
+    ):
+        raise RuntimeError("V-COCO v3 fixed-budget routing curve changed")
+    per_class = pd.read_csv(results / "confirmation_per_class.csv")
+    if set(per_class["family"]) != expected_families or set(per_class["class"]) != {
+        "sitting",
+        "standing",
+        "walking_running",
+    }:
+        raise RuntimeError("V-COCO v3 per-class evidence is incomplete")
+
+    deltas = pd.read_csv(results / "confirmation_subgroup_deltas.csv")
+    scenarios = deltas[deltas["family"].eq("teacher") & deltas["axis"].eq("scenario")]
+    if (
+        len(scenarios) != 5
+        or int((scenarios["macro_f1_delta_vs_static"] > 0.0).sum()) != 4
+        or float(
+            scenarios.loc[
+                scenarios["value"].astype(str).eq("1.9"), "macro_f1_delta_vs_static"
+            ].iloc[0]
+        )
+        >= 0.0
+    ):
+        raise RuntimeError("V-COCO v3 scenario evidence changed")
+
+    if (
+        annotation.get("status") != "VCOCO_V3_HUMAN_PILOT_AUDIT_COMPLETE"
+        or annotation.get("primary_task_presentations") != 130
+        or annotation.get("unique_content_rows") != 126
+        or annotation.get("human_pilot_labels_used_for_candidate_selection") is not False
+        or annotation.get("interrater_agreement_available") is not False
+    ):
+        raise RuntimeError("V-COCO v3 annotation audit changed")
+    if (
+        dataset.get("development", {}).get("samples") != 8339
+        or dataset.get("confirmation", {}).get("samples") != 1771
+        or dataset.get("confirmation", {}).get("scenarios") != 5
+        or dataset.get("confirmation", {}).get("open_number") != 1
+    ):
+        raise RuntimeError("Okutama dataset evidence changed")
+
+    source_metrics = pd.read_csv(results / "source_tag_development_metrics.csv").set_index(
+        ["stage", "family"]
+    )
+    dino2 = float(source_metrics.loc[("representations", "dinov2_base"), "macro_f1"])
+    dino3 = float(source_metrics.loc[("representations", "dinov3_base"), "macro_f1"])
+    nested = float(
+        source_metrics.loc[
+            ("nested_stacks", "dino_siglip_factorized_reliability_stack"), "macro_f1"
+        ]
+    )
+    if not (dino2 > dino3 and abs(nested - 0.8696815257533729) <= 1e-12):
+        raise RuntimeError("V-COCO v3 source-tag development evidence changed")
+
+    report = (repository / "docs/VCOCO_V3_MOTION_IDENTIFIABILITY.md").read_text(encoding="utf-8")
+    for marker in (
+        "status: Independent technical report",
+        "0.7854 macro-F1",
+        "0.0396 [0.0202, 0.0568]",
+        "All 100 temporal",
+        "# 8. Limitations and next measurements",
+    ):
+        if marker not in report:
+            raise RuntimeError(f"V-COCO v3 report is missing: {marker}")
+    runbook = (repository / "docs/VCOCO_V3_EXECUTION_RUNBOOK.md").read_text(encoding="utf-8")
+    if "features\\dinov3_base" in runbook or "--model-kind dinov3_base" in runbook:
+        raise RuntimeError("V-COCO v3 runbook still replays the rejected backbone")
+
+
+def validate_okutama_cptr_evidence(repository: Path) -> None:
+    results = repository / "results" / "okutama_cptr"
+    manifest = read_json(results / "evidence_manifest.json")
+    decision = read_json(results / "development_decision.json")
+    provenance = read_json(results / "provenance.json")
+    faithfulness = read_json(results / "faithfulness_summary.json")
+    uncertainty = read_json(results / "uncertainty.json")
+    if (
+        manifest.get("study") != "okutama_cptr_development"
+        or decision.get("status") != "OKUTAMA_CPTR_DEVELOPMENT_LOCKED_NO_PROMOTION"
+        or decision.get("promotion_passed") is not False
+        or provenance.get("status") != "OKUTAMA_CPTR_PORTABLE_EVIDENCE_COMPLETE"
+        or faithfulness.get("status") != "OKUTAMA_CPTR_FAITHFULNESS_COMPLETE"
+    ):
+        raise RuntimeError("CPTR portable evidence is incomplete")
+    if provenance.get("source_sha256", {}).get("exporter") != sha256_file(
+        repository / "tools" / "export_okutama_cptr_results.py"
+    ):
+        raise RuntimeError("CPTR exporter changed after evidence generation")
+    if any(
+        int(payload.get("calibration_samples_read", -1)) != 0
+        or int(payload.get("confirmation_samples_read", -1)) != 0
+        for payload in (decision, faithfulness)
+    ):
+        raise RuntimeError("Closed CPTR evaluation data entered development evidence")
+
+    artifact_names = {
+        path.name
+        for path in results.iterdir()
+        if path.is_file() and path.name != "evidence_manifest.json"
+    }
+    if (
+        int(manifest.get("artifact_count", -1)) != len(artifact_names)
+        or set(manifest.get("artifacts", {})) != artifact_names
+    ):
+        raise RuntimeError("CPTR portable evidence inventory is incomplete")
+    for name, record in manifest["artifacts"].items():
+        path = results / name
+        if sha256_file(path) != record.get("sha256") or path.stat().st_size != record.get(
+            "size_bytes"
+        ):
+            raise RuntimeError(f"CPTR portable artifact drift: {name}")
+
+    metrics = pd.read_csv(results / "headline_metrics.csv").set_index(["scope", "model"])
+    expected = {
+        ("development_validation", "v3_temporal_baseline"): 0.7806159956588115,
+        ("development_validation", "centre_short_parts"): 0.7886666661527836,
+        ("grouped_crossfit_oof", "v3_temporal_baseline"): 0.7164832120716224,
+        ("grouped_crossfit_oof", "centre_short_parts"): 0.7144451499106025,
+    }
+    if set(metrics.index) != set(expected):
+        raise RuntimeError("Unexpected CPTR headline model scopes")
+    for key, value in expected.items():
+        if abs(float(metrics.loc[key, "macro_f1"]) - value) > 1e-12:
+            raise RuntimeError(f"CPTR headline metric changed: {key}")
+
+    oof_uncertainty = uncertainty.get("crossfit_oof_cluster_bootstrap", {})
+    exact = uncertainty.get("crossfit_oof_exact_group_swap", {})
+    if (
+        oof_uncertainty.get("resamples") != 10000
+        or oof_uncertainty.get("clusters") != 11
+        or not (
+            float(oof_uncertainty["macro_f1"]["ci_95_low"])
+            < 0.0
+            < float(oof_uncertainty["macro_f1"]["ci_95_high"])
+        )
+        or exact.get("permutations") != 2048
+        or exact.get("recordings") != 11
+    ):
+        raise RuntimeError("CPTR grouped uncertainty changed")
+
+    components = pd.read_csv(results / "component_ablation.csv")
+    expected_components = {
+        "raw_trajectory",
+        "camera_compensated_trajectory",
+        "centre_short",
+        "dual_clock",
+        "dual_clock_specialized",
+        "centre_short_trajectory",
+        "centre_short_parts",
+        "integrated_cptr",
+        "counterfactual_original",
+        "counterfactual_refined",
+        "masked_initialisation",
+        "siglip_posture_specialist",
+        "group_dro",
+        "top_block_lora",
+    }
+    if set(components["component_id"]) != expected_components:
+        raise RuntimeError("CPTR component evidence is incomplete")
+    lineage_columns = {
+        "run_status",
+        "summary_sha256",
+        "request_payload_sha256",
+        "request_file_sha256",
+        "model_module_sha256",
+        "neural_module_sha256",
+        "feature_module_sha256",
+        "training_module_sha256",
+        "runner_sha256",
+        "grid_sha256",
+        "grid_lock_sha256",
+    }
+    if not lineage_columns.issubset(components.columns):
+        raise RuntimeError("CPTR component source lineage is incomplete")
+    if (
+        components[["summary_sha256", "request_payload_sha256", "request_file_sha256"]]
+        .isna()
+        .any()
+        .any()
+    ):
+        raise RuntimeError("CPTR component request lineage contains missing hashes")
+    if components["model_module_sha256"].dropna().nunique() < 2:
+        raise RuntimeError("CPTR sequential source revisions are no longer visible")
+    contract = provenance.get("crossfit_contract_audit", {})
+    if (
+        contract.get("status") != "VERIFIED_WITH_HISTORICAL_SCHEMA_LIMITATIONS"
+        or contract.get("requests_verified") != 25
+        or contract.get("candidate_grid_matches_adaptive_lock") is not True
+        or contract.get("historical_request_schema_omissions") != ["src/hac/cptr_training.py"]
+    ):
+        raise RuntimeError("CPTR cross-fit contract audit is incomplete")
+    fold_seed = pd.read_csv(results / "fold_seed_metrics.csv", dtype=str)
+    individual = fold_seed[
+        fold_seed["fold"].isin({"0", "1", "2", "3", "4"})
+        & fold_seed["seed"].isin({"42", "43", "44", "45", "46"})
+    ]
+    if len(individual) != 25 or len(fold_seed[fold_seed["seed"].eq("ensemble")]) != 5:
+        raise RuntimeError("CPTR fold/seed evidence is incomplete")
+
+    subgroups = pd.read_csv(results / "subgroup_metrics.csv").set_index(["scope", "subgroup"])
+    if (
+        float(subgroups.loc[("crossfit_oof", "window_occluded"), "macro_f1_delta"]) >= 0.0
+        or float(subgroups.loc[("crossfit_oof", "window_clear"), "macro_f1_delta"]) <= 0.0
+    ):
+        raise RuntimeError("CPTR visibility failure evidence changed")
+    motion_null = faithfulness["diagnostics"]["motion_null"]
+    if (
+        float(motion_null["macro_f1_delta_real_minus_intervention"]) < 0.04
+        or float(motion_null["mean_true_class_log_probability_gain_real_minus_intervention"]) < 0.10
+    ):
+        raise RuntimeError("CPTR temporal faithfulness evidence changed")
+
+    report = (repository / "docs" / "OKUTAMA_CPTR_DEVELOPMENT.md").read_text(encoding="utf-8")
+    for marker in (
+        "0.7887 on the fixed validation split",
+        "0.7144 for the new component and 0.7165",
+        "2,048-permutation recording-swap test",
+        "Calibration remains unopened",
+    ):
+        if marker not in report:
+            raise RuntimeError(f"CPTR development report is missing: {marker}")
+
+
 def main() -> None:
     args = parse_args()
     repository = args.repository.resolve()
     missing = sorted(
         name
-        for name in REQUIRED | POLAR_REQUIRED | VCOCO_V2_REQUIRED
+        for name in REQUIRED
+        | POLAR_REQUIRED
+        | VCOCO_V2_REQUIRED
+        | VCOCO_V3_REQUIRED
+        | V3_RELEASE_REQUIRED
+        | CPTR_REQUIRED
         if not (repository / name).is_file()
     )
     if missing:
@@ -688,15 +1208,17 @@ def main() -> None:
     for marker in (
         "cocodataset.org/#termsofuse",
         "facebookresearch/dinov2",
+        "facebookresearch/dinov3",
+        "Barekatain_Okutama-Action",
+        "google/siglip-base-patch16-224",
+        "google/siglip2-base-patch16-224",
         "pytorch/vision",
         "jacobgil/pytorch-grad-cam",
     ):
         if marker not in notices:
             raise RuntimeError(f"Third-party notice is missing: {marker}")
 
-    windows_user_path = re.compile(
-        r"[A-Za-z]:\\" + "Users" + r"\\", flags=re.IGNORECASE
-    )
+    windows_user_path = re.compile(r"[A-Za-z]:[\\/]+" + "Users" + r"[\\/]", flags=re.IGNORECASE)
     local_file_scheme = "file" + "://"
     oversized = []
     for path, relative in included_files(repository):
@@ -744,13 +1266,13 @@ def main() -> None:
     )
     if protocol.development_rows != 242 or protocol.test_rows != 43:
         raise RuntimeError("Tracked manifest no longer matches the fixed protocol")
-    expected_test_ids = set(
-        manifest.loc[manifest["split"].eq("test"), "image_id"].astype(str)
-    )
+    expected_test_ids = set(manifest.loc[manifest["split"].eq("test"), "image_id"].astype(str))
     validate_faithfulness(repository, expected_test_ids)
     validate_polar_release(repository)
     validate_study_report_release(repository)
     validate_vcoco_v2_release(repository)
+    validate_vcoco_v3_evidence(repository)
+    validate_okutama_cptr_evidence(repository)
     print("Repository validation passed")
 
 

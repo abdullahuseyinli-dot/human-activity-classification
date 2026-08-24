@@ -1,0 +1,121 @@
+{
+  "calibration_samples_read": 0,
+  "candidate_id": "centre_short_parts",
+  "confirmation_samples_read": 0,
+  "decision": {
+    "calibration_opened": false,
+    "default_model": "v3_temporal_8f_050s_five_seed_ensemble",
+    "reason": "the grouped cross-fit and preregistered aggregate gain gates did not pass",
+    "research_component": "centre_short_parts_five_seed_ensemble",
+    "research_component_status": "exploratory_not_promoted"
+  },
+  "development_validation": {
+    "baseline_metrics": {
+      "accuracy": 0.7780187997107737,
+      "adaptive_ece": 0.04583193672872694,
+      "balanced_accuracy": 0.7924257804492943,
+      "brier_score": 0.31559080390287514,
+      "classwise_ece": 0.05972666717778027,
+      "ece": 0.046653138790165395,
+      "log_loss": 0.563196080391679,
+      "macro_f1": 0.7806159956588115,
+      "sitting_f1": 0.8232445520581114,
+      "standing_f1": 0.7023060796645703,
+      "walking_running_f1": 0.8162973552537527,
+      "weighted_f1": 0.77498375048585,
+      "worst_class_f1": 0.7023060796645703
+    },
+    "candidate_metrics": {
+      "accuracy": 0.7866955892986262,
+      "adaptive_ece": 0.0483058269266667,
+      "balanced_accuracy": 0.800404942572225,
+      "brier_score": 0.30981007995915494,
+      "classwise_ece": 0.05685034863291407,
+      "ece": 0.042491978274627897,
+      "log_loss": 0.5575517580006192,
+      "macro_f1": 0.7886666661527836,
+      "sitting_f1": 0.8203883495145631,
+      "standing_f1": 0.7243133265513734,
+      "walking_running_f1": 0.8212983223924143,
+      "weighted_f1": 0.7851964224416701,
+      "worst_class_f1": 0.7243133265513734
+    },
+    "macro_f1_delta": 0.008050670493972123,
+    "per_class_f1_delta": {
+      "sitting": -0.0028562025435483474,
+      "standing": 0.02200724688680311,
+      "walking_running": 0.005000967138661605
+    },
+    "recordings": 3,
+    "samples": 1383
+  },
+  "fixed_epochs": {
+    "42": 2,
+    "43": 0,
+    "44": 1,
+    "45": 9,
+    "46": 1
+  },
+  "folds": 5,
+  "grouped_crossfit_oof": {
+    "baseline_metrics": {
+      "accuracy": 0.7130801687763713,
+      "adaptive_ece": 0.0819658461328286,
+      "balanced_accuracy": 0.7271250825437662,
+      "brier_score": 0.4090997564047117,
+      "classwise_ece": 0.07532260170540972,
+      "ece": 0.08212578680833203,
+      "log_loss": 0.7538910813078614,
+      "macro_f1": 0.7164832120716224,
+      "sitting_f1": 0.7367741935483871,
+      "standing_f1": 0.6766683911019141,
+      "walking_running_f1": 0.7360070515645659,
+      "weighted_f1": 0.7108681725925403,
+      "worst_class_f1": 0.6766683911019141
+    },
+    "candidate_metrics": {
+      "accuracy": 0.7122764717701426,
+      "adaptive_ece": 0.0740255891459902,
+      "balanced_accuracy": 0.7259082761612593,
+      "brier_score": 0.41009571317420634,
+      "classwise_ece": 0.07412675249956167,
+      "ece": 0.07452320257758478,
+      "log_loss": 0.7503436755089129,
+      "macro_f1": 0.7144451499106025,
+      "sitting_f1": 0.7294871794871794,
+      "standing_f1": 0.6772867420349434,
+      "walking_running_f1": 0.7365615282096846,
+      "weighted_f1": 0.7102933809160498,
+      "worst_class_f1": 0.6772867420349434
+    },
+    "macro_f1_delta": -0.0020380621610198713,
+    "recordings": 11,
+    "samples": 4977
+  },
+  "promotion_checks": {
+    "crossfit_oof_macro_f1_nonnegative": false,
+    "validation_cluster_interval_lower_bound_above_zero": true,
+    "validation_macro_f1_gain_at_least_0_01": false,
+    "validation_per_class_regression_within_0_01": true,
+    "worst_recording_delta_at_least_minus_0_01": false
+  },
+  "promotion_passed": false,
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "source_sha256": {
+    "crossfit_plan_lock": "82dd2a61ecf83606b9d794e11aa48a732325913b02d23a902ecd0e64ee41effb",
+    "development_summary": "4bfde80da8f0ab0ad3ebc95482e31d9df9fbfa5104b69c4831b72ab8468961c4",
+    "faithfulness_summary": "87ac0c7f51d732c617df3d7e62c8ddc21f1f2cace4ef967279e19c3059971852",
+    "locker": "ae485eaa0a5dae69287746e2ea05dceeef9795b5f71e7e5ae4e55836dd4b974a",
+    "protocol": "0bcb58909c04708447607fabccf7efbc8617c09e2d9fdfb7f3545e38e15954c8",
+    "protocol_lock": "42cd47a0e3d1fa6fc4dc5124832f3870c407b4cdd45555d5e27bca12d4fc18c2"
+  },
+  "status": "OKUTAMA_CPTR_DEVELOPMENT_LOCKED_NO_PROMOTION",
+  "validation_samples_read": 1383,
+  "worst_recording_macro_f1_delta": -0.013636202120757779
+}

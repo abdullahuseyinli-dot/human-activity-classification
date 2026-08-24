@@ -1,0 +1,110 @@
+{
+  "grid_version": "1.2.0-adaptive-2",
+  "status": "DECLARED_AFTER_INTEGRATION_SCREEN_BEFORE_STAGE2_FITTING",
+  "base_adaptive_grid_lock": ".runs/cptr/adaptive_grid_lock.json",
+  "selection_rationale": "Confidence-masked part tokens passed the incremental screen on the centre-conditioned short branch. Joint in-model integration with the trajectory branch did not pass, so trajectory predictions remain a separate router input and stage-two interventions are evaluated on the passing centre-short-plus-parts branch.",
+  "screen_evidence": [
+    {
+      "candidate_id": "dual_clock_specialized",
+      "summary": ".runs/cptr/adaptive/dual_clock_specialized/seed-42/summary.json",
+      "summary_sha256": "7b824200b1e63a11b7697497fda43af944901cfcc67f90f3f42af9703a0597de"
+    },
+    {
+      "candidate_id": "centre_short_trajectory",
+      "summary": ".runs/cptr/adaptive/centre_short_trajectory/seed-42/summary.json",
+      "summary_sha256": "bfb148b6c3ff9d301b5382f48bc9354e0563fa28012b2ee5dee19a0ee05c5f56"
+    },
+    {
+      "candidate_id": "centre_short_parts",
+      "summary": ".runs/cptr/adaptive/centre_short_parts/seed-42/summary.json",
+      "summary_sha256": "7031caf3fa2da07243f97a50f7878d04027320332f61ef62eded845213f72ced"
+    },
+    {
+      "candidate_id": "cptr_integrated",
+      "summary": ".runs/cptr/adaptive/cptr_integrated/seed-42/summary.json",
+      "summary_sha256": "b2ce03eb65262b1690ca859c64e298296eab7cc01a03836d51cdad32506631c7"
+    }
+  ],
+  "candidates": [
+    {
+      "candidate_id": "centre_short_parts_counterfactual",
+      "stage": "motion_null_and_invariance_training",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": false,
+      "use_compensated_trajectory": false,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": false,
+      "use_counterfactuals": true,
+      "use_masked_initialisation": false,
+      "group_objective": "erm",
+      "expert_roles": {
+        "centre_short": "both",
+        "parts": "both"
+      }
+    },
+    {
+      "candidate_id": "centre_short_parts_masked",
+      "stage": "target_video_masked_adaptation",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": false,
+      "use_compensated_trajectory": false,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": false,
+      "use_counterfactuals": true,
+      "use_masked_initialisation": true,
+      "group_objective": "erm",
+      "expert_roles": {
+        "centre_short": "both",
+        "parts": "both"
+      }
+    },
+    {
+      "candidate_id": "centre_short_parts_group_robust",
+      "stage": "group_robust_objective",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": false,
+      "use_compensated_trajectory": false,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": false,
+      "use_counterfactuals": true,
+      "use_masked_initialisation": true,
+      "group_objective": "group_dro",
+      "expert_roles": {
+        "centre_short": "both",
+        "parts": "both"
+      }
+    },
+    {
+      "candidate_id": "centre_short_parts_siglip",
+      "stage": "centre_siglip_specialist",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": false,
+      "use_compensated_trajectory": false,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": true,
+      "use_counterfactuals": true,
+      "use_masked_initialisation": true,
+      "group_objective": "erm",
+      "expert_roles": {
+        "centre_short": "both",
+        "parts": "both",
+        "siglip": "posture"
+      }
+    }
+  ],
+  "selection_policy": {
+    "screen_seed": 42,
+    "minimum_incremental_macro_f1_gain": 0.003,
+    "maximum_per_class_f1_regression": 0.01,
+    "failed_components_remain_in_evidence": true,
+    "trajectory_retained_for_cross_fitted_routing_only": true
+  }
+}

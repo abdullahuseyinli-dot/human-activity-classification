@@ -1,0 +1,21 @@
+{
+  "base_protocol_lock_sha256": "c759576ba16e360a94317d416131fa8c4ac29836242976d8befa07b3fe95c9a9",
+  "confirmation_open_number": 1,
+  "confirmation_used_for_selection": false,
+  "cuda": {
+    "available": true,
+    "cpu_fallback_permitted": false,
+    "cuda_runtime": "12.8",
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "torch_version": "2.11.0+cu128"
+  },
+  "external_cuda_amendment_sha256": "c6b4d7c414104a29e515a016274f57d3186a1c2a848c38444ca1071de3a81b38",
+  "external_cuda_amendment_version": "3.0.0-external-cuda-1",
+  "pipeline_lock_sha256": "9c2ff4715b87b9ee8854caa31f4f15ebf77306201911d839533aa3aab3be4068",
+  "protocol_version": "3.0.0-dev.2",
+  "repository_revision_at_cuda_lock": "11b7b9160785466841588b91ac815943dd94dad5",
+  "representation_cuda_logistic_fits": 6750,
+  "spatial_cuda_logistic_fits": 25380,
+  "status": "VCOCO_V3_PORTABLE_PROTOCOL_LINEAGE_COMPLETE",
+  "verified_cuda_temporal_runs": 100
+}

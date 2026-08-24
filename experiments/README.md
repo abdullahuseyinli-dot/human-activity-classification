@@ -1,6 +1,6 @@
 # Experiment runners
 
-The repository contains two versioned experiment sequences. Each sequence separates
+The repository contains four versioned experiment sequences. Each sequence separates
 data preparation, development-only model selection, final fitting, test access, and
 portable evidence export.
 
@@ -54,6 +54,64 @@ portable evidence export.
     locked evaluation.
 13. `tools/export_vcoco_v2_results.py` creates the path-sanitized evidence package, and
     `tools/render_vcoco_v2_figures.py` renders the tracked figures from that package.
+
+## Motion-identifiability and temporal extension
+
+1. `tools/finalize_vcoco_v3_pilot.py` freezes the fixed 130-presentation annotation
+   prefix; the resulting descriptive labels are excluded from model selection.
+2. `evaluate_vcoco_v3_nested_stacks.py` compares factorized DINO and DINO/SigLIP
+   probability stacks under nested image-grouped cross-validation.
+3. `run_vcoco_v3_feature_queue.py`, `evaluate_vcoco_v3_spatial.py`, and
+   `evaluate_vcoco_v3_representations.py` run the locked spatial and matched frozen
+   representation screens.
+4. `lock_vcoco_v3_neural.py` applies the predeclared promotion gate. The recorded run
+   stops neural adaptation when no spatial family qualifies.
+5. `audit_okutama_development.py` and `build_vcoco_v3_temporal_split.py` audit the
+   provider train archive and create scenario-grouped train, validation, and
+   calibration partitions.
+6. `cache_okutama_temporal_features.py` extracts revision-bound DINOv2-B frame features
+   on CUDA; the source-only and few-shot runners then measure the target-domain gap.
+7. `run_vcoco_v3_temporal_queue.py` trains the matched static and short-clip candidates,
+   recording-grouped cross-fits, and static students on CUDA.
+8. `finalize_vcoco_v3_temporal_development.py` fixes the classification student and
+   validates the temporal-benefit router before calibration data is read.
+9. `calibrate_vcoco_v3_temporal_pipeline.py` binds the final five-seed models,
+   temperatures, routing budgets, prediction-set thresholds, and artifact hashes.
+10. `audit_okutama_confirmation.py` opens the provider test archive once;
+    `evaluate_vcoco_v3_temporal_confirmation.py` evaluates the locked pipeline without
+    changing it.
+11. `tools/export_vcoco_v3_results.py` writes the path-sanitized evidence package, and
+    `tools/render_vcoco_v3_figures.py` renders figures only from that package.
+
+## Okutama CPTR architecture study
+
+1. `tools/lock_okutama_cptr_protocol.py` binds the data boundary, architecture,
+   execution order, regularization, counterfactuals, and promotion gates.
+2. `audit_okutama_cptr_baseline.py` replays the frozen five-seed baseline and its
+   temporal interventions before fitting a new component.
+3. `cache_okutama_cptr_motion.py` builds raw and camera-compensated person trajectories;
+   `cache_okutama_cptr_parts.py` and `cache_okutama_cptr_siglip.py` build the frozen
+   part-region and center-frame specialist stores on CUDA.
+4. `train_okutama_cptr_candidate.py` executes the locked raw trajectory, compensated
+   trajectory, center-conditioned, dual-clock, part, counterfactual, masked,
+   specialist, GroupDRO, and integrated screens. Each grid is hash-locked before its
+   first fit.
+5. `fit_okutama_cptr_router.py` evaluates the continuous utility router and required
+   confidence heuristics; `pretrain_okutama_cptr_masked.py` evaluates label-free target
+   video adaptation.
+6. `train_okutama_cptr_lora_specialist.py` trains the declared top-block DINOv2 LoRA
+   control with CUDA automatic mixed precision.
+7. The center-and-parts component is rerun with five seeds. Its fixed epoch counts are
+   recorded in `okutama_cptr_crossfit_plan.json` and bound by
+   `lock_okutama_cptr_crossfit_plan.py`.
+8. `crossfit_okutama_cptr.py` runs all 25 recording-grouped fold/seed fits on CUDA.
+   `finalize_okutama_cptr_development.py` aggregates OOF predictions, exact group-swap
+   tests, paired cluster intervals, class metrics, and visibility/transition subgroups.
+9. `evaluate_okutama_cptr_faithfulness.py` measures temporal and modality interventions,
+   learned gates, reliability, and cached-feature inference latency.
+10. `lock_okutama_cptr_development.py` fixes the development decision before any
+    calibration row can be opened. `export_okutama_cptr_results.py` produces the
+    path-sanitized package in `results/okutama_cptr`.
 
 The commands remain explicit so each gate has a visible input and output. Long-running
 jobs resume only when the recorded implementation and artifact hashes still match.

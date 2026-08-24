@@ -1,0 +1,107 @@
+{
+  "nested_stacks": {
+    "best_family": "dino_siglip_factorized_reliability_stack",
+    "best_macro_f1": 0.8696815257533729,
+    "decisions": {
+      "dino_factorized_probability_stack": {
+        "general_candidate": false,
+        "holm_adjusted_locomotion_p": 0.38236176382361764,
+        "holm_adjusted_macro_p": 0.42015798420157985,
+        "locomotion_specialist": false
+      },
+      "dino_siglip_factorized_reliability_stack": {
+        "general_candidate": true,
+        "holm_adjusted_locomotion_p": 0.0005999400059994001,
+        "holm_adjusted_macro_p": 0.0005999400059994001,
+        "locomotion_specialist": true
+      },
+      "dino_siglip_linear_svm_control": {
+        "general_candidate": false,
+        "holm_adjusted_locomotion_p": 0.0943905609439056,
+        "holm_adjusted_macro_p": 0.039996000399960006,
+        "locomotion_specialist": false
+      }
+    }
+  },
+  "neural_adaptation": {
+    "reason": "No declared spatial multiview family passed the promotion gate",
+    "status": "VCOCO_V3_NEURAL_STAGE_NOT_ELIGIBLE"
+  },
+  "representations": {
+    "best_family": "dinov2_base",
+    "best_macro_f1": 0.8394947059879568,
+    "decisions": {
+      "dinov2_base": {
+        "general_candidate": false,
+        "locomotion_specialist": false,
+        "role": "reference"
+      },
+      "dinov3_base": {
+        "general_candidate": false,
+        "holm_adjusted_locomotion_p": 0.9477052294770523,
+        "holm_adjusted_macro_p": 1.0,
+        "locomotion_specialist": false,
+        "role": "challenger"
+      },
+      "siglip2_base": {
+        "general_candidate": false,
+        "holm_adjusted_locomotion_p": 0.3595640435956404,
+        "holm_adjusted_macro_p": 1.0,
+        "locomotion_specialist": false,
+        "role": "challenger"
+      }
+    }
+  },
+  "spatial": {
+    "best_family": "multiresolution_224_336_reliability",
+    "best_macro_f1": 0.8420872028141894,
+    "decisions": {
+      "adaptive_context25_50_reliability": {
+        "general_candidate": false,
+        "holm_adjusted_macro_p": 0.251974802519748,
+        "locomotion_specialist": false
+      },
+      "box_augmentation_invariant_factorized": {
+        "general_candidate": false,
+        "holm_adjusted_macro_p": 0.06079392060793921,
+        "locomotion_specialist": false
+      },
+      "multiresolution_224_336_448_reliability": {
+        "general_candidate": false,
+        "holm_adjusted_macro_p": 0.49435056494350565,
+        "locomotion_specialist": false
+      },
+      "multiresolution_224_336_reliability": {
+        "general_candidate": false,
+        "holm_adjusted_macro_p": 0.16918308169183083,
+        "locomotion_specialist": false
+      },
+      "tight_basic_geometry": {
+        "general_candidate": false,
+        "holm_adjusted_macro_p": 0.007199280071992801,
+        "locomotion_specialist": false
+      },
+      "tight_blurred_context_boundary_geometry": {
+        "general_candidate": false,
+        "holm_adjusted_macro_p": 0.9131086891310869,
+        "locomotion_specialist": false
+      },
+      "tight_context50_boundary_geometry": {
+        "general_candidate": false,
+        "holm_adjusted_macro_p": 1.0,
+        "locomotion_specialist": false
+      },
+      "tight_masked_context_boundary_geometry": {
+        "general_candidate": false,
+        "holm_adjusted_macro_p": 1.0,
+        "locomotion_specialist": false
+      },
+      "tight_no_geometry": {
+        "general_candidate": false,
+        "holm_adjusted_macro_p": 0.1455854414558544,
+        "locomotion_specialist": false
+      }
+    }
+  },
+  "status": "VCOCO_V3_SOURCE_TAG_DEVELOPMENT_EXPORTED"
+}

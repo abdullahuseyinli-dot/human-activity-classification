@@ -1,0 +1,23 @@
+{
+  "mapping_version": "1.0.0",
+  "status": "DECLARED_BEFORE_POLIMI_LABEL_USE",
+  "dataset": "POLIMI-ITW-S",
+  "provider_labels_are_immutable": true,
+  "target_mapping": {
+    "A6_running": "walking_running",
+    "A8_sitting": "sitting",
+    "A16_standing": "standing",
+    "A27_walking": "walking_running"
+  },
+  "provider_label_column": "provider_label",
+  "mapped_label_column": "label",
+  "ambiguous_or_multilabel_policy": "preserve_provider_record_and_quarantine_from_primary_three_class_endpoint",
+  "modifier_policy": "retain_modifiers_as_separate_metadata; do_not_change_the_primary_activity_mapping",
+  "walking_running_reporting": {
+    "primary_combined_class": true,
+    "secondary_gait_breakdown": [
+      "walking",
+      "running"
+    ]
+  }
+}

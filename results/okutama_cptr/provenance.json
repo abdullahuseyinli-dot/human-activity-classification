@@ -1,0 +1,79 @@
+{
+  "camera_compensation": {
+    "estimator": "background_dominant_sparse_lucas_kanade_with_ransac_partial_affine",
+    "fallback": "phase_correlation_translation",
+    "maximum_corners": 400,
+    "minimum_inliers": 12,
+    "person_motion_policy": "robust_background_consensus_without_label_use",
+    "unreliable_estimate_policy": "preserve_raw_path_and_expose_quality_mask",
+    "working_resolution": [
+      320,
+      180
+    ]
+  },
+  "candidate_id": "centre_short_parts",
+  "crossfit_contract_audit": {
+    "candidate_grid_matches_adaptive_lock": true,
+    "historical_plan_lock_schema_omissions": [
+      "candidate_grid",
+      "candidate_grid_lock",
+      "src/hac/cptr_training.py"
+    ],
+    "historical_request_schema_omissions": [
+      "src/hac/cptr_training.py"
+    ],
+    "requests_verified": 25,
+    "scope": "Contract-completeness audit; reported metrics are unchanged.",
+    "shared_source_sha256": {
+      "candidate_grid": "d6c34b51d69d72a8c5f7092b0102d6b1f710494ff05d3e8e27bf7c0ea6fc1384",
+      "feature_module": "7e166996157730ea04229f7f67b3333eaa8f398b6a9a8c9c308ce0ba8f6866ae",
+      "model_module": "3648761dedad36c1562642d91009b87e25a01cdf0d0b0a5da65e03a20d7fed05",
+      "plan": "71a8f6c1a9123f0dc29ff81fe175be52e19fbe346a0647291f1643b3acf26a96",
+      "runner": "653fccc1a6fa09ac1409b27b324c5563f976af847e6cc4a2d24319641833050a"
+    },
+    "status": "VERIFIED_WITH_HISTORICAL_SCHEMA_LIMITATIONS"
+  },
+  "crossfit_folds": 5,
+  "dataset": "Okutama-Action provider train",
+  "development_samples": {
+    "calibration_read": 0,
+    "confirmation_read": 0,
+    "train": 4977,
+    "validation": 1383
+  },
+  "frozen_frame_backbone": {
+    "model_id": "facebook/dinov2-base",
+    "revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415"
+  },
+  "motion_feature_runtime_seconds": 209.85996379994322,
+  "part_feature_runtime_seconds": 461.89420410001185,
+  "portable_protocol_normalization": {
+    "field": "input.raw_development_archive",
+    "method_configuration_changed": false,
+    "reason": "replace the machine-local archive location with a runtime path"
+  },
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "siglip_control": {
+    "model_id": "google/siglip-base-patch16-224",
+    "revision": "7fd15f0689c79d79e38b1c2e2e2370a7bf2761ed"
+  },
+  "siglip_feature_runtime_seconds": 28.67075360007584,
+  "source_sha256": {
+    "crossfit_plan_lock": "82dd2a61ecf83606b9d794e11aa48a732325913b02d23a902ecd0e64ee41effb",
+    "development_lock": "93a8b3a5b35eb16b56fe33677c062b755243ff6758b3b8ac973b6dcfabe9e49d",
+    "execution_protocol": "0bcb58909c04708447607fabccf7efbc8617c09e2d9fdfb7f3545e38e15954c8",
+    "exporter": "0b85b704e11f811819e333eb60b293178b295f78a5050f4d876d37bcecb1075e",
+    "portable_protocol": "23513ef39bc80508900b0b925c480882370107f31dd838fc8e5ecc11bc73f0c9",
+    "protocol_lock": "42cd47a0e3d1fa6fc4dc5124832f3870c407b4cdd45555d5e27bca12d4fc18c2",
+    "tested_top_level_dependency_snapshot": "2b57c7772b4cd3660f8ba9c5116e7c1f94c5af2f6a537d384c0241a818f26a1b"
+  },
+  "status": "OKUTAMA_CPTR_PORTABLE_EVIDENCE_COMPLETE",
+  "torch_version": "2.11.0+cu128",
+  "training_device": "NVIDIA GeForce RTX 4060 Laptop GPU"
+}

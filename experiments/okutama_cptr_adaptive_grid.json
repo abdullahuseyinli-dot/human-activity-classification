@@ -1,0 +1,187 @@
+{
+  "grid_version": "1.1.0-adaptive-1",
+  "status": "DECLARED_AFTER_COMPONENT_SCREENS_BEFORE_ADAPTIVE_FITTING",
+  "base_grid_lock": ".runs/cptr/grid_lock.json",
+  "adaptation_reason": "The long clock improved the occluded-window subgroup but reduced overall and transition performance when allowed to modify both factorized heads. The adaptive candidates isolate head roles and integrate only the short-clock and compensated-trajectory components that passed their same-seed baseline screens.",
+  "screen_evidence": [
+    {
+      "candidate_id": "trajectory_raw",
+      "summary": ".runs/cptr/candidates/trajectory_raw/seed-42-v3/summary.json",
+      "summary_sha256": "0e75156e4ab7deb574bce243dbc16cd30e0b1b543610a36a00777b08d51303db"
+    },
+    {
+      "candidate_id": "trajectory_compensated",
+      "summary": ".runs/cptr/candidates/trajectory_compensated/seed-42-v2/summary.json",
+      "summary_sha256": "5694a4fdfeb6977433efd2470e08b41e7f18a3f3baffa5ff1fc8130e938f116c"
+    },
+    {
+      "candidate_id": "centre_short",
+      "summary": ".runs/cptr/candidates/centre_short/seed-42-v1/summary.json",
+      "summary_sha256": "ed4dd9ad78839af7b63e4204cd7521981888a62fee6da2d5865e24fdcba31b06"
+    },
+    {
+      "candidate_id": "dual_clock",
+      "summary": ".runs/cptr/candidates/dual_clock/seed-42-v1/summary.json",
+      "summary_sha256": "5961b9273c3d43931300c5746c67c84dc87042ddba6f00b08b710e21dd45ebf0"
+    }
+  ],
+  "candidates": [
+    {
+      "candidate_id": "dual_clock_specialized",
+      "stage": "dual_clock_head_specialization",
+      "use_short": true,
+      "use_long": true,
+      "use_trajectory": false,
+      "use_compensated_trajectory": false,
+      "use_parts": false,
+      "use_pose": false,
+      "use_siglip": false,
+      "use_counterfactuals": false,
+      "use_masked_initialisation": false,
+      "group_objective": "erm",
+      "expert_roles": {
+        "centre_short": "posture",
+        "centre_long": "motion"
+      }
+    },
+    {
+      "candidate_id": "centre_short_trajectory",
+      "stage": "passing_motion_component_integration",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": true,
+      "use_compensated_trajectory": true,
+      "use_parts": false,
+      "use_pose": false,
+      "use_siglip": false,
+      "use_counterfactuals": false,
+      "use_masked_initialisation": false,
+      "group_objective": "erm",
+      "expert_roles": {
+        "centre_short": "both",
+        "trajectory": "motion"
+      }
+    },
+    {
+      "candidate_id": "centre_short_parts",
+      "stage": "confidence_masked_part_articulation_ablation",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": false,
+      "use_compensated_trajectory": false,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": false,
+      "use_counterfactuals": false,
+      "use_masked_initialisation": false,
+      "group_objective": "erm",
+      "expert_roles": {
+        "centre_short": "both",
+        "parts": "both"
+      }
+    },
+    {
+      "candidate_id": "cptr_integrated",
+      "stage": "passing_component_integration",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": true,
+      "use_compensated_trajectory": true,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": false,
+      "use_counterfactuals": false,
+      "use_masked_initialisation": false,
+      "group_objective": "erm",
+      "expert_roles": {
+        "centre_short": "both",
+        "trajectory": "motion",
+        "parts": "both"
+      }
+    },
+    {
+      "candidate_id": "cptr_counterfactual",
+      "stage": "motion_null_and_invariance_training",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": true,
+      "use_compensated_trajectory": true,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": false,
+      "use_counterfactuals": true,
+      "use_masked_initialisation": false,
+      "group_objective": "erm",
+      "expert_roles": {
+        "centre_short": "both",
+        "trajectory": "motion",
+        "parts": "both"
+      }
+    },
+    {
+      "candidate_id": "cptr_masked_adapted",
+      "stage": "target_video_masked_adaptation",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": true,
+      "use_compensated_trajectory": true,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": false,
+      "use_counterfactuals": true,
+      "use_masked_initialisation": true,
+      "group_objective": "erm",
+      "expert_roles": {
+        "centre_short": "both",
+        "trajectory": "motion",
+        "parts": "both"
+      }
+    },
+    {
+      "candidate_id": "cptr_group_robust",
+      "stage": "group_robust_objective",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": true,
+      "use_compensated_trajectory": true,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": false,
+      "use_counterfactuals": true,
+      "use_masked_initialisation": true,
+      "group_objective": "group_dro",
+      "expert_roles": {
+        "centre_short": "both",
+        "trajectory": "motion",
+        "parts": "both"
+      }
+    },
+    {
+      "candidate_id": "cptr_siglip_specialist",
+      "stage": "centre_siglip_specialist",
+      "use_short": true,
+      "use_long": false,
+      "use_trajectory": true,
+      "use_compensated_trajectory": true,
+      "use_parts": true,
+      "use_pose": false,
+      "use_siglip": true,
+      "use_counterfactuals": true,
+      "use_masked_initialisation": true,
+      "group_objective": "erm",
+      "expert_roles": {
+        "centre_short": "both",
+        "trajectory": "motion",
+        "parts": "both",
+        "siglip": "posture"
+      }
+    }
+  ],
+  "selection_policy": {
+    "screen_seed": 42,
+    "minimum_incremental_macro_f1_gain": 0.003,
+    "maximum_per_class_f1_regression": 0.01,
+    "failed_components_remain_in_evidence": true,
+    "later_candidates_require_their_added_component_to_pass": true
+  }
+}

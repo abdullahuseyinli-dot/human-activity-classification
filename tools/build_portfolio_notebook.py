@@ -1,8 +1,9 @@
-"""Build and execute the compact POLAR and V-COCO study notebook."""
+"""Build and execute the repository's compact evidence notebook."""
 
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 from pathlib import Path
 
@@ -29,6 +30,15 @@ REQUIRED = (
     "results/vcoco_v2/official_test_per_class.csv",
     "results/vcoco_v2/official_test_summary.json",
     "results/vcoco_v2/official_test_uncertainty.json",
+    "results/vcoco_v3/confirmation_metrics.csv",
+    "results/vcoco_v3/confirmation_per_class.csv",
+    "results/vcoco_v3/confirmation_summary.json",
+    "results/vcoco_v3/confirmation_uncertainty.json",
+    "results/vcoco_v3/protocol_lineage.json",
+    "results/okutama_cptr/development_decision.json",
+    "results/okutama_cptr/headline_metrics.csv",
+    "results/okutama_cptr/subgroup_metrics.csv",
+    "results/okutama_cptr/faithfulness_summary.json",
     "assets/polar_test_comparison.png",
     "assets/polar_confusion_matrix.png",
     "assets/polar_scale_curve.png",
@@ -39,6 +49,8 @@ REQUIRED = (
     "assets/vcoco_v2_official_test_comparison.png",
     "assets/vcoco_v2_scale_gain.png",
     "assets/vcoco_v2_selective_prediction.png",
+    "assets/vcoco_v3_confirmation_comparison.png",
+    "assets/vcoco_v3_routing_curve.png",
 )
 
 
@@ -54,6 +66,11 @@ def parse_args() -> argparse.Namespace:
 
 def read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def read_csv_rows(path: Path) -> list[dict[str, str]]:
+    with path.open(encoding="utf-8", newline="") as handle:
+        return list(csv.DictReader(handle))
 
 
 def markdown(value: str):
@@ -76,6 +93,13 @@ def build_notebook(repository: Path) -> dict:
     vcoco_interval = read_json(
         repository / "results" / "vcoco_v2" / "official_test_uncertainty.json"
     )
+    v3_metrics = {
+        row["family"]: row
+        for row in read_csv_rows(repository / "results/vcoco_v3/confirmation_metrics.csv")
+    }
+    v3_interval = read_json(repository / "results/vcoco_v3/confirmation_uncertainty.json")
+    v3_summary = read_json(repository / "results/vcoco_v3/confirmation_summary.json")
+    cptr = read_json(repository / "results/okutama_cptr/development_decision.json")
     primary = test["primary_metrics"]
     interval = uncertainty["locked_ensemble"]
 
@@ -91,26 +115,28 @@ def build_notebook(repository: Path) -> dict:
     notebook["cells"] = [
         markdown(
             f"""
-# Source-Overlap-Controlled Human Activity Classification
+# Human Activity Classification Under Domain and Temporal Shift
 
-## Locked POLAR benchmark and V-COCO follow-up
+## POLAR, V-COCO, and Okutama-Action evidence
 
-This notebook is the compact, executable evidence narrative for a four-class still-image
-posture study. Model selection used the clean POLAR development split; nine neural fits
-and three frozen-feature probes completed before the official test cache opened once.
+This notebook is the compact, executable evidence narrative for the repository's
+still-image, person-level transfer, and short-video studies. It reads only tracked,
+path-sanitized evidence and performs no training or post-evaluation selection.
 
-**Locked result:** {primary['macro_f1']:.3f} macro-F1 (95% CI
-[{interval['ci_95_low']:.3f}, {interval['ci_95_high']:.3f}]) and
-{primary['accuracy']:.3f} accuracy on {test['test_rows_read']:,} held-out images.
+**Locked result:** {primary["macro_f1"]:.3f} macro-F1 (95% CI
+[{interval["ci_95_low"]:.3f}, {interval["ci_95_high"]:.3f}]) and
+{primary["accuracy"]:.3f} accuracy on {test["test_rows_read"]:,} held-out images.
 
 The person-level V-COCO follow-up reaches
-**{vcoco['primary_metrics']['macro_f1']:.4f} official-test macro-F1**, improving over
+**{vcoco["primary_metrics"]["macro_f1"]:.4f} official-test macro-F1**, improving over
 the historical source-only DINO baseline by
-**{vcoco_interval['point_estimate']:+.4f}**, with a 95% image-cluster interval of
-[{vcoco_interval['ci_95_low']:+.4f}, {vcoco_interval['ci_95_high']:+.4f}].
+**{vcoco_interval["point_estimate"]:+.4f}**, with a 95% image-cluster interval of
+[{vcoco_interval["ci_95_low"]:+.4f}, {vcoco_interval["ci_95_high"]:+.4f}].
 
-The notebook reads only tracked, path-sanitized evidence. It performs no training and
-makes no post-test selection decisions.
+On sealed Okutama confirmation data, the static target-trained model reaches
+**{float(v3_metrics["static"]["macro_f1"]):.4f} macro-F1** and the temporal teacher
+reaches **{float(v3_metrics["teacher"]["macro_f1"]):.4f}**. Routing half of the samples
+to clips retains **{float(v3_metrics["hybrid_budget_0.5"]["macro_f1"]):.4f}**.
 """
         ),
         code(
@@ -247,15 +273,15 @@ display(probe_rows[["candidate", "macro_f1", "accuracy", "log_loss", "ece", "fit
 
 The original no-retuning audit identified the external gap: the locked three-class
 POLAR ensemble reached 0.961 in-domain macro-F1 and
-{external['primary_image_metrics']['macro_f1']:.3f} on
-{external['image_level_rows']:,} unambiguous V-COCO images.
+{external["primary_image_metrics"]["macro_f1"]:.3f} on
+{external["image_level_rows"]:,} unambiguous V-COCO images.
 
 The follow-up keeps the official V-COCO memberships, trains on the target training
 split, selects on validation, and opens the official test labels once after locking the
 final stack. Two aspect-preserving DINOv2-B person views and five geometry features
 raise person-level macro-F1 from
-{vcoco['baseline_metrics']['macro_f1']:.4f} to
-{vcoco['primary_metrics']['macro_f1']:.4f}.
+{vcoco["baseline_metrics"]["macro_f1"]:.4f} to
+{vcoco["primary_metrics"]["macro_f1"]:.4f}.
 
 ![Official V-COCO test comparison](assets/vcoco_v2_official_test_comparison.png)
 
@@ -279,8 +305,87 @@ display(vcoco_per_class[["method", "class", "precision", "recall", "f1", "suppor
 """
         ),
         markdown(
+            f"""
+## 6. Motion identifiability on Okutama-Action
+
+The sealed confirmation compares the locked static model with an 8-frame, 0.5-second
+temporal teacher over {v3_summary["samples"]:,} person instances.
+The temporal model changes macro-F1 by
+**{v3_interval["teacher"]["macro_f1"]["point_estimate"]:+.4f}** with a 95% paired
+recording-cluster interval of
+[{v3_interval["teacher"]["macro_f1"]["ci_95_low"]:+.4f},
+{v3_interval["teacher"]["macro_f1"]["ci_95_high"]:+.4f}]. A fixed 50% routing budget
+reaches **{float(v3_metrics["hybrid_budget_0.5"]["macro_f1"]):.4f} macro-F1**.
+
+![Static, temporal, and routed confirmation](assets/vcoco_v3_confirmation_comparison.png)
+
+![Fixed-budget temporal routing](assets/vcoco_v3_routing_curve.png)
+"""
+        ),
+        code(
             """
-## 6. Attribution: localization is not enough
+v3_metrics = pd.read_csv(ROOT / "results/vcoco_v3/confirmation_metrics.csv")
+selected_v3 = v3_metrics[
+    v3_metrics["family"].isin(
+        ["source_only_static", "static", "teacher", "hybrid_budget_0.5"]
+    )
+]
+display(
+    selected_v3[
+        ["family", "macro_f1", "accuracy", "log_loss", "ece"]
+    ].reset_index(drop=True)
+)
+
+v3_per_class = pd.read_csv(ROOT / "results/vcoco_v3/confirmation_per_class.csv")
+display(
+    v3_per_class[v3_per_class["family"].isin(["static", "teacher", "hybrid_budget_0.5"])]
+    [["family", "class", "precision", "recall", "f1", "support"]]
+    .reset_index(drop=True)
+)
+"""
+        ),
+        markdown(
+            f"""
+## 7. CPTR architecture development
+
+The follow-up architecture keeps the static and temporal anchors frozen and evaluates
+center-conditioned residuals, camera-compensated trajectories, and confidence-masked
+body-region tokens. The center-plus-parts branch changes fixed-validation macro-F1 from
+**{cptr["development_validation"]["baseline_metrics"]["macro_f1"]:.4f}** to
+**{cptr["development_validation"]["candidate_metrics"]["macro_f1"]:.4f}**. The matched
+recording-grouped OOF comparison moves in the other direction:
+**{cptr["grouped_crossfit_oof"]["baseline_metrics"]["macro_f1"]:.4f}** for the temporal
+baseline and **{cptr["grouped_crossfit_oof"]["candidate_metrics"]["macro_f1"]:.4f}** for
+the candidate. The promotion gate therefore keeps the temporal ensemble as the default.
+
+Motion nulling reduces the candidate's validation macro-F1 by
+**{read_json(repository / "results/okutama_cptr/faithfulness_summary.json")["diagnostics"]["motion_null"]["macro_f1_delta_real_minus_intervention"]:.4f}**,
+while the grouped analysis identifies occluded windows as the largest observed failure
+mode. The fixed-split gain is retained as development evidence, not promoted as a
+generalized improvement.
+"""
+        ),
+        code(
+            """
+cptr_headline = pd.read_csv(ROOT / "results/okutama_cptr/headline_metrics.csv")
+display(
+    cptr_headline[
+        ["scope", "model", "samples", "recordings", "macro_f1", "accuracy", "log_loss"]
+    ]
+)
+
+cptr_subgroups = pd.read_csv(ROOT / "results/okutama_cptr/subgroup_metrics.csv")
+display(
+    cptr_subgroups[
+        cptr_subgroups["scope"].eq("crossfit_oof")
+        & cptr_subgroups["subgroup"].isin(["window_clear", "window_occluded", "transition"])
+    ][["subgroup", "samples", "baseline_macro_f1", "candidate_macro_f1", "macro_f1_delta"]]
+)
+"""
+        ),
+        markdown(
+            """
+## 8. Attribution: localization is not enough
 
 The fixed 256-image audit combines deletion/insertion, person-box localization,
 equal-area person/context occlusion, target sensitivity, and parameter randomization.
@@ -313,7 +418,7 @@ display(pd.DataFrame(rows))
         ),
         markdown(
             """
-## 7. Bounded bit-flip robustness
+## 9. Bounded bit-flip robustness
 
 Fault injection is reported separately from attribution faithfulness. Exact bit flips
 are applied either to the uint8 input tensor or to an int8-quantized classifier weight
@@ -337,20 +442,25 @@ display(
         ),
         markdown(
             """
-## 8. Conclusions
+## 10. Conclusions
 
 - Data scale is the largest isolated performance amplifier in this study.
 - DINOv2-B representations support strong linear and nonlinear final-stage classifiers.
 - Development-locked model diversity produces a statistically supported ensemble gain.
 - Person-centric scale conditioning raises official-test V-COCO macro-F1 from 0.7071
-  to 0.8663 and removes most of the historical small-person penalty.
+  to 0.8663 and greatly reduces the observed association with apparent person size.
 - Factorized posture-motion targets add a smaller, independently supported gain under
   matched feature inputs.
+- Short temporal context improves sealed Okutama macro-F1 from 0.7458 to 0.7854; fixed
+  50% routing retains 0.7817.
+- The center-plus-parts residual improves one fixed split but not recording-grouped OOF,
+  showing why the grouped promotion gate is necessary.
 - ConvNeXt Grad-CAM passes the declared sanity checks more convincingly than DINOv2-B
   integrated gradients.
 
 The complete method, evidence lineage, discussion, and references are documented in
-`docs/VCOCO_V2_EXTERNAL_TRANSFER.md` and `docs/POLAR_PUBLIC_REPORT.md`.
+`docs/POLAR_PUBLIC_REPORT.md`, `docs/VCOCO_V2_EXTERNAL_TRANSFER.md`,
+`docs/VCOCO_V3_MOTION_IDENTIFIABILITY.md`, and `docs/OKUTAMA_CPTR_DEVELOPMENT.md`.
 """
         ),
     ]

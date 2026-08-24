@@ -1,0 +1,70 @@
+{
+  "confirmation": {
+    "archive_bytes": 1650462812,
+    "archive_sha256": "9eb3995a4a96fc05f0502d6442873e5bbaaad28cc72217880e87a85daa733557",
+    "center_occluded": 36,
+    "class_counts": [
+      {
+        "label": "sitting",
+        "provider_base_action": "Sitting",
+        "samples": 351
+      },
+      {
+        "label": "standing",
+        "provider_base_action": "Standing",
+        "samples": 693
+      },
+      {
+        "label": "walking_running",
+        "provider_base_action": "Running",
+        "samples": 36
+      },
+      {
+        "label": "walking_running",
+        "provider_base_action": "Walking",
+        "samples": 691
+      }
+    ],
+    "open_number": 1,
+    "recordings": 10,
+    "samples": 1771,
+    "scenarios": 5,
+    "tracks": 198,
+    "transition_windows": 105,
+    "window_any_occluded": 65
+  },
+  "development": {
+    "archive_bytes": 5770432522,
+    "archive_sha256": "c021ce8a12c84e083f359023ffd41c145561aaedb48b118e7c5416d5ddcecb73",
+    "center_occluded": 388,
+    "class_counts": [
+      {
+        "label": "sitting",
+        "provider_base_action": "Sitting",
+        "samples": 1227
+      },
+      {
+        "label": "standing",
+        "provider_base_action": "Standing",
+        "samples": 3382
+      },
+      {
+        "label": "walking_running",
+        "provider_base_action": "Running",
+        "samples": 368
+      },
+      {
+        "label": "walking_running",
+        "provider_base_action": "Walking",
+        "samples": 3362
+      }
+    ],
+    "recordings": 33,
+    "samples": 8339,
+    "scenarios": 17,
+    "tracks": 699,
+    "transition_windows": 647,
+    "window_any_occluded": 553
+  },
+  "status": "OKUTAMA_DEVELOPMENT_AND_CONFIRMATION_AUDIT_EXPORTED"
+}

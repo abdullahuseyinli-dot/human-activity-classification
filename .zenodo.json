@@ -1,6 +1,6 @@
 {
-  "title": "Improving Person-Level External Transfer on V-COCO",
-  "description": "Versioned code, portable evidence, and an independent technical report for a locked person-level V-COCO study. A scale-conditioned DINOv2 stack improves official-test macro-F1 from 0.7071 to 0.8663 under a split-preserving protocol, with paired image-cluster uncertainty, calibration analysis, mechanism studies, and a complete evidence manifest. The release also retains the source-overlap-controlled POLAR benchmark that established the historical baseline.",
+  "title": "Human Activity Classification Under Domain and Temporal Shift",
+  "description": "Versioned code, technical reports, and portable evidence for linked POLAR, V-COCO, and Okutama-Action studies. The release adds a sealed tracked-video evaluation in which an eight-frame temporal model reaches 0.7854 macro-F1, compared with 0.7458 for the matched static model, together with fixed-budget routing, paired scenario-cluster uncertainty, and a complete execution lineage. It also includes the CPTR architecture study, whose positive fixed-validation result did not persist under recording-grouped cross-fitting, and retains the earlier source-overlap and person-level transfer releases.",
   "creators": [
     {
       "name": "Huseyinli, Abdulla"
@@ -9,7 +9,7 @@
   "license": "MIT",
   "upload_type": "software",
   "publication_date": "2026-08-24",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "language": "eng",
   "keywords": [
     "human activity recognition",
@@ -24,6 +24,10 @@
     "domain shift",
     "calibration",
     "selective classification",
+    "temporal modeling",
+    "motion identifiability",
+    "budgeted inference",
+    "camera compensation",
     "reproducible research"
   ]
 }

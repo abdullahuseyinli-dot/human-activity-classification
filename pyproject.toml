@@ -4,15 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "human-activity-classification"
-version = "2.0.0"
-description = "Source-overlap-controlled transfer-learning benchmarks for image-based human activity classification"
+version = "3.0.0"
+description = "Reproducible human activity classification benchmarks for still images and short clips"
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
 dependencies = [
+  "huggingface-hub>=0.28,<2",
   "imagehash>=4.3,<5",
   "joblib>=1.4,<2",
   "matplotlib>=3.9,<4",
   "numpy>=2.0,<3",
+  "opencv-python-headless>=4.10,<6",
   "pandas>=2.2,<4",
   "pillow>=11,<13",
   "grad-cam>=1.5,<2",
@@ -22,7 +24,7 @@ dependencies = [
   "torch>=2.6,<3",
   "torchvision>=0.21,<1",
   "tqdm>=4.66,<5",
-  "transformers>=4.48,<6",
+  "transformers>=4.56,<6",
 ]
 
 [project.optional-dependencies]

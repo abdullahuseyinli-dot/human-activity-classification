@@ -1,13 +1,12 @@
-# A 0.94 Macro-F1 System—and the Tests That Made the Result Worth Trusting
+# A 0.94 Macro-F1 System and the Tests That Made the Result Worth Trusting
 
 It is easy to improve an image classifier when every decision can be reconsidered after
 looking at the test set. It is much harder to improve one while preserving a clean
 answer to a simple question: *what did the model know before the test was opened?*
 
-This project began as a 285-image activity classifier with a 43-image test split. The
-expanded study uses a cleaned four-class subset of POLAR, a one-time test gate,
-ConvNeXt and DINOv2 models trained across three seeds, linear and RBF classifiers on
-multilayer embeddings, and a locked evaluation on a second dataset.
+The study uses a source-audited four-class subset of POLAR, a one-time test gate,
+multi-seed ConvNeXt and DINOv2 models, frozen-representation classifiers, and external
+evaluation.
 
 The final in-domain result is strong: **0.940 macro-F1 and 0.946 accuracy on 3,329 held-out
 POLAR images**. The more useful result is the full pattern around that number.
@@ -84,8 +83,9 @@ images, it scored 0.667. Adapted DINOv2-B transferred best at 0.673.
 
 The 29-point gap shows that regularities learned on POLAR transfer only partly to a
 different image and annotation distribution. Adapted DINOv2-B also transfers slightly
-better than the in-domain-optimal ensemble. Domain generalization is therefore the
-highest-value next experiment.
+better than the in-domain-optimal ensemble. The later person-level V-COCO and
+Okutama-Action studies investigate this gap through scale-aware crops, target-domain
+fitting, and short temporal context.
 
 ## The external gap had more than one cause
 
@@ -131,7 +131,7 @@ randomization correlations limit the class-specific interpretation of the heatma
 ## Bit flips answered a different question
 
 Input and classifier-weight bit flips were added as a separate robustness audit, not as
-an explanation metric. At the largest tested input rate—0.1% of uint8 input bits—both
+an explanation metric. At the largest tested input rate (0.1% of uint8 input bits), both
 neural components retained roughly 98% label agreement with their clean predictions.
 Sixteen flips per quantized classifier matrix caused no label changes in the averaged
 cohort output.
@@ -154,10 +154,12 @@ benchmark:
 - external validation that exposes the domain gap;
 - attribution tests that are allowed to fail.
 
-The clearest extension is to apply the same locked workflow to the remaining POLAR
-actions or an independently collected dataset with subject/session identifiers, then
-predeclare a domain-generalization intervention.
+The same locked workflow was later extended to person-level V-COCO transfer and
+tracked Okutama-Action video. Those studies separate person scale, target supervision,
+label ontology, and temporal identifiability while retaining one-time evaluation gates.
 
-The complete methods, tables, limitations, and references are in the
-[independent technical report](POLAR_PUBLIC_REPORT.md). Every promoted number is also
-available as path-free tracked evidence in `results/`.
+The complete POLAR methods, tables, limitations, and references are in the
+[technical report](POLAR_PUBLIC_REPORT.md). The later studies are documented in the
+[person-level transfer report](VCOCO_V2_EXTERNAL_TRANSFER.md) and the
+[motion-identifiability report](VCOCO_V3_MOTION_IDENTIFIABILITY.md). Every reported
+number is also available as path-free tracked evidence in `results/`.

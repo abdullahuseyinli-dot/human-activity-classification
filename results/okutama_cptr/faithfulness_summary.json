@@ -1,0 +1,549 @@
+{
+  "calibration_samples_read": 0,
+  "candidate_id": "centre_short_parts",
+  "checkpoint_sha256": {
+    "42": "a2fb1af7fb59d899c5e385167400da6553f757b526daf7f127ec5dc563d4339a",
+    "43": "e4f3fabad9e19900e9ed27202ee6c5adc8485a17f4d5e7516efe8009174ce448",
+    "44": "aa52647a840d2c84030cc522e5fcaf5accc5496d667f63e007bbff43901898d4",
+    "45": "84aa4d8716bb5a7033cfa867a2f73b79395c05ebadb892d9a537145d2b5cccac",
+    "46": "9449c7c093a2f3486dc17ab10600efce4ca838dbcf7ae4b876354d70fb107e16"
+  },
+  "confirmation_samples_read": 0,
+  "diagnostics": {
+    "background_camera_jitter": {
+      "macro_f1_delta_real_minus_intervention": 0.0,
+      "mean_true_class_log_probability_gain_real_minus_intervention": 1.6642384252918418e-06,
+      "metrics": {
+        "accuracy": 0.7866955892986262,
+        "log_loss": 0.5575534190144347,
+        "macro_f1": 0.7886666661527836,
+        "sitting_f1": 0.8203883495145631,
+        "standing_f1": 0.7243133265513734,
+        "walking_running_f1": 0.8212983223924143,
+        "worst_class_f1": 0.7243133265513734
+      },
+      "occluded_metrics": {
+        "accuracy": 0.72,
+        "log_loss": 0.8764460452475142,
+        "macro_f1": 0.6759259259259259,
+        "sitting_f1": 0.7777777777777778,
+        "standing_f1": 0.75,
+        "walking_running_f1": 0.5,
+        "worst_class_f1": 0.5
+      },
+      "prediction_change_fraction": 0.0,
+      "real_harms_intervention": 0,
+      "real_rescues_intervention": 0,
+      "transition_metrics": {
+        "accuracy": 0.6336633663366337,
+        "log_loss": 0.8268436055751539,
+        "macro_f1": 0.5176518935590607,
+        "sitting_f1": 0.21052631578947367,
+        "standing_f1": 0.6097560975609756,
+        "walking_running_f1": 0.7326732673267327,
+        "worst_class_f1": 0.21052631578947367
+      }
+    },
+    "deterministic_temporal_shuffle": {
+      "macro_f1_delta_real_minus_intervention": -0.0004536639103827067,
+      "mean_true_class_log_probability_gain_real_minus_intervention": 0.003506945911794901,
+      "metrics": {
+        "accuracy": 0.7859725234996384,
+        "log_loss": 0.5610587012394845,
+        "macro_f1": 0.7891203300631663,
+        "sitting_f1": 0.8252427184466019,
+        "standing_f1": 0.7222787385554426,
+        "walking_running_f1": 0.8198395331874544,
+        "worst_class_f1": 0.7222787385554426
+      },
+      "occluded_metrics": {
+        "accuracy": 0.72,
+        "log_loss": 0.8908194595533729,
+        "macro_f1": 0.6759259259259259,
+        "sitting_f1": 0.7777777777777778,
+        "standing_f1": 0.75,
+        "walking_running_f1": 0.5,
+        "worst_class_f1": 0.5
+      },
+      "prediction_change_fraction": 0.02096890817064353,
+      "real_harms_intervention": 13,
+      "real_rescues_intervention": 14,
+      "transition_metrics": {
+        "accuracy": 0.6435643564356436,
+        "log_loss": 0.8356478879749974,
+        "macro_f1": 0.5243027685408146,
+        "sitting_f1": 0.21052631578947367,
+        "standing_f1": 0.6172839506172839,
+        "walking_running_f1": 0.7450980392156863,
+        "worst_class_f1": 0.21052631578947367
+      }
+    },
+    "geometry_only": {
+      "macro_f1_delta_real_minus_intervention": 0.6097923096188526,
+      "mean_true_class_log_probability_gain_real_minus_intervention": 0.4750068187713623,
+      "metrics": {
+        "accuracy": 0.36225596529284165,
+        "log_loss": 1.0325585869719656,
+        "macro_f1": 0.178874356533931,
+        "sitting_f1": 0.0,
+        "standing_f1": 0.5308510638297872,
+        "walking_running_f1": 0.005772005772005772,
+        "worst_class_f1": 0.0
+      },
+      "occluded_metrics": {
+        "accuracy": 0.48,
+        "log_loss": 1.0560541929791083,
+        "macro_f1": 0.21621621621621623,
+        "sitting_f1": 0.0,
+        "standing_f1": 0.6486486486486487,
+        "walking_running_f1": 0.0,
+        "worst_class_f1": 0.0
+      },
+      "prediction_change_fraction": 0.6673897324656544,
+      "real_harms_intervention": 156,
+      "real_rescues_intervention": 743,
+      "transition_metrics": {
+        "accuracy": 0.37623762376237624,
+        "log_loss": 0.9292422636663589,
+        "macro_f1": 0.18225419664268586,
+        "sitting_f1": 0.0,
+        "standing_f1": 0.5467625899280576,
+        "walking_running_f1": 0.0,
+        "worst_class_f1": 0.0
+      }
+    },
+    "legacy_temporal": {
+      "macro_f1_delta_real_minus_intervention": 0.008050670493972123,
+      "mean_true_class_log_probability_gain_real_minus_intervention": 0.005642507690936327,
+      "metrics": {
+        "accuracy": 0.7780187997107737,
+        "log_loss": 0.5631942627336783,
+        "macro_f1": 0.7806159956588115,
+        "sitting_f1": 0.8232445520581114,
+        "standing_f1": 0.7023060796645703,
+        "walking_running_f1": 0.8162973552537527,
+        "worst_class_f1": 0.7023060796645703
+      },
+      "occluded_metrics": {
+        "accuracy": 0.72,
+        "log_loss": 0.7993500788493718,
+        "macro_f1": 0.7075163398692811,
+        "sitting_f1": 0.7058823529411765,
+        "standing_f1": 0.75,
+        "walking_running_f1": 0.6666666666666666,
+        "worst_class_f1": 0.6666666666666666
+      },
+      "prediction_change_fraction": 0.035430224150397684,
+      "real_harms_intervention": 18,
+      "real_rescues_intervention": 30,
+      "transition_metrics": {
+        "accuracy": 0.6138613861386139,
+        "log_loss": 0.8419649191496577,
+        "macro_f1": 0.49947946790052056,
+        "sitting_f1": 0.21052631578947367,
+        "standing_f1": 0.5641025641025641,
+        "walking_running_f1": 0.7238095238095238,
+        "worst_class_f1": 0.21052631578947367
+      }
+    },
+    "motion_null": {
+      "macro_f1_delta_real_minus_intervention": 0.044050799492675874,
+      "mean_true_class_log_probability_gain_real_minus_intervention": 0.11403161287307739,
+      "metrics": {
+        "accuracy": 0.7404193781634129,
+        "log_loss": 0.6715833696116142,
+        "macro_f1": 0.7446158666601077,
+        "sitting_f1": 0.7785547785547785,
+        "standing_f1": 0.6803118908382066,
+        "walking_running_f1": 0.7749809305873379,
+        "worst_class_f1": 0.6803118908382066
+      },
+      "occluded_metrics": {
+        "accuracy": 0.68,
+        "log_loss": 0.9958285891347246,
+        "macro_f1": 0.6441647597254004,
+        "sitting_f1": 0.7368421052631579,
+        "standing_f1": 0.6956521739130435,
+        "walking_running_f1": 0.5,
+        "worst_class_f1": 0.5
+      },
+      "prediction_change_fraction": 0.12509038322487345,
+      "real_harms_intervention": 43,
+      "real_rescues_intervention": 107,
+      "transition_metrics": {
+        "accuracy": 0.594059405940594,
+        "log_loss": 0.9803716419058486,
+        "macro_f1": 0.4905195067717809,
+        "sitting_f1": 0.2,
+        "standing_f1": 0.611764705882353,
+        "walking_running_f1": 0.6597938144329897,
+        "worst_class_f1": 0.2
+      }
+    },
+    "occlusion_unmasked": {
+      "macro_f1_delta_real_minus_intervention": 0.0006703297764876215,
+      "mean_true_class_log_probability_gain_real_minus_intervention": -0.001102002221159637,
+      "metrics": {
+        "accuracy": 0.7866955892986262,
+        "log_loss": 0.5564497554315029,
+        "macro_f1": 0.787996336376296,
+        "sitting_f1": 0.8175182481751825,
+        "standing_f1": 0.7243133265513734,
+        "walking_running_f1": 0.8221574344023324,
+        "worst_class_f1": 0.7243133265513734
+      },
+      "occluded_metrics": {
+        "accuracy": 0.72,
+        "log_loss": 0.815487704393966,
+        "macro_f1": 0.7075163398692811,
+        "sitting_f1": 0.7058823529411765,
+        "standing_f1": 0.75,
+        "walking_running_f1": 0.6666666666666666,
+        "worst_class_f1": 0.6666666666666666
+      },
+      "prediction_change_fraction": 0.0014461315979754157,
+      "real_harms_intervention": 1,
+      "real_rescues_intervention": 1,
+      "transition_metrics": {
+        "accuracy": 0.6336633663366337,
+        "log_loss": 0.8400618744585174,
+        "macro_f1": 0.5176518935590607,
+        "sitting_f1": 0.21052631578947367,
+        "standing_f1": 0.6097560975609756,
+        "walking_running_f1": 0.7326732673267327,
+        "worst_class_f1": 0.21052631578947367
+      }
+    },
+    "parts_missing": {
+      "macro_f1_delta_real_minus_intervention": 0.00763055683638969,
+      "mean_true_class_log_probability_gain_real_minus_intervention": 0.005392791237682104,
+      "metrics": {
+        "accuracy": 0.7780187997107737,
+        "log_loss": 0.562944545060034,
+        "macro_f1": 0.7810361093163939,
+        "sitting_f1": 0.8203883495145631,
+        "standing_f1": 0.7085478887744593,
+        "walking_running_f1": 0.8141720896601591,
+        "worst_class_f1": 0.7085478887744593
+      },
+      "occluded_metrics": {
+        "accuracy": 0.72,
+        "log_loss": 0.8840177946827074,
+        "macro_f1": 0.6759259259259259,
+        "sitting_f1": 0.7777777777777778,
+        "standing_f1": 0.75,
+        "walking_running_f1": 0.5,
+        "worst_class_f1": 0.5
+      },
+      "prediction_change_fraction": 0.014461315979754157,
+      "real_harms_intervention": 4,
+      "real_rescues_intervention": 16,
+      "transition_metrics": {
+        "accuracy": 0.6138613861386139,
+        "log_loss": 0.8314629695524088,
+        "macro_f1": 0.49947946790052056,
+        "sitting_f1": 0.21052631578947367,
+        "standing_f1": 0.5641025641025641,
+        "walking_running_f1": 0.7238095238095238,
+        "worst_class_f1": 0.21052631578947367
+      }
+    },
+    "parts_repeated": {
+      "macro_f1_delta_real_minus_intervention": 0.0012061712205019282,
+      "mean_true_class_log_probability_gain_real_minus_intervention": 0.006069250404834747,
+      "metrics": {
+        "accuracy": 0.7845263919016631,
+        "log_loss": 0.5636210078971676,
+        "macro_f1": 0.7874604949322817,
+        "sitting_f1": 0.8203883495145631,
+        "standing_f1": 0.7243460764587525,
+        "walking_running_f1": 0.8176470588235294,
+        "worst_class_f1": 0.7243460764587525
+      },
+      "occluded_metrics": {
+        "accuracy": 0.72,
+        "log_loss": 0.8775908164430587,
+        "macro_f1": 0.6759259259259259,
+        "sitting_f1": 0.7777777777777778,
+        "standing_f1": 0.75,
+        "walking_running_f1": 0.5,
+        "worst_class_f1": 0.5
+      },
+      "prediction_change_fraction": 0.007953723788864787,
+      "real_harms_intervention": 4,
+      "real_rescues_intervention": 7,
+      "transition_metrics": {
+        "accuracy": 0.6336633663366337,
+        "log_loss": 0.8321406848818835,
+        "macro_f1": 0.5176518935590607,
+        "sitting_f1": 0.21052631578947367,
+        "standing_f1": 0.6097560975609756,
+        "walking_running_f1": 0.7326732673267327,
+        "worst_class_f1": 0.21052631578947367
+      }
+    },
+    "real": {
+      "macro_f1_delta_real_minus_intervention": 0.0,
+      "mean_true_class_log_probability_gain_real_minus_intervention": 0.0,
+      "metrics": {
+        "accuracy": 0.7866955892986262,
+        "log_loss": 0.5575517578031629,
+        "macro_f1": 0.7886666661527836,
+        "sitting_f1": 0.8203883495145631,
+        "standing_f1": 0.7243133265513734,
+        "walking_running_f1": 0.8212983223924143,
+        "worst_class_f1": 0.7243133265513734
+      },
+      "occluded_metrics": {
+        "accuracy": 0.72,
+        "log_loss": 0.8764504755941981,
+        "macro_f1": 0.6759259259259259,
+        "sitting_f1": 0.7777777777777778,
+        "standing_f1": 0.75,
+        "walking_running_f1": 0.5,
+        "worst_class_f1": 0.5
+      },
+      "prediction_change_fraction": 0.0,
+      "real_harms_intervention": 0,
+      "real_rescues_intervention": 0,
+      "transition_metrics": {
+        "accuracy": 0.6336633663366337,
+        "log_loss": 0.8268451291709991,
+        "macro_f1": 0.5176518935590607,
+        "sitting_f1": 0.21052631578947367,
+        "standing_f1": 0.6097560975609756,
+        "walking_running_f1": 0.7326732673267327,
+        "worst_class_f1": 0.21052631578947367
+      }
+    },
+    "reverse_temporal_order": {
+      "macro_f1_delta_real_minus_intervention": 0.0026903285307418034,
+      "mean_true_class_log_probability_gain_real_minus_intervention": 0.00269045471213758,
+      "metrics": {
+        "accuracy": 0.7838033261026753,
+        "log_loss": 0.560242211925576,
+        "macro_f1": 0.7859763376220418,
+        "sitting_f1": 0.8192771084337349,
+        "standing_f1": 0.7196738022426096,
+        "walking_running_f1": 0.8189781021897811,
+        "worst_class_f1": 0.7196738022426096
+      },
+      "occluded_metrics": {
+        "accuracy": 0.72,
+        "log_loss": 0.8910002373525512,
+        "macro_f1": 0.6759259259259259,
+        "sitting_f1": 0.7777777777777778,
+        "standing_f1": 0.75,
+        "walking_running_f1": 0.5,
+        "worst_class_f1": 0.5
+      },
+      "prediction_change_fraction": 0.022415039768618944,
+      "real_harms_intervention": 12,
+      "real_rescues_intervention": 16,
+      "transition_metrics": {
+        "accuracy": 0.6237623762376238,
+        "log_loss": 0.8327890275764704,
+        "macro_f1": 0.5077164859343077,
+        "sitting_f1": 0.19047619047619047,
+        "standing_f1": 0.6,
+        "walking_running_f1": 0.7326732673267327,
+        "worst_class_f1": 0.19047619047619047
+      }
+    },
+    "short_repeated": {
+      "macro_f1_delta_real_minus_intervention": 0.046051921040852206,
+      "mean_true_class_log_probability_gain_real_minus_intervention": 0.10163741558790207,
+      "metrics": {
+        "accuracy": 0.7389732465654375,
+        "log_loss": 0.6591891754946373,
+        "macro_f1": 0.7426147451119314,
+        "sitting_f1": 0.7775175644028103,
+        "standing_f1": 0.6738916256157635,
+        "walking_running_f1": 0.7764350453172205,
+        "worst_class_f1": 0.6738916256157635
+      },
+      "occluded_metrics": {
+        "accuracy": 0.68,
+        "log_loss": 0.9942766780619854,
+        "macro_f1": 0.6441647597254004,
+        "sitting_f1": 0.7368421052631579,
+        "standing_f1": 0.6956521739130435,
+        "walking_running_f1": 0.5,
+        "worst_class_f1": 0.5
+      },
+      "prediction_change_fraction": 0.1193058568329718,
+      "real_harms_intervention": 37,
+      "real_rescues_intervention": 103,
+      "transition_metrics": {
+        "accuracy": 0.6039603960396039,
+        "log_loss": 0.9674276287436346,
+        "macro_f1": 0.4985868031423095,
+        "sitting_f1": 0.21052631578947367,
+        "standing_f1": 0.611764705882353,
+        "walking_running_f1": 0.673469387755102,
+        "worst_class_f1": 0.21052631578947367
+      }
+    },
+    "zero_appearance_dynamics": {
+      "macro_f1_delta_real_minus_intervention": 0.044050799492675874,
+      "mean_true_class_log_probability_gain_real_minus_intervention": 0.11402202397584915,
+      "metrics": {
+        "accuracy": 0.7404193781634129,
+        "log_loss": 0.6715737768027451,
+        "macro_f1": 0.7446158666601077,
+        "sitting_f1": 0.7785547785547785,
+        "standing_f1": 0.6803118908382066,
+        "walking_running_f1": 0.7749809305873379,
+        "worst_class_f1": 0.6803118908382066
+      },
+      "occluded_metrics": {
+        "accuracy": 0.68,
+        "log_loss": 0.9958271276404842,
+        "macro_f1": 0.6441647597254004,
+        "sitting_f1": 0.7368421052631579,
+        "standing_f1": 0.6956521739130435,
+        "walking_running_f1": 0.5,
+        "worst_class_f1": 0.5
+      },
+      "prediction_change_fraction": 0.12509038322487345,
+      "real_harms_intervention": 43,
+      "real_rescues_intervention": 107,
+      "transition_metrics": {
+        "accuracy": 0.594059405940594,
+        "log_loss": 0.980213584046195,
+        "macro_f1": 0.4905195067717809,
+        "sitting_f1": 0.2,
+        "standing_f1": 0.611764705882353,
+        "walking_running_f1": 0.6597938144329897,
+        "worst_class_f1": 0.2
+      }
+    },
+    "zero_geometry": {
+      "macro_f1_delta_real_minus_intervention": 0.0008092487088039446,
+      "mean_true_class_log_probability_gain_real_minus_intervention": 0.00843188539147377,
+      "metrics": {
+        "accuracy": 0.7852494577006508,
+        "log_loss": 0.5659836393098725,
+        "macro_f1": 0.7878574174439796,
+        "sitting_f1": 0.8221153846153846,
+        "standing_f1": 0.7215447154471545,
+        "walking_running_f1": 0.8199121522693997,
+        "worst_class_f1": 0.7215447154471545
+      },
+      "occluded_metrics": {
+        "accuracy": 0.72,
+        "log_loss": 0.8792004402840615,
+        "macro_f1": 0.6759259259259259,
+        "sitting_f1": 0.7777777777777778,
+        "standing_f1": 0.75,
+        "walking_running_f1": 0.5,
+        "worst_class_f1": 0.5
+      },
+      "prediction_change_fraction": 0.005784526391901663,
+      "real_harms_intervention": 3,
+      "real_rescues_intervention": 5,
+      "transition_metrics": {
+        "accuracy": 0.6336633663366337,
+        "log_loss": 0.8377692793881546,
+        "macro_f1": 0.5176518935590607,
+        "sitting_f1": 0.21052631578947367,
+        "standing_f1": 0.6097560975609756,
+        "walking_running_f1": 0.7326732673267327,
+        "worst_class_f1": 0.21052631578947367
+      }
+    }
+  },
+  "gate_summary": {
+    "motion": {
+      "centre_short": 0.2667124271392822,
+      "legacy_short": 0.932256281375885,
+      "parts": 0.1329331398010254
+    },
+    "posture": {
+      "centre_short": 0.22275064885616302,
+      "legacy_short": 0.9754330515861511,
+      "parts": 0.08381704986095428
+    },
+    "reliability": {
+      "centre_short": 0.9904193878173828,
+      "legacy_short": 0.9904193878173828,
+      "parts": 0.5086397528648376
+    }
+  },
+  "latency": [
+    {
+      "batch_latency_ms_mean": 10.134518999839202,
+      "batch_latency_ms_p50": 10.073249984998256,
+      "batch_latency_ms_p95": 11.194200051249936,
+      "batch_size": 64,
+      "measured_iterations": 100,
+      "per_sample_latency_ms_mean": 0.15835185937248752,
+      "scope": "classifier_forward_from_cached_DINOv2_and_part_features",
+      "seed": 42,
+      "warmup_iterations": 20
+    },
+    {
+      "batch_latency_ms_mean": 10.092913000844419,
+      "batch_latency_ms_p50": 10.014249943196774,
+      "batch_latency_ms_p95": 11.19705502060242,
+      "batch_size": 64,
+      "measured_iterations": 100,
+      "per_sample_latency_ms_mean": 0.15770176563819405,
+      "scope": "classifier_forward_from_cached_DINOv2_and_part_features",
+      "seed": 43,
+      "warmup_iterations": 20
+    },
+    {
+      "batch_latency_ms_mean": 10.152057007653639,
+      "batch_latency_ms_p50": 9.973699983675033,
+      "batch_latency_ms_p95": 10.93528995406814,
+      "batch_size": 64,
+      "measured_iterations": 100,
+      "per_sample_latency_ms_mean": 0.1586258907445881,
+      "scope": "classifier_forward_from_cached_DINOv2_and_part_features",
+      "seed": 44,
+      "warmup_iterations": 20
+    },
+    {
+      "batch_latency_ms_mean": 10.547244001645595,
+      "batch_latency_ms_p50": 10.41795004857704,
+      "batch_latency_ms_p95": 12.348144932184368,
+      "batch_size": 64,
+      "measured_iterations": 100,
+      "per_sample_latency_ms_mean": 0.16480068752571242,
+      "scope": "classifier_forward_from_cached_DINOv2_and_part_features",
+      "seed": 45,
+      "warmup_iterations": 20
+    },
+    {
+      "batch_latency_ms_mean": 10.876684992108494,
+      "batch_latency_ms_p50": 10.236099944449961,
+      "batch_latency_ms_p95": 16.184404952218756,
+      "batch_size": 64,
+      "measured_iterations": 100,
+      "per_sample_latency_ms_mean": 0.16994820300169522,
+      "scope": "classifier_forward_from_cached_DINOv2_and_part_features",
+      "seed": 46,
+      "warmup_iterations": 20
+    }
+  ],
+  "latency_feature_extraction_excluded": true,
+  "samples": 1383,
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "source_sha256": {
+    "grid": "d6c34b51d69d72a8c5f7092b0102d6b1f710494ff05d3e8e27bf7c0ea6fc1384",
+    "manifest": "5997e412ea8823bff9787aea9b825f465096dfbc25ccebad0bfe97104a4ae4fa",
+    "part_store": "f6d7c3650575470cc10fb74c5e0b771dd69abbe81183fd091a4b739dd13399f2",
+    "protocol": "0bcb58909c04708447607fabccf7efbc8617c09e2d9fdfb7f3545e38e15954c8",
+    "protocol_lock": "42cd47a0e3d1fa6fc4dc5124832f3870c407b4cdd45555d5e27bca12d4fc18c2",
+    "runner": "f1631f46c929cc69aeab744044a761e23d800a1aa90fff16828aab748e65a27c"
+  },
+  "status": "OKUTAMA_CPTR_FAITHFULNESS_COMPLETE",
+  "validation_samples_read": 1383
+}

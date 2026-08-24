@@ -1,0 +1,257 @@
+{
+  "grid_version": "1.0.0-okutama-temporal-1",
+  "status": "DECLARED_BEFORE_TEMPORAL_FITTING",
+  "dataset": {
+    "name": "Okutama-Action",
+    "development_partition": "provider_train",
+    "confirmation_partition": "provider_test",
+    "development_labels": [
+      "sitting",
+      "standing",
+      "walking_running"
+    ],
+    "provider_labels_immutable": true,
+    "confirmation_archive_sealed_until_pipeline_lock": true,
+    "raw_media_committed_to_git": false
+  },
+  "required_gates": {
+    "representation_development": "VCOCO_V3_MATCHED_REPRESENTATION_DEVELOPMENT_COMPLETE",
+    "neural_development": "VCOCO_V3_NEURAL_DEVELOPMENT_COMPLETE_OR_NOT_ELIGIBLE",
+    "temporal_manifest": "VCOCO_V3_TEMPORAL_MANIFEST_LOCKED",
+    "confirmation_open": "VCOCO_V3_TEMPORAL_PIPELINE_LOCKED_BEFORE_CONFIRMATION"
+  },
+  "split_policy": {
+    "group": "scenario_id",
+    "stored_group_column": "recording_id",
+    "synchronized_drone_views_stay_together": true,
+    "no_track_crossing": true,
+    "development_splitter": "StratifiedGroupKFold",
+    "calibration_folds": 5,
+    "calibration_fold": 0,
+    "calibration_seed": 20260902,
+    "validation_folds_within_remainder": 5,
+    "validation_fold": 0,
+    "validation_seed": 20260903,
+    "confirmation_partition": "provider_test",
+    "confirmation_bootstrap_seed": 20260906,
+    "confirmation_open_count": 1
+  },
+  "input": {
+    "frame_backbone_rule": "use_the_locked_best_DINO_family_from_the_matched_representation_screen",
+    "tight_view": "person_tight",
+    "context_view": "person_context_25",
+    "image_size": 224,
+    "frame_feature_blocks": [
+      "tight_embedding",
+      "context_embedding",
+      "box_geometry"
+    ],
+    "feature_file_schema": "packed_npy_store_with_manifest_feature_index",
+    "center_frame_policy": "provider_manual_annotation_at_temporal_midpoint"
+  },
+  "teacher_candidates": [
+    {
+      "candidate_id": "temporal_8f_050s",
+      "uniform_samples": 8,
+      "window_seconds": 0.5
+    },
+    {
+      "candidate_id": "temporal_8f_100s",
+      "uniform_samples": 8,
+      "window_seconds": 1.0
+    },
+    {
+      "candidate_id": "temporal_16f_100s",
+      "uniform_samples": 16,
+      "window_seconds": 1.0
+    }
+  ],
+  "families": [
+    "source_only_static_transfer",
+    "target_supervised_static_factorized_model",
+    "target_supervised_short_clip_temporal_teacher",
+    "temporal_teacher_distilled_static_student",
+    "identifiability_conditioned_static_student",
+    "budgeted_static_to_clip_router"
+  ],
+  "architecture": {
+    "temporal_model_dim": 256,
+    "temporal_layers": 2,
+    "attention_heads": 4,
+    "feedforward_dim": 512,
+    "static_hidden_dim": 256,
+    "dropout": 0.1,
+    "factorized_posture_motion_heads": true,
+    "temporal_pooling": "masked_attention"
+  },
+  "training": {
+    "execution_backend": "cuda",
+    "cpu_fallback_permitted": false,
+    "automatic_mixed_precision": true,
+    "optimizer": "AdamW",
+    "learning_rate": 0.0002,
+    "weight_decay": 0.01,
+    "batch_size": 64,
+    "maximum_epochs": 40,
+    "minimum_epochs": 8,
+    "early_stopping_patience": 6,
+    "warmup_fraction": 0.1,
+    "gradient_clip_norm": 1.0,
+    "label_smoothing": 0.02,
+    "class_balance": "fit_partition_inverse_frequency",
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "teacher_crossfit_folds": 5,
+    "teacher_crossfit_group": "recording_id",
+    "crossfit_seed": 20260904
+  },
+  "distillation": {
+    "temperature": 2.0,
+    "teacher_advantage_minimum_log_likelihood_gain": 0.2,
+    "teacher_targets_for_training": "recording-grouped_out_of_fold_only"
+  },
+  "student_candidates": [
+    {
+      "candidate_id": "distilled_static",
+      "supervised_weight": 0.7,
+      "teacher_distribution_weight": 0.3,
+      "identifiability_weight": 0.0
+    },
+    {
+      "candidate_id": "identifiability_conditioned_static",
+      "supervised_weight": 0.6,
+      "teacher_distribution_weight": 0.3,
+      "identifiability_weight": 0.1
+    }
+  ],
+  "routing": {
+    "clip_budget_fractions": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "ranking_score": "calibrated_predicted_temporal_benefit",
+    "threshold_selection_split": "calibration",
+    "minimum_average_precision_gain_over_prevalence": 0.05,
+    "validation_cluster_ci_lower_bound_above_zero": true,
+    "calibrator_solver": "pytorch_cuda_lbfgs_logistic",
+    "calibrator_C": 1.0,
+    "calibrator_maximum_iterations": 400,
+    "calibrator_gradient_tolerance": 1e-5
+  },
+  "prediction_sets": {
+    "method": "split_conformal_APS",
+    "miscoverage_levels": [
+      0.05,
+      0.1
+    ],
+    "calibration_group": "recording_id",
+    "threshold_selection_split": "calibration"
+  },
+  "transfer": {
+    "source_only_target_labels_used_for_fit_or_selection": false,
+    "source_only_endpoint": "provider_label_macro_f1",
+    "target_supervised_results_reported_separately": true,
+    "few_shot_per_class_budgets": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32
+    ],
+    "few_shot_seeds": [
+      3101,
+      3102,
+      3103,
+      3104,
+      3105
+    ],
+    "few_shot_fit_split": "train",
+    "few_shot_evaluation_split": "validation",
+    "few_shot_sampling": "class_balanced_round_robin_across_tracks_and_scenarios",
+    "few_shot_head_C": 0.1,
+    "few_shot_solver": "pytorch_cuda_lbfgs_logistic",
+    "few_shot_maximum_iterations": 400,
+    "few_shot_gradient_tolerance": 1e-5,
+    "few_shot_methods": [
+      "target_only_factorized_linear",
+      "source_probability_recalibration"
+    ],
+    "few_shot_hyperparameter_selection": "none"
+  },
+  "pose_velocity_svm": {
+    "role": "optional_mechanism_control",
+    "required_pose_array": "normalized_2d_keypoints_with_optional_confidence",
+    "confidence_threshold": 0.2,
+    "C": [
+      0.01,
+      0.1,
+      1.0,
+      10.0
+    ],
+    "class_weight": [
+      "none",
+      "balanced"
+    ],
+    "calibration_folds": 5,
+    "calibration_method": "multinomial_logistic_on_grouped_out_of_fold_svm_scores",
+    "execution_backend": "cuda",
+    "solver": "pytorch_cuda_lbfgs_ovr_squared_hinge",
+    "maximum_iterations": 800,
+    "gradient_tolerance": 0.0001,
+    "calibrator_maximum_iterations": 400,
+    "calibrator_gradient_tolerance": 0.00001,
+    "optional_when_pose_unavailable": true
+  },
+  "selection": {
+    "teacher_primary": "provider_label_macro_f1",
+    "teacher_secondary": [
+      "locomotion_f1",
+      "worst_class_f1",
+      "log_loss"
+    ],
+    "static_student_primary": "provider_label_macro_f1",
+    "identifiability_primary": "temporal_advantage_average_precision",
+    "confirmation_primary": [
+      "provider_label_macro_f1",
+      "locomotion_f1",
+      "worst_class_f1"
+    ],
+    "required_subgroups": [
+      "walking_running_subtype",
+      "transition_window",
+      "occluded",
+      "person_scale",
+      "drone_view",
+      "part_of_day",
+      "scenario"
+    ],
+    "bootstrap_unit": "recording_id",
+    "bootstrap_resamples": 10000,
+    "confirmation_models_locked_before_open": true
+  },
+  "subgroup_definitions": {
+    "person_scale_area_fraction_edges": [
+      0.0,
+      0.001,
+      0.005,
+      0.02,
+      1.0
+    ],
+    "person_scale_names": [
+      "tiny",
+      "small",
+      "medium",
+      "large"
+    ],
+    "minimum_reported_rows": 20
+  }
+}

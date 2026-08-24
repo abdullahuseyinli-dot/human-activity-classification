@@ -1,0 +1,15 @@
+axis,value,count,fraction
+posture,other,41,0.3253968253968254
+posture,seated,23,0.1825396825396825
+posture,upright,62,0.492063492063492
+visible_translation,locomoting,82,0.6507936507936508
+visible_translation,stationary,39,0.3095238095238095
+visible_translation,transition,5,0.0396825396825396
+gait,indeterminate,1,0.0079365079365079
+gait,not_applicable,75,0.5952380952380952
+gait,running,24,0.1904761904761904
+gait,walking,26,0.2063492063492063
+visibility,clear,75,0.5952380952380952
+visibility,occluded,9,0.0714285714285714
+visibility,too_small,3,0.0238095238095238
+visibility,truncated,39,0.3095238095238095
