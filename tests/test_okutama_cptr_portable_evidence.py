@@ -29,11 +29,16 @@ def test_cptr_portable_inventory_matches_files() -> None:
         for path in RESULTS.iterdir()
         if path.is_file() and path.name != "evidence_manifest.json"
     }
+    assert manifest["schema_version"] == 2
     assert manifest["study"] == "okutama_cptr_development"
+    assert manifest["hash_algorithm"] == "sha256"
+    assert manifest["text_encoding"] == "utf-8"
+    assert manifest["text_line_endings"] == "LF"
     assert manifest["artifact_count"] == len(actual)
     assert set(manifest["artifacts"]) == actual
     for name, evidence in manifest["artifacts"].items():
         path = RESULTS / name
+        assert b"\r" not in path.read_bytes()
         assert sha256_file(path) == evidence["sha256"]
         assert path.stat().st_size == evidence["size_bytes"]
 

@@ -14,38 +14,41 @@
       "size_bytes": 4337
     },
     "faithfulness_metrics.csv": {
-      "sha256": "a72ef76ec5d526d0c1d0993abdc3a9637601ec602921a9a948c1fe2b4a784e77",
-      "size_bytes": 3013
+      "sha256": "1520e1d413d1c3624f45db3a84dd4e5e4f6cb13e59a344f42e81d87b52e5b00a",
+      "size_bytes": 2999
     },
     "faithfulness_summary.json": {
       "sha256": "add6d1b6a7b91b96a32ce4b10d149f9c46833694485d41ac93c8f41dc9698f19",
       "size_bytes": 20201
     },
     "fold_seed_metrics.csv": {
-      "sha256": "af29e248986a0717ad66f54c30a21b007b67ad498a091ba552397b8af9a0545c",
-      "size_bytes": 2755
+      "sha256": "e5d49f45fa6b66ea3af1ca61eb40e96cce126c779eec97e24d920036c717b8fc",
+      "size_bytes": 2719
     },
     "headline_metrics.csv": {
       "sha256": "3dcfbc3db74d9904d4c125725b26d187cc72acd1feb199300af60cb706efdf72",
       "size_bytes": 1384
     },
     "provenance.json": {
-      "sha256": "caddb5cc187d52ad29d9ecc628697d6c068db25fb8b1b66ae739b6d8c4d262a9",
+      "sha256": "056380ae1b74fdd2b063b04b28ce4b00387b63fc2ea94d86aa1b7b0091581344",
       "size_bytes": 3163
     },
     "recording_metrics.csv": {
-      "sha256": "6272e729e272d1953a551ae21d241e6595c6fe031c54add9bea32531a8365d36",
-      "size_bytes": 1201
+      "sha256": "39a4a5579ba239eab85e88b5a0dd6cb9da5f0a019d9d1fe5f8c66488966cb4ab",
+      "size_bytes": 1186
     },
     "subgroup_metrics.csv": {
-      "sha256": "37885c3870bbd7ac103e8ef4f7d2459d1779f039a26bbf809d344f2affbf2426",
-      "size_bytes": 2776
+      "sha256": "9bf09dcbfeb0c5cf689c354ab7fcb0191be1f769e83cbf332ddabc3c6ed26f08",
+      "size_bytes": 2767
     },
     "uncertainty.json": {
-      "sha256": "775fb0f09b496e466747b7182b5bebe33c0f5a4b507e270e72542225600bec09",
-      "size_bytes": 2426
+      "sha256": "aed88ab6f17ff5532ad6efc7765f1360631c749fe1c93ac23884b04d155877fd",
+      "size_bytes": 2348
     }
   },
-  "schema_version": 1,
-  "study": "okutama_cptr_development"
+  "hash_algorithm": "sha256",
+  "schema_version": 2,
+  "study": "okutama_cptr_development",
+  "text_encoding": "utf-8",
+  "text_line_endings": "LF"
 }

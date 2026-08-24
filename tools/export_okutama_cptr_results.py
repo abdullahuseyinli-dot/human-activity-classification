@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import shutil
 from pathlib import Path
 
 import pandas as pd
@@ -139,16 +138,26 @@ def read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def write_utf8_lf(path: Path, text: str) -> None:
+    """Write deterministic portable text without platform newline translation."""
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    path.write_bytes(normalized.encode("utf-8"))
+
+
 def write_json(path: Path, payload: object) -> None:
-    path.write_text(
+    write_utf8_lf(
+        path,
         json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n",
-        encoding="utf-8",
-        newline="\n",
     )
 
 
 def write_csv(path: Path, frame: pd.DataFrame) -> None:
-    frame.to_csv(path, index=False, lineterminator="\n")
+    write_utf8_lf(path, frame.to_csv(index=False, lineterminator="\n"))
+
+
+def copy_portable_text(source: Path, destination: Path) -> None:
+    """Copy a locked text artifact into the portable LF-normalized package."""
+    write_utf8_lf(destination, source.read_text(encoding="utf-8"))
 
 
 def require_artifact(summary_path: Path, name: str) -> Path:
@@ -427,7 +436,7 @@ def main() -> None:
         ),
     }
     for name, source in source_artifacts.items():
-        shutil.copyfile(source, output / name)
+        copy_portable_text(source, output / name)
     portable_faithfulness = {
         key: faithfulness[key]
         for key in (
@@ -500,9 +509,7 @@ def main() -> None:
         "crossfit_contract_audit": crossfit_contract_audit(repository),
     }
     write_json(output / "provenance.json", provenance)
-    (output / "README.md").write_text(
-        render_readme(decision, faithfulness), encoding="utf-8", newline="\n"
-    )
+    write_utf8_lf(output / "README.md", render_readme(decision, faithfulness))
 
     manifest_path = output / "evidence_manifest.json"
     artifacts = {}
@@ -514,8 +521,11 @@ def main() -> None:
             "size_bytes": path.stat().st_size,
         }
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "study": "okutama_cptr_development",
+        "hash_algorithm": "sha256",
+        "text_encoding": "utf-8",
+        "text_line_endings": "LF",
         "artifact_count": len(artifacts),
         "artifacts": artifacts,
     }

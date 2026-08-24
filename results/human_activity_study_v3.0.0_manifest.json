@@ -879,8 +879,8 @@
       "size_bytes": 4337
     },
     "results/okutama_cptr/evidence_manifest.json": {
-      "sha256": "3285bffdc41dbcad1aa6c10188ff5ea8c5c12e5d9ad43d8f6da119fa1e3a6e33",
-      "size_bytes": 1716
+      "sha256": "3e3094e21ad8be8649f359ddad65dd5249ed508765707947b58a1dcc42673dfb",
+      "size_bytes": 1803
     },
     "results/okutama_cptr/faithfulness_metrics.csv": {
       "sha256": "1520e1d413d1c3624f45db3a84dd4e5e4f6cb13e59a344f42e81d87b52e5b00a",
@@ -899,7 +899,7 @@
       "size_bytes": 1384
     },
     "results/okutama_cptr/provenance.json": {
-      "sha256": "caddb5cc187d52ad29d9ecc628697d6c068db25fb8b1b66ae739b6d8c4d262a9",
+      "sha256": "056380ae1b74fdd2b063b04b28ce4b00387b63fc2ea94d86aa1b7b0091581344",
       "size_bytes": 3163
     },
     "results/okutama_cptr/recording_metrics.csv": {
@@ -1579,8 +1579,8 @@
       "size_bytes": 1160
     },
     "tests/test_okutama_cptr_portable_evidence.py": {
-      "sha256": "79b739bb54e7804252a41ab31b65f96f7a42dbcb59919393d370333edc010163",
-      "size_bytes": 5042
+      "sha256": "c3cf7194e25570ab6e4d7f2ce569092dc8401f8bb681880bb83dd9a84c2b189e",
+      "size_bytes": 5278
     },
     "tests/test_okutama_transfer.py": {
       "sha256": "38d5c80acce4a39357923a8cec79f1e93e8ca271a3b4b597918a77419dbe0dfb",
@@ -1695,8 +1695,8 @@
       "size_bytes": 1508
     },
     "tests/test_vcoco_v3_temporal.py": {
-      "sha256": "4352a8a274a628bf563719b72c9caf3071e1dd79acfcb0600161aab82810aac6",
-      "size_bytes": 9945
+      "sha256": "7b7aba64a8272ddf32c52773397b53129a5662735be1c796e74cc5b7cbd84e09",
+      "size_bytes": 10041
     },
     "tests/test_vcoco_views.py": {
       "sha256": "f0956422e19888428502e39eeba13460257da5434206d45b644f36c2672dcc71",
@@ -1811,8 +1811,8 @@
       "size_bytes": 9891
     },
     "tools/export_okutama_cptr_results.py": {
-      "sha256": "0b85b704e11f811819e333eb60b293178b295f78a5050f4d876d37bcecb1075e",
-      "size_bytes": 22436
+      "sha256": "841c401f8aeed16764d7c121ec69e475b5a7527b5f814adc7eb7797b10441489",
+      "size_bytes": 22925
     },
     "tools/export_pipeline_source.py": {
       "sha256": "942c22ef55ed90ce96e4e1ea78a0addec94d8e90e4182e8c574bee7a6113126a",

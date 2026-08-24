@@ -287,6 +287,7 @@ def test_temporal_feature_dataset_reads_packed_memmap_store(tmp_path):
     assert item["recording_id"] == "scenario"
 
 
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="pose-control fitting requires CUDA")
 def test_pose_svm_bundle_returns_calibrated_three_class_probabilities():
     rng = np.random.default_rng(12)
     labels = np.repeat(np.arange(3), 20)
